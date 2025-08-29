@@ -45,7 +45,7 @@ N    = config['simulation']['Nvertices']                # number of vertices in 
 Lambda = config['physics']['Lambda']                    # surface tension
 V0     = config['physics']['V0']                        # reference volume of cells
 Vth    = config['physics']['Vth/V0'] * V0               # threshold volume
-stdV0  = 0.75                                           # standard deviation of volume of cells
+stdV0  = 0.5                                            # standard deviation of volume of cells
 tauV   = config['physics']['tauV']                      # inverse increase rate in V0 unit
 A0     = (np.sqrt(3)*(V0**2)/2)**(1./3.)                # reference area of cells
 
@@ -68,7 +68,7 @@ vm.initRegularTriangularLattice(size=N, hexagonArea=A0) # initialise periodic sy
 #vm.addActiveBrownianForce("abp", v0, taup)             # centre active Brownian force
 vm.addSurfaceForce("surface", Lambda, V0, tauV)         # surface tension force
 vm.vertexForces["surface"].volume = dict(map(           # set cell volume
-    lambda i: (i, np.random.uniform(low=V0 - stdV0, high=V0 + stdV0)),
+    lambda i: (i, np.random.normal(loc=V0, scale=stdV0)),
     vm.vertexForces["surface"].volume))
 
 
