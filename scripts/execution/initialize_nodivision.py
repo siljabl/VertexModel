@@ -4,7 +4,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from cells.bind import VertexModel
 from cells.plot import plot
 from cells.init import movie_sh_fname
+
 from utils.exception_handlers import save_snapshot
+from utils.config_functions   import load_config, save_config
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,7 +15,15 @@ from tempfile import mkdtemp
 from datetime import datetime
 
 
+# command-line argument parsing
+parser = argparse.ArgumentParser(description="Run simulation without activity to relax the initial conditions")
+parser.add_argument('--config', type=str, default='data/simulated/configs/config.json')
 
+args = parser.parse_args()
+
+# load existing configuration
+config_path = args.config
+config = load_config(config_path)
 
 # set ouput paths
 fname = f"init_nodivision_{datetime.today().strftime('%Y%m%d')}"
