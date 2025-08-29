@@ -26,15 +26,18 @@ args = parser.parse_args()
 config_path = args.config
 config = load_config(config_path)
 
-
 # set ouput paths
-fname = f"init_nodivision_{datetime.today().strftime('%Y%m%d')}"
+fname = f"init_nodivision_{datetime.today().strftime('%Y%m%d_%H%M')}"
+path_to_config = f"data/simulated/configs/{fname}.json"
 path_to_output = f"data/simulated/raw/{fname}.p"
 path_to_movies = f"data/simulated/videos/{fname}.p"
 print("Simulation name: ", fname)
 
 _frames_dir = mkdtemp()
 print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
+
+# save run specific config file
+save_config(path_to_config, config)
 
 
 
@@ -72,7 +75,7 @@ vm.initRegularTriangularLattice(size=N, hexagonArea=A0) # initialise periodic sy
 
 
 # add forces
-vm.addActiveBrownianForce("abp", v0, taup)             # centre active Brownian force
+#vm.addActiveBrownianForce("abp", v0, taup)             # centre active Brownian force
 vm.addSurfaceForce("surface", Lambda, V0, tauV)         # surface tension force
 vm.vertexForces["surface"].volume = dict(map(           # set cell volume
     lambda i: (i, sc.stats.truncnorm((Vmin-V0)/stdV0, (Vmax-V0)/stdV0, loc=V0, scale=stdV0).rvs()),
