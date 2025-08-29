@@ -44,6 +44,7 @@ np.random.seed(1)
 seed = config['simulation']['seed']                     # random number generator seed
 N    = config['simulation']['Nvertices']                # number of vertices in each dimension
 
+print(N)
 Lambda = config['physics']['Lambda']                    # surface tension
 V0     = config['physics']['V0']                        # reference volume of cells
 Vth    = config['physics']['Vth/V0'] * V0               # threshold volume
