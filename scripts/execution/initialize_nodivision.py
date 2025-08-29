@@ -44,12 +44,13 @@ np.random.seed(1)
 seed = config['simulation']['seed']                     # random number generator seed
 N    = config['simulation']['Nvertices']                # number of vertices in each dimension
 
-print(N)
 Lambda = config['physics']['Lambda']                    # surface tension
 V0     = config['physics']['V0']                        # reference volume of cells
 Vth    = config['physics']['Vth/V0'] * V0               # threshold volume
 tauV   = config['physics']['tauV']                      # inverse increase rate in V0 unit
 A0     = (np.sqrt(3)*(V0**2)/2)**(1./3.)                # reference area of cells
+v0     = 0.75
+taup   = 5
 
 stdV0  = config['experimental']['stdV0']                # standard deviation of volume of cells
 Vmin   = config['experimental']['Vmin']
@@ -71,8 +72,6 @@ vm.initRegularTriangularLattice(size=N, hexagonArea=A0) # initialise periodic sy
 
 
 # add forces
-v0 = 0.75
-taup = 5
 vm.addActiveBrownianForce("abp", v0, taup)             # centre active Brownian force
 vm.addSurfaceForce("surface", Lambda, V0, tauV)         # surface tension force
 vm.vertexForces["surface"].volume = dict(map(           # set cell volume
