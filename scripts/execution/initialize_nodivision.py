@@ -34,17 +34,16 @@ print("Simulation name: ", fname)
 
 
 # PARAMETERS
-seed = 0                                # random number generator seed
-Nsteps = 30
-N = 24                                  # number of vertices in each dimension
+seed = config['simulation']['seed']                                # random number generator seed
+N = config['simulation']['Nvertices']                                  # number of vertices in each dimension
 
 
-Lambda = 1                              # surface tension
-V0 = 1                                  # reference volume of cells
-Vth = 1.5*V0                            # threshold volume
-A0 = (np.sqrt(3)*(V0**2)/2)**(1./3.)    # reference area of cells
-stdV0 = 0.75                            # standard deviation of volume of cells
-tauV = config['physics']['tauV']                   # inverse increase rate in V0 unit
+Lambda = config['physics']['Lambda']             # surface tension
+V0 = config['physics']['V0']                     # reference volume of cells
+Vth = V0 * config['physics']['Vth/V0']           # threshold volume
+A0 = (np.sqrt(3)*(V0**2)/2)**(1./3.)             # reference area of cells
+stdV0 = 0.75                                     # standard deviation of volume of cells
+tauV = config['physics']['tauV']                 # inverse increase rate in V0 unit
 
 
 
@@ -54,7 +53,8 @@ tauV = config['physics']['tauV']                   # inverse increase rate in V0
 vm = VertexModel(seed)                                  # initialise vertex model object
 vm.initRegularTriangularLattice(size=N, hexagonArea=A0) # initialise periodic system
 
-# forces
+
+# add forces
 #vm.addActiveBrownianForce("abp", v0, taup)      # centre active Brownian force
 vm.addSurfaceForce("surface", Lambda, V0, tauV) # surface tension force
 vm.vertexForces["surface"].volume = dict(map(   # set cell volume
@@ -66,27 +66,29 @@ vm.vertexForces["surface"].volume = dict(map(   # set cell volume
 # SIMULATION
 
 # parameters
-dt = config['simulation']['dt']             # integration time step
-delta = config['simulation']['delta']       # length below which T1s are triggered
-epsilon = config['simulation']['epsilon']   # edges have length delta+epsilon after T1s
-period = config['simulation']['period']     # saving frequence
+dt      = config['simulation']['dt']                    # integration time step
+delta   = config['simulation']['delta']                 # length below which T1s are triggered
+epsilon = config['simulation']['epsilon']               # edges have length delta+epsilon after T1s
+period  = config['simulation']['period']                # saving frequence
+Nsteps  = config['simulation']['Nsteps']                # don't understand exactly what this is.
+
 
 # frames directory
 _frames_dir = mkdtemp()
 print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
 frame = 0
 
-# output
+# outputs
 with open(path_to_output, "wb") as dump: pass           # output file is created
-
-# simulation
 fig, ax = plot(vm, fig=None, ax=None)                   # initialise plot with first frame
 
+
+# simulation
 for step in range(0, Nsteps):
     # output is appended to file
     with open(path_to_output, "ab") as dump: pickle.dump(vm, dump)
 
-    # plot
+    # plot snapshot
     save_snapshot(vm, fig, ax, _frames_dir, frame)
     frame += 1
 
