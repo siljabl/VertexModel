@@ -2,6 +2,7 @@ import os, sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from cells.bind import VertexModel
+from cells.plot import plot
 from cells.init import movie_sh_fname
 
 from utils.exception_handlers import save_snapshot
@@ -22,7 +23,6 @@ path_to_movies = f"data/simulated/videos/{fname}.p"
 print("Simulation name: ", fname)
 
 
-
 # PARAMETERS
 seed = 0                                # random number generator seed
 
@@ -36,7 +36,7 @@ V0 = 1                                  # reference volume of cells
 Vth = 1.5*V0                            # threshold volume
 A0 = (np.sqrt(3)*(V0**2)/2)**(1./3.)    # reference area of cells
 stdV0 = 0.75                            # standard deviation of volume of cells
-tauV = 200                              # inverse increase rate in V0 unit
+tauV = 0                              # inverse increase rate in V0 unit
 
 
 
