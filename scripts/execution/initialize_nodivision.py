@@ -18,32 +18,42 @@ from datetime import datetime
 # command-line argument parsing
 parser = argparse.ArgumentParser(description="Run simulation without activity to relax the initial conditions")
 parser.add_argument('--config', type=str, default='data/simulated/configs/config.json')
-
 args = parser.parse_args()
+
 
 # load existing configuration
 config_path = args.config
 config = load_config(config_path)
 
+
 # set ouput paths
 fname = f"init_nodivision_{datetime.today().strftime('%Y%m%d')}"
 path_to_output = f"data/simulated/raw/{fname}.p"
 path_to_movies = f"data/simulated/videos/{fname}.p"
-
 print("Simulation name: ", fname)
+
+_frames_dir = mkdtemp()
+print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
+
 
 
 # PARAMETERS
-seed = config['simulation']['seed']                                # random number generator seed
-N = config['simulation']['Nvertices']                                  # number of vertices in each dimension
 
+seed = config['simulation']['seed']                     # random number generator seed
+N    = config['simulation']['Nvertices']                # number of vertices in each dimension
 
-Lambda = config['physics']['Lambda']             # surface tension
-V0 = config['physics']['V0']                     # reference volume of cells
-Vth = V0 * config['physics']['Vth/V0']           # threshold volume
-A0 = (np.sqrt(3)*(V0**2)/2)**(1./3.)             # reference area of cells
-stdV0 = 0.75                                     # standard deviation of volume of cells
-tauV = config['physics']['tauV']                 # inverse increase rate in V0 unit
+Lambda = config['physics']['Lambda']                    # surface tension
+V0     = config['physics']['V0']                        # reference volume of cells
+Vth    = config['physics']['Vth/V0'] * V0               # threshold volume
+stdV0  = 0.75                                           # standard deviation of volume of cells
+tauV   = config['physics']['tauV']                      # inverse increase rate in V0 unit
+A0     = (np.sqrt(3)*(V0**2)/2)**(1./3.)                # reference area of cells
+
+dt      = config['simulation']['dt']                    # integration time step
+delta   = config['simulation']['delta']                 # length below which T1s are triggered
+epsilon = config['simulation']['epsilon']               # edges have length delta+epsilon after T1s
+period  = config['simulation']['period']                # saving frequence
+Nsteps  = config['simulation']['Nsteps']                # don't understand exactly what this is.
 
 
 
@@ -55,9 +65,9 @@ vm.initRegularTriangularLattice(size=N, hexagonArea=A0) # initialise periodic sy
 
 
 # add forces
-#vm.addActiveBrownianForce("abp", v0, taup)      # centre active Brownian force
-vm.addSurfaceForce("surface", Lambda, V0, tauV) # surface tension force
-vm.vertexForces["surface"].volume = dict(map(   # set cell volume
+#vm.addActiveBrownianForce("abp", v0, taup)             # centre active Brownian force
+vm.addSurfaceForce("surface", Lambda, V0, tauV)         # surface tension force
+vm.vertexForces["surface"].volume = dict(map(           # set cell volume
     lambda i: (i, np.random.uniform(low=V0 - stdV0, high=V0 + stdV0)),
     vm.vertexForces["surface"].volume))
 
@@ -65,25 +75,13 @@ vm.vertexForces["surface"].volume = dict(map(   # set cell volume
 
 # SIMULATION
 
-# parameters
-dt      = config['simulation']['dt']                    # integration time step
-delta   = config['simulation']['delta']                 # length below which T1s are triggered
-epsilon = config['simulation']['epsilon']               # edges have length delta+epsilon after T1s
-period  = config['simulation']['period']                # saving frequence
-Nsteps  = config['simulation']['Nsteps']                # don't understand exactly what this is.
-
-
-# frames directory
-_frames_dir = mkdtemp()
-print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
-frame = 0
-
 # outputs
 with open(path_to_output, "wb") as dump: pass           # output file is created
 fig, ax = plot(vm, fig=None, ax=None)                   # initialise plot with first frame
 
 
 # simulation
+frame = 0
 for step in range(0, Nsteps):
     # output is appended to file
     with open(path_to_output, "ab") as dump: pickle.dump(vm, dump)
