@@ -42,7 +42,7 @@ print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
 
 np.random.seed(1)
 seed = config['simulation']['seed']                     # random number generator seed
-N    = config['simulation']['Nvertices']                # number of vertices in each dimension
+N    = 6#config['simulation']['Nvertices']                # number of vertices in each dimension
 
 Lambda = config['physics']['Lambda']                    # surface tension
 V0     = config['physics']['V0']                        # reference volume of cells
