@@ -61,7 +61,7 @@ vm.vertexForces["surface"].volume = dict(map(   # set cell volume
 dt = 1e-2           # integration time step
 delta = 0.02        # length below which T1s are triggered
 epsilon = 0.002     # edges have length delta+epsilon after T1s
-period = 10        # saving frequence
+period  = 1        # saving frequence
 
 # frames directory
 _frames_dir = mkdtemp()
