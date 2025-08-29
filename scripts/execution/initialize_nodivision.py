@@ -36,9 +36,6 @@ print("Simulation name: ", fname)
 _frames_dir = mkdtemp()
 print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
 
-# save run specific config file
-save_config(path_to_config, config)
-
 
 
 # PARAMETERS
@@ -64,6 +61,10 @@ delta   = config['simulation']['delta']                 # length below which T1s
 epsilon = config['simulation']['epsilon']               # edges have length delta+epsilon after T1s
 period  = config['simulation']['period']                # saving frequence
 Nsteps  = config['simulation']['Nsteps']                # don't understand exactly what this is.
+
+
+# save run specific config file
+save_config(path_to_config, config)
 
 
 
