@@ -1,3 +1,13 @@
 {
-    "tauV": 0
+    "physics": {
+	"tauV": 0
+    },
+
+    "simulation": {
+	"dt": 1e-2,
+	"delta": 0.02,
+	"epsilon": 0.002,
+	"period": 2
+    }
+
 }

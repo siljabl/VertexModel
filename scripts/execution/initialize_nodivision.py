@@ -38,15 +38,13 @@ seed = 0                                # random number generator seed
 Nsteps = 30
 N = 24                                  # number of vertices in each dimension
 
-#v0 = 0                                  # self-propulsion velocity
-#taup = 1                                # self-propulsion persistence time
 
 Lambda = 1                              # surface tension
 V0 = 1                                  # reference volume of cells
 Vth = 1.5*V0                            # threshold volume
 A0 = (np.sqrt(3)*(V0**2)/2)**(1./3.)    # reference area of cells
 stdV0 = 0.75                            # standard deviation of volume of cells
-tauV = 0                              # inverse increase rate in V0 unit
+tauV = config['physics']['tauV']                   # inverse increase rate in V0 unit
 
 
 
@@ -68,10 +66,10 @@ vm.vertexForces["surface"].volume = dict(map(   # set cell volume
 # SIMULATION
 
 # parameters
-dt = 1e-2           # integration time step
-delta = 0.02        # length below which T1s are triggered
-epsilon = 0.002     # edges have length delta+epsilon after T1s
-period  = 2         # saving frequence
+dt = config['simulation']['dt']             # integration time step
+delta = config['simulation']['delta']       # length below which T1s are triggered
+epsilon = config['simulation']['epsilon']   # edges have length delta+epsilon after T1s
+period = config['simulation']['period']     # saving frequence
 
 # frames directory
 _frames_dir = mkdtemp()
