@@ -14,7 +14,12 @@
 	"epsilon": 0.002,
 	"period": 2,
 	"Nsteps": 30
-    }
+    },
 
+    "experimental": {
+	"stdV0": 0.33,
+	"Vmin": 0.55,
+	"Vmax": 5.5
+    }
 }
 
