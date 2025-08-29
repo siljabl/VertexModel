@@ -39,7 +39,7 @@ print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
 
 # PARAMETERS
 
-np.random.seed(0)
+np.random.seed(1)
 seed = config['simulation']['seed']                     # random number generator seed
 N    = config['simulation']['Nvertices']                # number of vertices in each dimension
 
