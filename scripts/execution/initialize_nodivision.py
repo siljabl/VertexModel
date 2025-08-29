@@ -1,18 +1,18 @@
-import os, sys
+import os, sys, pickle, subprocess, traceback, argparse
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from cells.bind import VertexModel
 from cells.plot import plot
 from cells.init import movie_sh_fname
-
 from utils.exception_handlers import save_snapshot
 
-import pickle, subprocess, traceback
 import numpy as np
 import matplotlib.pyplot as plt
 from operator import itemgetter
 from tempfile import mkdtemp
 from datetime import datetime
+
+
 
 
 # set ouput paths
