@@ -74,7 +74,7 @@ with open(path_to_output, "wb") as dump: pass           # output file is created
 # simulation
 fig, ax = plot(vm, fig=None, ax=None)                   # initialise plot with first frame
 
-for step in range(0, 10):
+for step in range(0, 30):
     # output is appended to file
     with open(path_to_output, "ab") as dump: pickle.dump(vm, dump)
 
