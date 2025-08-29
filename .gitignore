@@ -2,3 +2,4 @@ simulation/
 data/experimental
 venv/
 .emacs
+notebooks/
