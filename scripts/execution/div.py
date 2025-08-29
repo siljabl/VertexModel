@@ -1,0 +1,94 @@
+from cells.bind import VertexModel
+from cells.plot import plot, WindowClosedException
+from cells.init import movie_sh_fname
+
+import pickle, subprocess, os, sys, traceback
+import numpy as np
+import matplotlib.pyplot as plt
+from operator import itemgetter
+from tempfile import mkdtemp
+
+# PARAMETERS
+
+seed = 0                                # random number generator seed
+
+N = 24                                  # number of vertices in each dimension
+
+v0 = 0.75                               # self-propulsion velocity
+taup = 5                                # self-propulsion persistence time
+
+Lambda = 1                              # surface tension
+V0 = 1                                  # reference volume of cells
+Vth = 1.5*V0                            # threshold volume
+A0 = (np.sqrt(3)*(V0**2)/2)**(1./3.)    # reference area of cells
+stdV0 = 0.75                            # standard deviation of volume of cells
+tauV = 200                              # inverse increase rate in V0 unit
+
+# INITIALISATION
+
+# vertex model object
+vm = VertexModel(seed)                                  # initialise vertex model object
+vm.initRegularTriangularLattice(size=N, hexagonArea=A0) # initialise periodic system
+
+# forces
+vm.addActiveBrownianForce("abp", v0, taup)      # centre active Brownian force
+vm.addSurfaceForce("surface", Lambda, V0, tauV) # surface tension force
+vm.vertexForces["surface"].volume = dict(map(   # set cell volume
+    lambda i: (i, np.random.uniform(low=V0 - stdV0, high=V0 + stdV0)),
+    vm.vertexForces["surface"].volume))
+
+# SIMULATION
+
+# parameters
+dt = 1e-2           # integration time step
+delta = 0.02        # length below which T1s are triggered
+epsilon = 0.002     # edges have length delta+epsilon after T1s
+period = 100        # saving frequence
+
+# frames directory
+_frames_dir = mkdtemp()
+print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
+index = 0
+
+# output
+with open("out.p", "wb") as dump: pass
+
+# simulation
+fig, ax = plot(vm, fig=None, ax=None)                   # initialise plot with first frame
+plt.ion()                                               # enable interactive mode
+plt.show()
+while True:
+    # output
+    with open("out.p", "ab") as dump: pickle.dump(vm, dump)
+    # plot
+    try:
+        # update plot
+        plot(vm, fig=fig, ax=ax, update=True)
+        # save frame
+        while True:
+            try:
+                fig.savefig(os.path.join(_frames_dir, "%05d.png" % index))
+                index += 1
+                break
+            except SyntaxError:
+                # dirty fix to "SyntaxError: not a PNG file" with multiple matplotlib instances
+                print(traceback.format_exc(), file=sys.stderr)
+                pass
+    except WindowClosedException:
+        break
+    # integrate
+    vm.nintegrate(period, dt, delta, epsilon)
+    # divide
+    volumes = vm.vertexForces["surface"].volume.copy()
+    heights = vm.vertexForces["surface"].height.copy()
+    for i in vm.getVertexIndicesByType("centre"):                   # loop over cell centres
+        if np.random.rand() < (volumes[i] - Vth)/Vth:               # probability of dividing
+            j = vm.splitCellAtMax(i)                                # divide
+            volumes[i] = heights[i]*vm.getVertexToNeighboursArea(i) # mother cell keeps same height
+            volumes[j] = heights[i]*vm.getVertexToNeighboursArea(j) # daughter gets height of mother
+    vm.vertexForces["surface"].volume = volumes
+
+# make movie
+subprocess.call([movie_sh_fname,
+    "-d", _frames_dir, "-p", sys.executable, "-y"])
+

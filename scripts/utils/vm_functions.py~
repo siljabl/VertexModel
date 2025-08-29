@@ -1,0 +1,25 @@
+from cells.bind import VertexModel
+import numpy as np
+
+
+def apply_cell_divisions(vm, Vth):
+    """
+    Function to add cell division to vm add-hoc
+    vm:  vertex model object
+    Vth: threshold volume that defined volume at cell division
+    """
+    
+    volumes = vm.vertexForces["surface"].volume.copy()
+    heights = vm.vertexForces["surface"].height.copy()
+    
+    for i in vm.getVertexIndicesByType("centre"):
+
+        if np.random.rand() < (volumes[i] - Vth)/Vth:               # probability of cell division is proportional to cell volume
+
+            j = vm.splitCellAtMax(i)                                # divide
+            volumes[i] = heights[i]*vm.getVertexToNeighboursArea(i) # mother cell keeps same height
+            volumes[j] = heights[i]*vm.getVertexToNeighboursArea(j) # daughter gets height of mother
+        
+        vm.vertexForces["surface"].volume = volumes                 # update cell volumes
+
+        return vm
