@@ -42,7 +42,7 @@ print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
 
 np.random.seed(1)
 seed = config['simulation']['seed']                     # random number generator seed
-N    = 6#config['simulation']['Nvertices']                # number of vertices in each dimension
+N    = config['simulation']['Nvertices']                # number of vertices in each dimension
 
 Lambda = config['physics']['Lambda']                    # surface tension
 V0     = config['physics']['V0']                        # reference volume of cells
@@ -70,7 +70,9 @@ vm.initRegularTriangularLattice(size=N, hexagonArea=A0) # initialise periodic sy
 
 
 # add forces
-#vm.addActiveBrownianForce("abp", v0, taup)             # centre active Brownian force
+v0 = 0.75
+taup = 5
+vm.addActiveBrownianForce("abp", v0, taup)             # centre active Brownian force
 vm.addSurfaceForce("surface", Lambda, V0, tauV)         # surface tension force
 vm.vertexForces["surface"].volume = dict(map(           # set cell volume
     lambda i: (i, sc.stats.truncnorm((Vmin-V0)/stdV0, (Vmax-V0)/stdV0, loc=V0, scale=stdV0).rvs()),
