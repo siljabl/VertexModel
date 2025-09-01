@@ -2,7 +2,7 @@
     "physics": {
 	"tauV": 0,
 	"Lambda": 1,
-	"V0": 2,
+	"V0": 1,
 	"Vth/V0": 1.5,
 	"v0": 0.75,
 	"taup": 5
