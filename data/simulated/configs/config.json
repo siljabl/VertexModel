@@ -10,7 +10,7 @@
 
     "simulation": {
 	"seed": 0,
-	"Nvertices": 6,
+	"Nvertices": 18,
 	"dt": 1e-2,
 	"delta": 0.02,
 	"epsilon": 0.002,
