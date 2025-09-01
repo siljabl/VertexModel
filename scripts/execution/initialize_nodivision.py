@@ -53,7 +53,7 @@ v0     = 0.75
 taup   = 5
 
 stdV0  = config['experimental']['stdV0']                # standard deviation of volume of cells
-Vmin   = config['experimental']['Vmin']
+Vmin   = 0#config['experimental']['Vmin']
 Vmax   = config['experimental']['Vmax']
 
 dt      = config['simulation']['dt']                    # integration time step
