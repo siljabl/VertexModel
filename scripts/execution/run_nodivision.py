@@ -53,8 +53,8 @@ v0     = config['physics']['v0']
 taup   = config['physics']['taup']
 
 stdV0  = config['experimental']['stdV0']                # standard deviation of volume of cells
-Vmin   = config['experimental']['Vmin']
-Vmax   = config['experimental']['Vmax']
+Vmin   = config['experimental']['Vmin'] * V0
+Vmax   = config['experimental']['Vmax'] * V0
 
 dt      = config['simulation']['dt']                    # integration time step
 delta   = config['simulation']['delta']                 # length below which T1s are triggered

@@ -2,7 +2,7 @@
     "physics": {
 	"tauV": 0,
 	"Lambda": 1,
-	"V0": 1,
+	"V0": 9,
 	"Vth/V0": 1.5,
 	"v0": 0.75,
 	"taup": 5
@@ -10,7 +10,7 @@
 
     "simulation": {
 	"seed": 0,
-	"Nvertices": 18,
+	"Nvertices": 6,
 	"dt": 1e-2,
 	"delta": 0.02,
 	"epsilon": 0.002,
