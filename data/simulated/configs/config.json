@@ -3,7 +3,9 @@
 	"tauV": 0,
 	"Lambda": 1,
 	"V0": 2,
-	"Vth/V0": 1.5
+	"Vth/V0": 1.5,
+	"v0": 0.75,
+	"taup": 5
     },
 
     "simulation": {
@@ -13,7 +15,7 @@
 	"delta": 0.02,
 	"epsilon": 0.002,
 	"period": 100,
-	"Nsteps": 30
+	"Nsteps": 100
     },
 
     "experimental": {
