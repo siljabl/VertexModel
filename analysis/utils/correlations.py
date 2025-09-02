@@ -519,7 +519,7 @@ def vector_spatial_correlation(x, y, vec1, vec2, dr, r_max):
 
 
 
-def general_spatial_correlation(x, y, var1, var2=None, dr=40, r_max=500):
+def general_spatial_correlation(x, y, var1, var2=None, dr=40, r_max=500, t_avrg=False):
 
     if np.any(var2==None):
         var2 = var1
@@ -564,6 +564,8 @@ def general_spatial_correlation(x, y, var1, var2=None, dr=40, r_max=500):
 
             C_norm, N_in_rbin, r_bin_centers, frame_axis_masked = vector_spatial_correlation(x, y, [var1x, var1y], [var2x, var2y], dr, r_max)
                   
+    if t_avrg:
+        C_norm = np.mean(C_norm, axis=0)
 
     
     COR = {'C_norm':          C_norm,

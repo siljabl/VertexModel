@@ -30,8 +30,8 @@ def get_cell_positions(list_vm):
     cells = list_vm[0].getVertexIndicesByType("centre")                 # indices of cell centres (from first frame)
 
     positions = np.ma.array(list(map(
-    lambda vm: itemgetter(*cells)(vm.getPositions(wrapped=False)),      # unwrapped positions of centres
-    list_vm)))
+        lambda vm: itemgetter(*cells)(vm.getPositions(wrapped=False)),      # unwrapped positions of centres
+        list_vm)))
 
     return positions
 
@@ -41,18 +41,19 @@ def get_cell_heights(list_vm):
     cells = list_vm[0].getVertexIndicesByType("centre")                 # indices of cell centres (from first frame)
 
     heights = np.ma.array(list(map(
-    lambda vm: itemgetter(*cells)(vm.vertexForces["surface"].height.copy()),
-    list_vm)))
+        lambda vm: itemgetter(*cells)(vm.vertexForces["surface"].height.copy()),
+        list_vm)))
 
     return heights
 
 
 def get_cell_volumes(list_vm):
-    """ Get cell heights """
+    """ Get cell volumes """
     cells = list_vm[0].getVertexIndicesByType("centre")                 # indices of cell centres (from first frame)
 
     volumes = np.ma.array(list(map(
-    lambda vm: itemgetter(*cells)(vm.vertexForces["surface"].volume.copy()),
-    list_vm)))
+        lambda vm: itemgetter(*cells)(vm.vertexForces["surface"].volume.copy()),  # unwrapped positions of centres
+        list_vm)))
+
 
     return volumes
