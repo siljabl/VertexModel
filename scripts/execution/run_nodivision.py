@@ -40,25 +40,26 @@ print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
 
 # PARAMETERS
 
-np.random.seed(1)
-seed = config['simulation']['seed']                     # random number generator seed
-N    = config['simulation']['Nvertices']                # number of vertices in each dimension. N_cell = N**2 / 3
-r_grid = config['simulation']['r_grid']
-A_grid = (3**(3/2) / 2) * r_grid**2                            # area of regular hexagon
+# Lattice
+seed  = config['simulation']['seed']                    # random number generator seed
+Ngrid = config['simulation']['Nvertices']               # number of vertices in each dimension. Ncell = Ngrid**2 / 3
+rgrid = config['simulation']['rgrid']                   # distance betweeen vertices
+Agrid = (3**(3/2) / 2) * r_grid**2                      # area of regular hexagon
 
-r_cell = config['physics']['r_cell']                    # radius/side lenght of regular hexagon
-V0 = (3**2 / 2) * r_cell**3                            # volume of regular hexagon
+# Cell size
+r0    = config['physics']['rcell']                      # reference side lenght of regular cell
+V0    = (3**2 / 2) * r0**3                              # corresponding volume
+stdV0 = config['experimental']['stdV0']                 # standard deviation of cell volume distribution
+Vmin  = config['experimental']['Vmin'] * V0             # lower limit on colume
+Vmax  = config['experimental']['Vmax'] * V0             # upper limit on volume
 
-stdV0 = config['experimental']['stdV0']                 # standard deviation of volume of cells
-Vmin  = config['experimental']['Vmin'] * V0
-Vmax  = config['experimental']['Vmax'] * V0
-Vth   = config['physics']['Vth/V0'] * V0                # threshold volume
-
+# Forces
 Lambda = config['physics']['Lambda']                    # surface tension
 tauV   = config['physics']['tauV']                      # inverse increase rate in V0 unit
 v0     = config['physics']['v0']
 taup   = config['physics']['taup']
 
+# Integration
 dt      = config['simulation']['dt']                    # integration time step
 delta   = config['simulation']['delta']                 # length below which T1s are triggered
 epsilon = config['simulation']['epsilon']               # edges have length delta+epsilon after T1s
@@ -66,7 +67,7 @@ period  = config['simulation']['period']                # saving frequence
 Nsteps  = config['simulation']['Nsteps']                # don't understand exactly what this is.
 
 
-# save run specific config file
+# save simulation-specific config file
 save_config(path_to_config, config)
 
 
@@ -74,14 +75,14 @@ save_config(path_to_config, config)
 # INITIALISATION
 
 # vertex model object
-vm = VertexModel(seed)                                      # initialise vertex model object
-vm.initRegularTriangularLattice(size=N, hexagonArea=A_grid) # initialise periodic system
+vm = VertexModel(seed)                                         # initialise vertex model object
+vm.initRegularTriangularLattice(size=Ngrid, hexagonArea=Agrid) # initialise periodic system
 
 
 # add forces
-vm.addActiveBrownianForce("abp", v0, taup)              # centre active Brownian force
-vm.addSurfaceForce("surface", Lambda, V0, tauV)         # surface tension force
-vm.vertexForces["surface"].volume = dict(map(           # set cell volume
+vm.addActiveBrownianForce("abp", v0, taup)                     # centre active Brownian force
+vm.addSurfaceForce("surface", Lambda, V0, tauV)                # surface tension force
+vm.vertexForces["surface"].volume = dict(map(                  # set cell volume
     lambda i: (i, sc.stats.truncnorm((Vmin-V0)/stdV0, (Vmax-V0)/stdV0, loc=V0, scale=stdV0).rvs()),
     vm.vertexForces["surface"].volume))
 
