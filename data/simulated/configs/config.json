@@ -2,7 +2,7 @@
     "physics": {
 	"tauV": 0,
 	"Lambda": 1,
-	"V0": 9,
+	"r_cell": 1,
 	"Vth/V0": 1.5,
 	"v0": 0.75,
 	"taup": 5
@@ -11,6 +11,7 @@
     "simulation": {
 	"seed": 0,
 	"Nvertices": 6,
+	"r_grid": 1.5,
 	"dt": 1e-2,
 	"delta": 0.02,
 	"epsilon": 0.002,

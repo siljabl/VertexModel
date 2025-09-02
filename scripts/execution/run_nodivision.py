@@ -42,19 +42,22 @@ print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
 
 np.random.seed(1)
 seed = config['simulation']['seed']                     # random number generator seed
-N    = config['simulation']['Nvertices']                # number of vertices in each dimension
+N    = config['simulation']['Nvertices']                # number of vertices in each dimension. N_cell = N**2 / 3
+r_grid = config['simulation']['r_grid']
+A_grid = (3**(3/2) / 2) * r_grid**2                            # area of regular hexagon
+
+r_cell = config['physics']['r_cell']                    # radius/side lenght of regular hexagon
+V0 = (3**2 / 2) * r_cell**3                            # volume of regular hexagon
+
+stdV0 = config['experimental']['stdV0']                 # standard deviation of volume of cells
+Vmin  = config['experimental']['Vmin'] * V0
+Vmax  = config['experimental']['Vmax'] * V0
+Vth   = config['physics']['Vth/V0'] * V0                # threshold volume
 
 Lambda = config['physics']['Lambda']                    # surface tension
-V0     = config['physics']['V0']                        # reference volume of cells
-Vth    = config['physics']['Vth/V0'] * V0               # threshold volume
 tauV   = config['physics']['tauV']                      # inverse increase rate in V0 unit
-A0     = (np.sqrt(3)*(V0**2)/2)**(1./3.)                # reference area of cells
 v0     = config['physics']['v0']
 taup   = config['physics']['taup']
-
-stdV0  = config['experimental']['stdV0']                # standard deviation of volume of cells
-Vmin   = config['experimental']['Vmin'] * V0
-Vmax   = config['experimental']['Vmax'] * V0
 
 dt      = config['simulation']['dt']                    # integration time step
 delta   = config['simulation']['delta']                 # length below which T1s are triggered
@@ -71,8 +74,8 @@ save_config(path_to_config, config)
 # INITIALISATION
 
 # vertex model object
-vm = VertexModel(seed)                                  # initialise vertex model object
-vm.initRegularTriangularLattice(size=N, hexagonArea=A0) # initialise periodic system
+vm = VertexModel(seed)                                      # initialise vertex model object
+vm.initRegularTriangularLattice(size=N, hexagonArea=A_grid) # initialise periodic system
 
 
 # add forces
