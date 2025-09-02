@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 from pathlib import Path
 from operator import itemgetter
-from utils.file_functions import load_vm_output
+import utils.vm_output_handling as output
 from utils.correlations import general_spatial_correlation, general_temporal_correlation
 
 
@@ -19,25 +19,15 @@ for file in Path("../../data/simulated/raw/").glob("nodivision_20250902_1328.p")
     print(file)
 
     # load frames
-    list_vm, init_vm = load_vm_output(file)                       # stop when we have read the whole file
+    list_vm, init_vm = output.load(file)                       # stop when we have read the whole file
 
-        
-    # # get cell properties
-    # cells = list_vm[0].getVertexIndicesByType("centre")                 # indices of cell centres (from first frame)
 
-    # positions = np.ma.array(list(map(
-    #     lambda vm: itemgetter(*cells)(vm.getPositions(wrapped=False)),  # unwrapped positions of centres
-    #     list_vm)))
+    # get cell properties
+    positions = output.get_cell_positions(list_vm)
+    heights   = output.get_cell_heights(list_vm)
+    volumes   = output.get_cell_volumes(list_vm)
 
-    # heights = np.ma.array(list(map(
-    # lambda vm: itemgetter(*cells)(vm.vertexForces["surface"].height.copy()),
-    # list_vm)))
-
-    # volumes = np.ma.array(list(map(
-    #     lambda vm: itemgetter(*cells)(vm.vertexForces["surface"].volume.copy()),  # unwrapped positions of centres
-    #     list_vm)))
-
-    # areas = np.ma.array(volumes / heights)
+    areas = np.ma.array(volumes / heights)
 
     # # subtract mean
     # h_var = heights - np.mean(heights, axis=1, keepdims=True)
