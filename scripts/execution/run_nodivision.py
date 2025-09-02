@@ -44,7 +44,7 @@ print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
 seed  = config['simulation']['seed']                    # random number generator seed
 Ngrid = config['simulation']['Nvertices']               # number of vertices in each dimension. Ncell = Ngrid**2 / 3
 rgrid = config['simulation']['rgrid']                   # distance betweeen vertices
-Agrid = (3**(3/2) / 2) * r_grid**2                      # area of regular hexagon
+Agrid = (3**(3/2) / 2) * rgrid**2                      # area of regular hexagon
 
 # Cell size
 r0    = config['physics']['rcell']                      # reference side lenght of regular cell

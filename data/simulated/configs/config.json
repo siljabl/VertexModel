@@ -1,6 +1,6 @@
 {
     "physics": {
-	"rcell": 1.2,
+	"rcell": 1,
 	"tauV": 0,
 	"Lambda": 1,
 	"Vth/V0": 1.5,
