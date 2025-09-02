@@ -11,7 +11,7 @@
     "simulation": {
 	"seed": 0,
 	"Nvertices": 6,
-	"r_grid": 1.5,
+	"r_grid": 0.5,
 	"dt": 1e-2,
 	"delta": 0.02,
 	"epsilon": 0.002,
