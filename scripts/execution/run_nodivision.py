@@ -43,12 +43,12 @@ print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
 # Lattice
 seed  = config['simulation']['seed']                    # random number generator seed
 Ngrid = config['simulation']['Nvertices']               # number of vertices in each dimension. Ncell = Ngrid**2 / 3
-rgrid = config['simulation']['rgrid']                   # distance betweeen vertices
-Agrid = (3**(3/2) / 2) * rgrid**2                      # area of regular hexagon
 
 # Cell size
-r0    = config['physics']['rcell']                      # reference side lenght of regular cell
-V0    = (3**2 / 2) * r0**3                              # corresponding volume
+rhex  = config['physics']['rhex']                      # reference side lenght of regular cell
+rho   = config['physics']['rho']                   # r6 / r0, defines compression/stretching of cells
+A0    = (3**(3/2) / 2) * (rhex / rho)**2                # area of regular hexagon
+V0    = (3**2 / 2) * rhex**3                            # corresponding volume
 stdV0 = config['experimental']['stdV0'] * V0            # standard deviation of cell volume distribution
 Vmin  = config['experimental']['Vmin']  * V0            # lower limit on colume
 Vmax  = config['experimental']['Vmax']  * V0            # upper limit on volume
@@ -76,7 +76,7 @@ save_config(path_to_config, config)
 
 # vertex model object
 vm = VertexModel(seed)                                         # initialise vertex model object
-vm.initRegularTriangularLattice(size=Ngrid, hexagonArea=Agrid) # initialise periodic system
+vm.initRegularTriangularLattice(size=Ngrid, hexagonArea=A0) # initialise periodic system
 
 
 # add forces
