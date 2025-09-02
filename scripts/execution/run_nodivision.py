@@ -49,9 +49,9 @@ Agrid = (3**(3/2) / 2) * rgrid**2                      # area of regular hexagon
 # Cell size
 r0    = config['physics']['rcell']                      # reference side lenght of regular cell
 V0    = (3**2 / 2) * r0**3                              # corresponding volume
-stdV0 = config['experimental']['stdV0']                 # standard deviation of cell volume distribution
-Vmin  = config['experimental']['Vmin'] * V0             # lower limit on colume
-Vmax  = config['experimental']['Vmax'] * V0             # upper limit on volume
+stdV0 = config['experimental']['stdV0'] * V0            # standard deviation of cell volume distribution
+Vmin  = config['experimental']['Vmin']  * V0            # lower limit on colume
+Vmax  = config['experimental']['Vmax']  * V0            # upper limit on volume
 
 # Forces
 Lambda = config['physics']['Lambda']                    # surface tension

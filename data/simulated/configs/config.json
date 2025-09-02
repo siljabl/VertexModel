@@ -20,9 +20,9 @@
     },
 
     "experimental": {
-	"stdV0": 0.33,
-	"Vmin": 0.55,
-	"Vmax": 5.5
+	"stdV0": 0.4,
+	"Vmin": 0.6,
+	"Vmax": 3.5
     }
 }
 
