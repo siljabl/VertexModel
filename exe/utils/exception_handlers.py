@@ -2,7 +2,6 @@ import os
 from cells.plot import plot
 
 
-
 def save_snapshot(vm, fig, ax, _frames_dir, index):
     # update plot
     plot(vm, fig=fig, ax=ax, update=True)
