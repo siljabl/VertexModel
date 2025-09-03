@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 from datetime import datetime
 
-import correlation_computations as compute
+import utils.correlation_computations as compute
 
 class VMAutocorrelationObject:
     def __init__(self, filename, path_addition=''):
@@ -16,7 +16,7 @@ class VMAutocorrelationObject:
         """
         assert filename is not None
         
-        root, ext = os.path.splitext(filename)
+        root, _ = os.path.splitext(filename)
         
         self.fname = filename
         self.path  = f"data/simulated/obj/autocorrelation_{root}.obj"
