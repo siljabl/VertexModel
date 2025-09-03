@@ -536,12 +536,12 @@ def general_spatial_correlation(x, y, var1, var2=None, dr=40, r_max=500, t_avrg=
     if len(dim_var1) == 2:
 
         if len(dim_var2) == 2:
-            print("scalar spatial correlation")
+            # print("scalar spatial correlation")
 
             C_norm, N_in_rbin, r_bin_centers, frame_axis_masked = scalar_spatial_correlation(x, y, var1, var2, dr, r_max)
 
         else:
-            print("scalar-vector spatial correlation")
+            # print("scalar-vector spatial correlation")
 
             var2x = var2[0]
             var2y = var2[1]
@@ -555,12 +555,12 @@ def general_spatial_correlation(x, y, var1, var2=None, dr=40, r_max=500, t_avrg=
         var1y = var1[1]
 
         if len(dim_var2) == 2:
-            print("scalar-vector spatial correlation")
+            # print("scalar-vector spatial correlation")
 
             C_norm, N_in_rbin, r_bin_centers, frame_axis_masked = scalar_vector_spatial_correlation(x, y, var2, [var1x, var1y], dr, r_max)
 
         else:
-            print("vector spatial correlation")
+            # print("vector spatial correlation")
 
             var2x = var2[0]
             var2y = var2[1]

@@ -80,8 +80,14 @@ class VMAutocorrelationObject:
 
 
 
-    def compute_spatial(self, positions, variable, dr, r_max, variable_name, t_avrg=False):
+    def compute_spatial(self, positions, variable, dr, r_max, variable_name, t_avrg=False, overwrite=False):
         """ Computes spatial autocorrelation """
+
+        # check if correlation exists
+        if not overwrite:
+            if variable_name in self.spatial.keys():
+                print(f"Spatial autocorrelation of {variable_name} already exists.")
+                return
 
         Cr = compute.general_spatial_correlation(positions[:,:,0], positions[:,:,1], variable,
                                                  dr=dr, r_max=r_max, t_avrg=t_avrg)
@@ -92,9 +98,15 @@ class VMAutocorrelationObject:
 
 
 
-    def compute_temporal(self, variable, t_max, variable_name, t_avrg=False):
+    def compute_temporal(self, variable, t_max, variable_name, t_avrg=False, overwrite=False):
         """ Computes temporal autocorrelation """
 
+        # check if correlation exists
+        if not overwrite:
+            if variable_name in self.tempoal.keys():
+                print(f"Temporal autocorrelation of {variable_name} already exists.")
+                return
+            
         Ct = compute.general_temporal_correlation(variable, t_max=t_max, t_avrg=t_avrg)
 
         self.temporal[variable_name] = Ct['C_norm']

@@ -32,6 +32,8 @@ def plot_results(corr_obj, variable_name):
     plt.tight_layout()
 
 
+
+
 def save_plot(figure, output_path):
     """Save the generated plot to a specific directory."""
     figure.savefig(output_path)
@@ -40,7 +42,8 @@ def save_plot(figure, output_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Plot correlations")
-    parser.add_argument('file',   type=str,  help="filename")
+    parser.add_argument('file', type=str, help="filename")
+    parser.add_argument('var',  type=str, help="var to plot correlation of")
     args = parser.parse_args()
 
     # File paths
@@ -51,7 +54,7 @@ def main():
     corr_obj = VMAutocorrelationObject(fname)
     
     # Generate plot
-    plot_result_figure = plot_results(corr_obj, 'hh')
+    plot_results(corr_obj, args.var)
     
     # Save plot
     save_plot(plt, output_path)
