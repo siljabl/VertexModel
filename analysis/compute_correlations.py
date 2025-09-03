@@ -14,7 +14,7 @@ parser.add_argument('--dr',   type=float, help="spatial step size [r_6]",       
 parser.add_argument('--rmax', type=float, help="max distance to consider [r_6]", default='20')
 args = parser.parse_args()
 
-tmax = 99
+tmax = 99   # take lenght of array / save in config?
 
 i = 1
 for path in Path("data/simulated/raw/").glob("nodivision_20250902_1328*.p"):
@@ -37,7 +37,6 @@ for path in Path("data/simulated/raw/").glob("nodivision_20250902_1328*.p"):
     h_variation = np.ma.array(heights - np.mean(heights, axis=1, keepdims=True), mask=False)
     A_variation = np.ma.array(areas   - np.mean(areas,   axis=1, keepdims=True), mask=False)
     V_variation = np.ma.array(volumes - np.mean(volumes, axis=1, keepdims=True), mask=False)
-
 
     # initialize correlation object
     autocorr_obj = VMAutocorrelationObject(fname)

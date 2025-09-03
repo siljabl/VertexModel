@@ -18,8 +18,8 @@ class VMAutocorrelationObject:
         
         root, _ = os.path.splitext(filename)
         
-        self.fname = filename
-        self.path  = f"data/simulated/obj/autocorrelation_{root}.obj"
+        self.fname = root
+        self.path  = f"data/simulated/obj/autocorrelation_{self.fname}.obj"
 
         self.temporal = {}
         self.spatial  = {}
