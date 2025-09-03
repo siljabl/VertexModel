@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser(description="Compute correlations on simulation
 parser.add_argument('fpattern',    type=str,   help="file patter to do computations on")
 parser.add_argument('--dr',        type=float, help="spatial step size [r_6]",         default='1')
 parser.add_argument('--rmax',      type=float, help="max distance to consider [r_6]",  default='20')
-parser.add_argument('--overwrite', type=bool,  help="overwrite previous computations", default='False')
+parser.add_argument('--overwrite', type=bool,  help="overwrite previous computations", default=False)
 args = parser.parse_args()
 
 tmax = 99   # take lenght of array / save in config?
@@ -42,6 +42,7 @@ for path in Path("data/simulated/raw/").glob(args.fpattern):
 
     # initialize correlation object
     autocorr_obj = VMAutocorrelationObject(fname)
+
 
     # compute spatial autocorrelations
     autocorr_obj.compute_spatial(positions, h_variation, args.dr, args.rmax, 'hh', t_avrg=True, overwrite=args.overwrite)

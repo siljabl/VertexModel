@@ -103,7 +103,7 @@ class VMAutocorrelationObject:
 
         # check if correlation exists
         if not overwrite:
-            if variable_name in self.tempoal.keys():
+            if variable_name in self.temporal.keys():
                 print(f"Temporal autocorrelation of {variable_name} already exists.")
                 return
             
