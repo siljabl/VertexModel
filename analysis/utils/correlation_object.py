@@ -89,25 +89,3 @@ class VMAutocorrelationObject:
         self.r_array[variable_name]  = Cr['r_bin_centers'].compressed()
         self.log['r'][variable_name] = datetime.today().strftime('%Y/%m/%d_%H:%M')
 
-
-    # def summary(self):
-    #     return {
-    #         'temporal': self.temporal_corrs,
-    #         'spatial': self.spatial_corrs,
-    #     }
-
-    # def visualize_temporal(self):
-    #     import seaborn as sns
-    #     import matplotlib.pyplot as plt
-
-    #     sns.heatmap(self.temporal_corrs, annot=True, fmt=".2f")
-    #     plt.title('Temporal Correlation Heatmap')
-    #     plt.show()
-
-    # def visualize_spatial(self):
-    #     import seaborn as sns
-    #     import matplotlib.pyplot as plt
-
-    #     sns.heatmap(self.spatial_corrs, annot=True, fmt=".2f")
-    #     plt.title('Spatial Correlation Heatmap')
-    #     plt.show()
