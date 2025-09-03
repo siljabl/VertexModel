@@ -20,7 +20,6 @@ from utils.correlation_object import VMAutocorrelationObject
 
 def plot_results(corr_obj, variable_name):
     """Plot the simulation results."""
-    plt.figure(figsize=(10, 6))
     #sns.set(style="whitegrid")
     
     # Assuming the data has columns 'time' and 'value'
@@ -42,22 +41,26 @@ def save_plot(figure, output_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Plot correlations")
-    parser.add_argument('file', type=str, help="filename")
-    parser.add_argument('var',  type=str, help="var to plot correlation of")
+    parser.add_argument('fpattern', type=str, help="filepattern to plot")
+    parser.add_argument('var',      type=str, help="var to plot correlation of")
     args = parser.parse_args()
 
-    # File paths
-    output_path = 'results/correlation_plot.png'
-    fname = os.path.basename(args.file)
+    plt.figure(figsize=(10, 6))
+    
+    for path in Path("data/simulated/obj/").glob(f"*{args.fpattern}*.obj"):
 
-    # Load data
-    corr_obj = VMAutocorrelationObject(fname)
-    
-    # Generate plot
-    plot_results(corr_obj, args.var)
-    
-    # Save plot
-    save_plot(plt, output_path)
+        # File paths
+        fname = f"{args.fpattern}{os.path.basename(path).split(args.fpattern)[-1]}"
+        output_path = f"results/spatial_autocorrelation_{args.var}_{args.fpattern}.png"
+
+        # Load data
+        corr_obj = VMAutocorrelationObject(fname)
+        
+        # Generate plot
+        plot_results(corr_obj, args.var)
+        
+        # Save plot
+        save_plot(plt, output_path)
 
 
 if __name__ == "__main__":
