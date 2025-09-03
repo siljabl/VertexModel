@@ -570,7 +570,7 @@ def general_spatial_correlation(x, y, var1, var2=None, dr=40, r_max=500, t_avrg=
     
     COR = {'C_norm':          C_norm,
            'N_pairs_in_rbin': N_in_rbin,
-           'r_bin_centers':   r_bin_centers,
+           'r_bin_centers':   np.ma.array(r_bin_centers, mask=C_norm.mask),
            'frame_axis':      frame_axis_masked}
             
     return COR

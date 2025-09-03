@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 from operator import itemgetter
 import utils.vm_output_handling as output
-from utils.correlations import general_spatial_correlation, general_temporal_correlation
+from analysis.utils.correlation_computations import general_spatial_correlation, general_temporal_correlation
 
 # turn off interactive plotting
 mpl.use('Agg')
