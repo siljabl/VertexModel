@@ -1,21 +1,23 @@
 from cells.bind import VertexModel
 
 import os
+import argparse
 import numpy as np
 from pathlib import Path
 
 import utils.vm_output_handling as vm_output
 from utils.correlation_object import VMAutocorrelationObject
 
-# turn off interactive plotting
-#mpl.use('Agg')
+# command-line argument parsing
+parser = argparse.ArgumentParser(description="Compute correlations on simulation data and save as pickle")
+parser.add_argument('--dr',   type=float, help="spatial step size [r_6]",        default='1')
+parser.add_argument('--rmax', type=float, help="max distance to consider [r_6]", default='20')
+args = parser.parse_args()
 
-dr    = 2
-r_max = 20
 
 
 i = 1
-for path in Path("data/simulated/raw/").glob("nodivision_20250902_*.p"):
+for path in Path("data/simulated/raw/").glob("nodivision_20250902_1328*.p"):
     fname = os.path.basename(path)
 
     # load frames
@@ -31,17 +33,17 @@ for path in Path("data/simulated/raw/").glob("nodivision_20250902_*.p"):
 
     areas = np.ma.array(volumes / heights)
 
-
     # subtract mean
     h_variation = heights - np.mean(heights, axis=1, keepdims=True)
     A_variation = areas   - np.mean(areas,   axis=1, keepdims=True)
     V_variation = volumes - np.mean(volumes, axis=1, keepdims=True)
 
+
     # initialize correlation object
     autocorr_obj = VMAutocorrelationObject(fname)
-    autocorr_obj.compute_spatial(positions, h_variation, dr, r_max, 'hh', t_avrg=True)
-    autocorr_obj.compute_spatial(positions, A_variation, dr, r_max, 'AA', t_avrg=True)
-    autocorr_obj.compute_spatial(positions, V_variation, dr, r_max, 'VV', t_avrg=True)
+    autocorr_obj.compute_spatial(positions, h_variation, args.dr, args.rmax, 'hh', t_avrg=True)
+    autocorr_obj.compute_spatial(positions, A_variation, args.dr, args.rmax, 'AA', t_avrg=True)
+    autocorr_obj.compute_spatial(positions, V_variation, args.dr, args.rmax, 'VV', t_avrg=True)
 
     # save autocorrelation
     autocorr_obj.save_pickle()
