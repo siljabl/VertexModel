@@ -5,6 +5,7 @@ from numba import njit, prange
 import warnings
 
 def scalar_temporal_correlation(var1, var2, Nframes, t_max=None):
+
     '''
     Computes temporal correlation of two scalars
     '''
@@ -156,7 +157,7 @@ def vector_temporal_correlation(vec1, vec2, Nframes, t_max=None):
 
 
 
-def general_temporal_correlation(var1, var2=None, t_max=None):
+def general_temporal_correlation(var1, var2=None, t_max=None, t_avrg=False):
 
     if np.any(var2==None):
         var2 = var1
@@ -194,13 +195,15 @@ def general_temporal_correlation(var1, var2=None, t_max=None):
             var2x = var2[0]
             var2y = var2[1]
             C_norm, N, delta_f = vector_temporal_correlation([var1x, var1y], [var2x, var2y], Nframes, t_max)
-                  
 
-    VAUTO = {'delta_f': delta_f,
+    if t_avrg:
+        C_norm = np.mean(C_norm, axis=0)                  
+
+    COR = {'delta_f': delta_f,
              'C_norm':  C_norm,
              'N':       N}
             
-    return VAUTO
+    return COR
 
 
 ########################

@@ -62,6 +62,7 @@ class VMAutocorrelationObject:
 
     def save_pickle(self, path_addition=''):
         """ Saves object as pickle"""
+
          # Prepare state dictionary to save
         state = {
             'fname':    self.fname,
@@ -89,3 +90,13 @@ class VMAutocorrelationObject:
         self.r_array[variable_name]  = Cr['r_bin_centers'].compressed()
         self.log['r'][variable_name] = datetime.today().strftime('%Y/%m/%d_%H:%M')
 
+
+
+    def compute_temporal(self, variable, t_max, variable_name, t_avrg=False):
+        """ Computes temporal autocorrelation """
+
+        Ct = compute.general_temporal_correlation(variable, t_max=t_max, t_avrg=t_avrg)
+
+        self.temporal[variable_name] = Ct['C_norm']
+        self.t_array[variable_name]  = np.arange(t_max)
+        self.log['t'][variable_name] = datetime.today().strftime('%Y/%m/%d_%H:%M')

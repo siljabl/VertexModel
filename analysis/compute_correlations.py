@@ -14,7 +14,7 @@ parser.add_argument('--dr',   type=float, help="spatial step size [r_6]",       
 parser.add_argument('--rmax', type=float, help="max distance to consider [r_6]", default='20')
 args = parser.parse_args()
 
-
+tmax = 99
 
 i = 1
 for path in Path("data/simulated/raw/").glob("nodivision_20250902_1328*.p"):
@@ -34,16 +34,23 @@ for path in Path("data/simulated/raw/").glob("nodivision_20250902_1328*.p"):
     areas = np.ma.array(volumes / heights)
 
     # subtract mean
-    h_variation = heights - np.mean(heights, axis=1, keepdims=True)
-    A_variation = areas   - np.mean(areas,   axis=1, keepdims=True)
-    V_variation = volumes - np.mean(volumes, axis=1, keepdims=True)
+    h_variation = np.ma.array(heights - np.mean(heights, axis=1, keepdims=True), mask=False)
+    A_variation = np.ma.array(areas   - np.mean(areas,   axis=1, keepdims=True), mask=False)
+    V_variation = np.ma.array(volumes - np.mean(volumes, axis=1, keepdims=True), mask=False)
 
 
     # initialize correlation object
     autocorr_obj = VMAutocorrelationObject(fname)
+
+    # compute spatial autocorrelations
     autocorr_obj.compute_spatial(positions, h_variation, args.dr, args.rmax, 'hh', t_avrg=True)
     autocorr_obj.compute_spatial(positions, A_variation, args.dr, args.rmax, 'AA', t_avrg=True)
     autocorr_obj.compute_spatial(positions, V_variation, args.dr, args.rmax, 'VV', t_avrg=True)
+
+    # compute temporal autocorrelations
+    autocorr_obj.compute_temporal(h_variation, tmax, 'hh', t_avrg=True)
+    autocorr_obj.compute_temporal(A_variation, tmax, 'AA', t_avrg=True)
+    autocorr_obj.compute_temporal(V_variation, tmax, 'VV', t_avrg=True)
 
     # save autocorrelation
     autocorr_obj.save_pickle()
