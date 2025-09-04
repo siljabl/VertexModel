@@ -1,7 +1,7 @@
 {
     "physics": {
 	"rhex": 1,
-	"rho": 1.2,
+	"rho": 1.3,
 	"tauV": 0,
 	"Lambda": 1,
 	"Vth/V0": 1.5,
