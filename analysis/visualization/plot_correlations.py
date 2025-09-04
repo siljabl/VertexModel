@@ -56,7 +56,7 @@ def main():
     parser = argparse.ArgumentParser(description="Plot correlations")
     parser.add_argument('fpattern', type=str, help="filepattern to plot")
     parser.add_argument('variable', type=str, help="variable to plot correlation of")
-    parser.add_argument('type',     type=str, help="type of correlation, 't' or 'r'")
+    parser.add_argument('type',     type=str, help="type of correlation (t or r)")
     args = parser.parse_args()
 
     assert args.type in ['r', 't']
@@ -67,11 +67,10 @@ def main():
     else:
         initialize_temporal(args.variable)
 
-    for path in Path("data/simulated/obj/").glob(f"*{args.fpattern}*.obj"):
+    for path in Path("data/simulated/obj/").glob(f"{args.fpattern}*.autocorr"):
 
         # File paths
         fname = f"{args.fpattern}{os.path.basename(path).split(args.fpattern)[-1]}"
-        output_path = f"results/spatial_autocorrelation_{args.variable}_{args.fpattern}.png"
 
         # Load data
         corr_obj = VMAutocorrelationObject(fname)
@@ -79,12 +78,14 @@ def main():
         # Generate plot
         if args.type == "r":
             plt.plot(corr_obj.r_array[args.variable], corr_obj.spatial[args.variable])
+            output_path = f"results/spatial_autocorrelation_{args.variable}_{args.fpattern}.png"
         
         else:
             plt.plot(corr_obj.t_array[args.variable], corr_obj.temporal[args.variable])
+            output_path = f"results/temporal_autocorrelation_{args.variable}_{args.fpattern}.png"
         
-        # Save plot
-        save_plot(plt, output_path)
+    # Save plot
+    save_plot(plt, output_path)
 
 
 if __name__ == "__main__":
