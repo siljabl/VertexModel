@@ -78,7 +78,7 @@ def initialize_figure(variable_name, type):
 
 
 def save_plot(figure, output_path):
-    """Save the generated plot to a specific directory."""
+    """ Save the generated plot to a specific directory. """
     figure.savefig(output_path)
     print(f"Plot saved to {output_path}")
 
