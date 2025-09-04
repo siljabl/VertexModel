@@ -18,22 +18,22 @@ import utils.vm_output_handling as vm_output
 from utils.correlation_object import VMAutocorrelationObject
 
 
-def initialize_spatial(variable_name):
-    plt.figure(figsize=(10, 6))
-    plt.title(rf'$C_{{{variable_name}}}(r)$')
-    plt.xlabel(r'$r~/~r_0$')
+def initialize_figure(variable_name, type):
+    """ Create figure """
+    plt.figure(figsize=(6, 4))
 
-    plt.hlines(0, 0, 20, linestyle="dashed", color="gray")
+    if type == 'r':
+        plt.title(rf'$C_{{{variable_name}}}(r)$')
+        plt.xlabel(r'$r~/~r_0$')
+        plt.hlines(0, 0, 20, linestyle="dashed", color="gray")
+
+    else:
+        plt.title(rf'$C_{{{variable_name}}}(t)$')
+        plt.xlabel(r'$t$')
+        plt.hlines(0, 0, 50, linestyle="dashed", color="gray")
+
     plt.tight_layout()
 
-
-def initialize_temporal(variable_name):
-    plt.figure(figsize=(10, 6))
-    plt.title(rf'$C_{{{variable_name}}}(t)$')
-    plt.xlabel(r'$t$')
-
-    plt.hlines(0, 0, 99, linestyle="dashed", color="gray")
-    plt.tight_layout()
 
 
 def plot_results(corr_obj, variable_name):
@@ -57,17 +57,18 @@ def main():
     parser.add_argument('fpattern', type=str, help="filepattern to plot")
     parser.add_argument('variable', type=str, help="variable to plot correlation of")
     parser.add_argument('type',     type=str, help="type of correlation (t or r)")
+    parser.add_argument('-cmap',    type=str, help="Matplob colormap", default='plasma')
     args = parser.parse_args()
 
     assert args.type in ['r', 't']
+    
+    initialize_figure(args.variable, args.type)
 
-    if args.type == 'r':
-        initialize_spatial(args.variable)
+    nfiles = (len(list(Path("data/simulated/obj/").glob(f"{args.fpattern}*.autocorr"))))
+    cmap   = mpl.colormaps[args.cmap]
+    colors = cmap(np.linspace(0.1, 0.9, nfiles))
 
-    else:
-        initialize_temporal(args.variable)
-
-    for path in Path("data/simulated/obj/").glob(f"{args.fpattern}*.autocorr"):
+    for color, path in zip(colors, Path("data/simulated/obj/").glob(f"{args.fpattern}*.autocorr")):
 
         # File paths
         fname = f"{args.fpattern}{os.path.basename(path).split(args.fpattern)[-1]}"
@@ -77,11 +78,11 @@ def main():
         
         # Generate plot
         if args.type == "r":
-            plt.plot(corr_obj.r_array[args.variable], corr_obj.spatial[args.variable])
+            plt.plot(corr_obj.r_array[args.variable], corr_obj.spatial[args.variable], color=color)
             output_path = f"results/spatial_autocorrelation_{args.variable}_{args.fpattern}.png"
         
         else:
-            plt.plot(corr_obj.t_array[args.variable], corr_obj.temporal[args.variable])
+            plt.plot(corr_obj.t_array[args.variable], corr_obj.temporal[args.variable], color=color)
             output_path = f"results/temporal_autocorrelation_{args.variable}_{args.fpattern}.png"
         
     # Save plot
