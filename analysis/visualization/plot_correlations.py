@@ -18,6 +18,49 @@ from utils.config_functions   import load_config, get_config_value
 from utils.correlation_object import VMAutocorrelationObject
 
 
+def sort_files(fpattern, legend):
+    """ 
+    Goes through files to plot and returns sorted arrays of legend and file
+
+    Parameters:
+    - fpattern: pattern in file name
+    - legend: key in config that is used to label plot. Also used as title on legend.
+    """
+
+    files  = []
+    labels = []
+
+    # Aquire labels from config
+    for path in Path("data/simulated/obj/").glob(f"{fpattern}*.autocorr"):
+
+        # File path
+        fname = f"{fpattern}{os.path.basename(path).split(fpattern)[-1]}"
+
+        # Load data
+        corr_obj = VMAutocorrelationObject(fname)
+
+        # Load config to get plot label
+        config_path = f"data/simulated/configs/{corr_obj.fname}.json"
+        config = load_config(config_path)
+
+        # save in arrays
+        files.append(fname)
+        labels.append(get_config_value(config, legend))
+
+    # Sort labels if legend is specified
+    if legend != '':
+        
+        sort_inds = np.argsort(labels)
+        sort_files  = np.array(files)[sort_inds]
+        sort_labels = np.array(labels)[sort_inds]
+
+        return sort_files, sort_labels
+    
+    else:
+        return files, labels
+
+
+
 def initialize_figure(variable_name, type):
     """ Create figure """
     plt.figure(figsize=(6, 4))
@@ -30,7 +73,7 @@ def initialize_figure(variable_name, type):
     else:
         plt.title(rf'$C_{{{variable_name}}}(t)$')
         plt.xlabel(r'$t$')
-        plt.hlines(0, 0, 50, linestyle="dashed", color="gray")
+        plt.hlines(0, 0, 99, linestyle="dashed", color="gray")
 
 
 
@@ -55,25 +98,19 @@ def main():
     # create figure and plot line at 0 
     initialize_figure(args.variable, args.type)
 
+    # sort data sets by legend value
+    files, labels = sort_files(args.fpattern, args.legend)
+
     # define line colors
-    nfiles = (len(list(Path("data/simulated/obj/").glob(f"{args.fpattern}*.autocorr"))))
     cmap   = mpl.colormaps[args.cmap]
-    colors = cmap(np.linspace(0.1, 0.9, nfiles))
+    colors = cmap(np.linspace(0.1, 0.9, len(files)))
 
 
     # plot from each data set
-    for color, path in zip(colors, Path("data/simulated/obj/").glob(f"{args.fpattern}*.autocorr")):
-
-        # File path
-        fname = f"{args.fpattern}{os.path.basename(path).split(args.fpattern)[-1]}"
+    for fname, label, color in zip(files, labels, colors):
 
         # Load data
         corr_obj = VMAutocorrelationObject(fname)
-
-        # Load config to get plot label
-        config_path = f"data/simulated/configs/{corr_obj.fname}.json"
-        config = load_config(config_path)
-        label  = get_config_value(config, args.legend)
         
         # Generate plot
         if args.type == "r":
@@ -90,8 +127,11 @@ def main():
                      color=color, 
                      label=label)
         
+    # Add legend
+    if args.legend != '':
+        plt.legend(title=rf'$\{args.legend}$')
+
     # Save plot
-    plt.legend(title=rf'$\{args.legend}$')
     plt.tight_layout()
     save_plot(plt, output_path)
 
