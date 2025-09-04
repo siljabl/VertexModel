@@ -47,16 +47,16 @@ for path in Path("data/simulated/raw/").glob(args.fpattern):
 
 
     # compute spatial autocorrelations
-    autocorr_obj.compute_spatial(positions, h_variation, args.dr, args.rmax, 'hh', t_avrg=True, overwrite=args.overwrite)
-    autocorr_obj.compute_spatial(positions, A_variation, args.dr, args.rmax, 'AA', t_avrg=True, overwrite=args.overwrite)
-    autocorr_obj.compute_spatial(positions, V_variation, args.dr, args.rmax, 'VV', t_avrg=True, overwrite=args.overwrite)
-    autocorr_obj.compute_spatial(positions, velocities,  args.dr, args.rmax, 'vv', t_avrg=True, overwrite=args.overwrite)
+    autocorr_obj.compute_spatial(positions, h_variation, 'hh', args.dr, args.rmax, t_avrg=True, overwrite=args.overwrite)
+    autocorr_obj.compute_spatial(positions, A_variation, 'AA', args.dr, args.rmax, t_avrg=True, overwrite=args.overwrite)
+    autocorr_obj.compute_spatial(positions, V_variation, 'VV', args.dr, args.rmax, t_avrg=True, overwrite=args.overwrite)
+    autocorr_obj.compute_spatial(positions, velocities,  'vv', args.dr, args.rmax, t_avrg=True, overwrite=args.overwrite)
 
     # compute temporal autocorrelations
-    autocorr_obj.compute_temporal(h_variation, tmax, 'hh', t_avrg=True, overwrite=args.overwrite)
-    autocorr_obj.compute_temporal(A_variation, tmax, 'AA', t_avrg=True, overwrite=args.overwrite)
-    autocorr_obj.compute_temporal(V_variation, tmax, 'VV', t_avrg=True, overwrite=args.overwrite)
-    autocorr_obj.compute_temporal(velocities,  tmax, 'vv', t_avrg=True, overwrite=args.overwrite)
+    autocorr_obj.compute_temporal(h_variation, 'hh', tmax, t_avrg=True, overwrite=args.overwrite)
+    autocorr_obj.compute_temporal(A_variation, 'AA', tmax, t_avrg=True, overwrite=args.overwrite)
+    autocorr_obj.compute_temporal(V_variation, 'VV', tmax, t_avrg=True, overwrite=args.overwrite)
+    autocorr_obj.compute_temporal(velocities,  'vv', tmax, t_avrg=True, overwrite=args.overwrite)
 
     # save autocorrelation
     autocorr_obj.save_pickle()
