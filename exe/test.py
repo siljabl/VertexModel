@@ -2,10 +2,7 @@ import os
 import sys
 from pathlib import Path
 
+data_dir   = "data/simulated/"
 
 arg = sys.argv[1]
-parent = Path(arg).parent
-print(arg)
-print(Path(arg).parent)
-print(Path(parent).parent)
-print(Path(arg).name)
+print(arg.split(data_dir)[-1])

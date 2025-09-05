@@ -9,22 +9,25 @@ import utils.config_functions   as config
 import utils.vm_output_handling as vm_output
 from   utils.correlation_object import VMAutocorrelationObject
 
+data_dir   = "data/simulated/raw/"
+config_dir = "data/simulated/configs/"
 
 # Command-line argument parsing
 parser = argparse.ArgumentParser(description="Computes correlations on simulation data and save as pickle")
-parser.add_argument('filepath',   type=str,   help="Defines path to files to do computations on (using * if necessary).")
+parser.add_argument('filepath',   type=str,   help="Defines path to files to do computations on, as 'path/to/file*'")
 parser.add_argument('-dr',        type=float, help="Spatial step size (float)",                                     default='1')
 parser.add_argument('-rmax',      type=float, help="Max distance to coompute correlation for (float)",              default='20')
 parser.add_argument('-tfrac',     type=float, help="Fraction of total duration to compute correlation for (float)", default='0.5')
 parser.add_argument('-overwrite', type=bool,  help="Overwrite previous computations (True/False)",                  default=False)
 args = parser.parse_args()
 
-parent     = f"{Path(args.filepath).parent}/"
-filename   = f"{Path(args.filepath).name}/"
-config_dir = f"{Path(parent).parent}/configs/"
+# Decompose input path
+path_tail = args.filepath.split(data_dir)[-1]
+filename  = Path(path_tail).name
+parent    = f"{Path(path_tail).parent}/"
 
 i = 1
-for path in Path(parent).glob(filename):
+for path in Path(f"{data_dir}{parent}").glob(filename):
 
     # Load frames as vm objects
     list_vm, init_vm = vm_output.load(path)
