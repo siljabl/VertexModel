@@ -3,6 +3,8 @@ import numpy as np
 
 
 def cell_divisions(vm, Vth):
+    """ Performs cell division on vm object """
+    
     volumes = vm.vertexForces["surface"].volume.copy()
     heights = vm.vertexForces["surface"].height.copy()
 
@@ -17,4 +19,16 @@ def cell_divisions(vm, Vth):
         vm.vertexForces["surface"].volume = volumes
 
     return vm
+
+
+def hexagon_volume(rhex):
+    """ Computes volume of regular hexagon with side length rhex  """
+
+    return (3**2 / 2) * rhex**3
+
+
+def hexagon_area(rhex):
+    """ Computes area of regular hexagon with side length rhex """
+
+    return (3**(3/2) / 2) * (rhex)**2
 

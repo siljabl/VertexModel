@@ -1,32 +1,43 @@
-import os, sys, pickle, subprocess, traceback, argparse
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+#import os
+import sys
+import pickle
+import argparse
+import subprocess
+import scipy as sc
+
+import matplotlib
+matplotlib.use('Agg')
+
+from tempfile import mkdtemp
+from datetime import datetime
 
 from cells.bind import VertexModel
 from cells.plot import plot
 from cells.init import movie_sh_fname
 
+from utils.vm_functions       import *
 from utils.exception_handlers import save_snapshot
 from utils.config_functions   import load_config, save_config
 
-import numpy as np
-import scipy as sc
-import matplotlib.pyplot as plt
-from operator import itemgetter
-from tempfile import mkdtemp
-from datetime import datetime
+
+# not needed?
+#sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+#print(os.path.join(os.path.dirname(__file__), '..'))
 
 
-# command-line argument parsing
+
+# Command-line argument parsing
 parser = argparse.ArgumentParser(description="Run simulation without activity to relax the initial conditions")
 parser.add_argument('--config', type=str, default='data/simulated/configs/config.json')
 args = parser.parse_args()
 
 
-# load existing configuration
+# Load config file
 config_path = args.config
 config = load_config(config_path)
 
-# set ouput paths
+
+# Define paths for output
 fname = f"nodivision_{datetime.today().strftime('%Y%m%d_%H%M')}"
 path_to_config = f"data/simulated/configs/{fname}.json"
 path_to_output = f"data/simulated/raw/{fname}.p"
@@ -43,46 +54,48 @@ print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
 # Lattice
 seed  = config['simulation']['seed']                    # random number generator seed
 Ngrid = config['simulation']['Nvertices']               # number of vertices in each dimension. Ncell = Ngrid**2 / 3
+r0    = config['physics']['r0']                         # length scale of triangular lattice
+
 
 # Cell size
-rhex  = config['physics']['rhex']                      # reference side lenght of regular cell
-rho   = config['physics']['rho']                   # r6 / r0, defines compression/stretching of cells
-A0    = (3**(3/2) / 2) * (rhex / rho)**2                # area of regular hexagon
-V0    = (3**2 / 2) * rhex**3                            # corresponding volume
+rho   = config['physics']['rho']                        # defines compression/stretching of cells
+rhex  = rho * r0                                        # reference side lenght of regular cell (hexagon)
+A0    = hexagon_area(r0)                                # initial cell area
+V0    = hexagon_volume(rhex)                            # cell volume
 stdV0 = config['experimental']['stdV0'] * V0            # standard deviation of cell volume distribution
-Vmin  = config['experimental']['Vmin']  * V0            # lower limit on colume
+Vmin  = config['experimental']['Vmin']  * V0            # lower limit on volume
 Vmax  = config['experimental']['Vmax']  * V0            # upper limit on volume
 
 # Forces
 Lambda = config['physics']['Lambda']                    # surface tension
 tauV   = config['physics']['tauV']                      # inverse increase rate in V0 unit
-v0     = config['physics']['v0']
-taup   = config['physics']['taup']
+v0     = config['physics']['v0']                        # self-propulsion velocity
+taup   = config['physics']['taup']                      # self-propulsion persistence time
 
 # Integration
 dt      = config['simulation']['dt']                    # integration time step
 delta   = config['simulation']['delta']                 # length below which T1s are triggered
 epsilon = config['simulation']['epsilon']               # edges have length delta+epsilon after T1s
 period  = config['simulation']['period']                # saving frequence
-Nsteps  = config['simulation']['Nsteps']                # don't understand exactly what this is.
+Nsteps  = config['simulation']['Nsteps']                # number of steps/frames in simulation
 
 
-# save simulation-specific config file
+# Save simulation-specific config file
 save_config(path_to_config, config)
 
 
 
 # INITIALISATION
 
-# vertex model object
-vm = VertexModel(seed)                                         # initialise vertex model object
-vm.initRegularTriangularLattice(size=Ngrid, hexagonArea=A0) # initialise periodic system
+# Vertex model object
+vm = VertexModel(seed)                                          # initialise vertex model object
+vm.initRegularTriangularLattice(size=Ngrid, hexagonArea=A0)     # initialise periodic system
 
 
-# add forces
-vm.addActiveBrownianForce("abp", v0, taup)                     # centre active Brownian force
-vm.addSurfaceForce("surface", Lambda, V0, tauV)                # surface tension force
-vm.vertexForces["surface"].volume = dict(map(                  # set cell volume
+# Add forces
+vm.addActiveBrownianForce("abp", v0, taup)                      # centre active Brownian force
+vm.addSurfaceForce("surface", Lambda, V0, tauV)                 # surface tension force
+vm.vertexForces["surface"].volume = dict(map(                   # set cell volume
     lambda i: (i, sc.stats.truncnorm((Vmin-V0)/stdV0, (Vmax-V0)/stdV0, loc=V0, scale=stdV0).rvs()),
     vm.vertexForces["surface"].volume))
 

@@ -1,8 +1,13 @@
 import os
+import sys
+import traceback
+
 from cells.plot import plot
 
 
 def save_snapshot(vm, fig, ax, _frames_dir, index):
+    """ Saves simulation snapshot while taking care of syntax errors """
+    
     # update plot
     plot(vm, fig=fig, ax=ax, update=True)
 

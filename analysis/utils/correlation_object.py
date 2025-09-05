@@ -80,7 +80,7 @@ class VMAutocorrelationObject:
 
 
 
-    def compute_spatial(self, positions, variable, dr, r_max, variable_name, t_avrg=False, overwrite=False):
+    def compute_spatial(self, positions, variable, variable_name, dr, r_max, t_avrg=False, overwrite=False):
         """ Computes spatial autocorrelation """
 
         # check if correlation exists
@@ -98,7 +98,7 @@ class VMAutocorrelationObject:
 
 
 
-    def compute_temporal(self, variable, t_max, variable_name, t_avrg=False, overwrite=False):
+    def compute_temporal(self, variable, variable_name, t_max, t_avrg=False, overwrite=False):
         """ Computes temporal autocorrelation """
 
         # check if correlation exists

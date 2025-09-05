@@ -78,7 +78,7 @@ def initialize_figure(variable_name, type):
 
 
 def save_plot(figure, output_path):
-    """Save the generated plot to a specific directory."""
+    """ Save the generated plot to a specific directory. """
     figure.savefig(output_path)
     print(f"Plot saved to {output_path}")
 
@@ -86,7 +86,7 @@ def save_plot(figure, output_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Plot correlations")
-    parser.add_argument('fpattern', type=str, help="filepattern to plot")
+    parser.add_argument('fpattern', type=str, help="Defines file names as <fpattern>*.autocorr")
     parser.add_argument('variable', type=str, help="variable to plot correlation of")
     parser.add_argument('type',     type=str, help="type of correlation (t or r)")
     parser.add_argument('-legend',  type=str, help="title of legend", default='')

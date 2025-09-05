@@ -1,6 +1,6 @@
 {
     "physics": {
-	"rhex": 1,
+	"r0": 1,
 	"rho": 1.3,
 	"tauV": 0,
 	"Lambda": 1,
