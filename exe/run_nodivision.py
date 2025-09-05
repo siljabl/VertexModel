@@ -45,7 +45,7 @@ print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
 # Lattice
 seed  = config['simulation']['seed']                    # random number generator seed
 Ngrid = config['simulation']['Nvertices']               # number of vertices in each dimension. Ncell = Ngrid**2 / 3
-r0    = config['physics']['r0']                         # length scale of triangular lattice
+r0    = config['simulation']['rgrid']                         # length scale of triangular lattice
 
 
 # Cell size

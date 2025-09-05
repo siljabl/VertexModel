@@ -1,6 +1,5 @@
 {
     "physics": {
-	"r0": 1,
 	"rho": 1,
 	"tauV": 0,
 	"Lambda": 1,
@@ -12,6 +11,7 @@
     "simulation": {
 	"seed": 0,
 	"Nvertices": 42,
+	"rgrid": 1,
 	"dt": 1e-2,
 	"delta": 0.02,
 	"epsilon": 0.002,
