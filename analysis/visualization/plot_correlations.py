@@ -6,7 +6,7 @@ import argparse
 import numpy as np
 from pathlib import Path
 
-# Append the path of parent directories
+# Append the path of relative_path directories
 sys.path.append("analysis/")
 sys.path.append("VertexModel/analysis/")
 
@@ -20,39 +20,39 @@ from utils.path_handling      import decompose_input_path
 from utils.correlation_object import VMAutocorrelationObject
 
 # Autocorrelation output directory
-autocorr_dir = "data/simulated/obj/"
-config_dir   = "data/simulated/configs/"
+obj_dir    = "data/simulated/obj/"
+config_dir = "data/simulated/configs/"
 
 # params
 rmax = 20
 tmax = 99
 
 
-def sort_files(fnames, legend, parent=''):
+def sort_files(fnames, legend, relative_path=''):
     """ 
     Goes through files to plot and returns sorted arrays of legend labels and files
 
     Parameters:
     - fnames: file name pattern. File names on form <fnames>.autocorr
     - legend: key in config that is used to label plot. Also used as title on legend.
-    - parent: path from autocorr_dir to file
+    - relative_path: path from obj_dir to file
     """
 
     file_list  = []
     label_list = []
 
     # Aquire labels from config
-    for path in Path(f"{autocorr_dir}{parent}").glob(f"{fnames}.autocorr"):
+    for path in Path(f"{obj_dir}{relative_path}").glob(f"{fnames}.autocorr"):
 
         # File path
         fname = f"{Path(path).stem}"
 
         # Load config to get plot label
-        config_path = f"{config_dir}{fname}.json"
+        config_path = f"{config_dir}{relative_path}{fname}.json"
         config_file = config.load(config_path)
 
         # save in arrays
-        file_list.append(fname)
+        file_list.append(f"{relative_path}{fname}")
         label_list.append(config.get_value(config_file, legend))
 
     # Sort labels if legend is specified
@@ -96,7 +96,7 @@ def save_plot(figure, out_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Plot all defined autocorrelations")
-    parser.add_argument('filepath', type=str, help="Defines path to files to plot. Filename is on form <'path/to/file*'>.autocorr")
+    parser.add_argument('filepath', type=str, help="Path to files to plot. Should be in obj/. Filename is on form <'path/to/file*'>.autocorr")
     parser.add_argument('variable', type=str, help="Variable to plot correlation of (varvar)")
     parser.add_argument('type',     type=str, help="Type of correlation (t or r)")
     parser.add_argument('-legend',  type=str, help="Add legend (str)",                  default='')
@@ -104,7 +104,7 @@ def main():
     args = parser.parse_args()
 
     # Decompose input path
-    parent, filename = decompose_input_path(args.filepath, autocorr_dir)
+    relative_path, filename = decompose_input_path(args.filepath, obj_dir)
 
     # Assert temporal or spatial correlation
     assert args.type in ['r', 't'], "Wrong correlation variable. Must be r or t"
@@ -113,7 +113,7 @@ def main():
     initialize_figure(args.variable, args.type)
 
     # Sort data sets by legend value
-    files, labels = sort_files(filename, args.legend, parent)
+    files, labels = sort_files(filename, args.legend, relative_path)
 
     # Assert correct file name
     assert len(files) > 0, f"No files matches filename: {args.filepath}.autocorr"

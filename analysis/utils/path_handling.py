@@ -1,8 +1,9 @@
 from pathlib import Path
 
+"""
+This file should probably be replaced by the use of Path
+"""
 
-# data_dir   = "data/simulated/raw/"
-# config_dir = "data/simulated/configs/"
 
 def decompose_input_path(filepath, dirpath):
     """ 
@@ -13,14 +14,13 @@ def decompose_input_path(filepath, dirpath):
     - dirpath:  path to directory, as path/to/dir/
 
     Returns:
-    - file: filename with extension (if any)
+    - file: filename without extension (if any)
     - relative_parent: path between dir and file
     """
 
     # Decompose input path
     relative_path = filepath.split(dirpath)[-1]
-    file = Path(relative_path).name
+    file = Path(relative_path).stem
     relative_parent = f"{Path(relative_path).parent}/"
 
     return relative_parent, file
-
