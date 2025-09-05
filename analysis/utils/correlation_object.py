@@ -43,9 +43,11 @@ class VMAutocorrelationObject:
         - path: path to pickle to load.
         """
         
+        # Load pickle
         with open(f"{path_addition}{self.path}", 'rb') as f:
             state = pickle.load(f)
         
+        # Update object
         self.temporal = state.get('temporal', {})
         self.spatial  = state.get('spatial', {})
         self.t_array  = state.get('t_array', {})
@@ -59,7 +61,7 @@ class VMAutocorrelationObject:
     def save_pickle(self, path_addition=''):
         """ Saves object as pickle"""
 
-         # Prepare state dictionary to save
+        # Prepare state dictionary to save
         state = {
             'temporal': self.temporal,
             'spatial':  self.spatial,
@@ -68,6 +70,7 @@ class VMAutocorrelationObject:
             'log':      self.log
         }
         
+        # Save
         with open(f"{path_addition}{self.path}", 'wb') as f:
             pickle.dump(state, f)
 
@@ -78,15 +81,17 @@ class VMAutocorrelationObject:
     def compute_spatial(self, positions, variable, variable_name, dr, r_max, t_avrg=False, overwrite=False):
         """ Computes spatial autocorrelation """
 
-        # check if correlation exists
+        # Check if correlation exists
         if not overwrite:
             if variable_name in self.spatial.keys():
                 print(f"Spatial autocorrelation of {variable_name} already exists.")
                 return
 
+        # Compute autocorrelation
         Cr = compute.general_spatial_correlation(positions[:,:,0], positions[:,:,1], variable,
                                                  dr=dr, r_max=r_max, t_avrg=t_avrg)
 
+        # Update object
         self.spatial[variable_name]  = Cr['C_norm'].compressed()
         self.r_array[variable_name]  = Cr['r_bin_centers'].compressed()
         self.log['r'][variable_name] = datetime.today().strftime('%Y/%m/%d_%H:%M')
@@ -96,14 +101,16 @@ class VMAutocorrelationObject:
     def compute_temporal(self, variable, variable_name, t_max, t_avrg=False, overwrite=False):
         """ Computes temporal autocorrelation """
 
-        # check if correlation exists
+        # Check if correlation exists
         if not overwrite:
             if variable_name in self.temporal.keys():
                 print(f"Temporal autocorrelation of {variable_name} already exists.")
                 return
-            
+
+        # Compute autocorrelation    
         Ct = compute.general_temporal_correlation(variable, t_max=t_max, t_avrg=t_avrg)
 
+        # Update object
         self.temporal[variable_name] = Ct['C_norm']
         self.t_array[variable_name]  = np.arange(t_max)
         self.log['t'][variable_name] = datetime.today().strftime('%Y/%m/%d_%H:%M')
