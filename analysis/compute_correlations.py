@@ -5,8 +5,12 @@ import argparse
 import numpy as np
 from pathlib import Path
 
-import utils.vm_output_handling as     vm_output
+import utils.config_functions   as config
+import utils.vm_output_handling as vm_output
 from   utils.correlation_object import VMAutocorrelationObject
+
+data_dir   = "data/simulated/raw/"
+config_dir = "data/simulated/configs/"
 
 # Command-line argument parsing
 parser = argparse.ArgumentParser(description="Computes correlations on simulation data and save as pickle")
@@ -17,16 +21,21 @@ parser.add_argument('--tmax',      type=float, help="Fraction of total duration 
 parser.add_argument('--overwrite', type=bool,  help="Overwrite previous computations (True/False)",                  default=False)
 args = parser.parse_args()
 
-tmax = 99   # take lenght of array / save in config?
 
 i = 1
-for path in Path("data/simulated/raw/").glob(args.files):
+for path in Path(data_dir).glob(args.files):
 
     # Load frames as vm objects
     list_vm, init_vm = vm_output.load(path)
 
-    # Get compression/extension
-    rho = np.round(42 / init_vm.systemSize[0], 1)
+    # Load config
+    config_path = f"{config_dir}{Path(path).stem}.json"
+    config_file = config.load(config_path)
+
+    # Get values from config
+    rho  = config.get_value(config_file, 'rho')
+    tmax = config.get_value(config_file, 'Nsteps')
+    # rmax = 
 
     # Get cell properties
     positions  = vm_output.get_cell_positions(list_vm)
