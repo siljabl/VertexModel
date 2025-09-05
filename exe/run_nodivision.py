@@ -54,11 +54,12 @@ print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
 # Lattice
 seed  = config['simulation']['seed']                    # random number generator seed
 Ngrid = config['simulation']['Nvertices']               # number of vertices in each dimension. Ncell = Ngrid**2 / 3
+r0    = config['physics']['r0']                         # length scale of triangular lattice
+
 
 # Cell size
-rhex  = config['physics']['rhex']                       # reference side lenght of regular hexagon
 rho   = config['physics']['rho']                        # defines compression/stretching of cells
-r0    = rhex / rho                                      # lenght scale of triangular lattice
+rhex  = rho * r0                                        # reference side lenght of regular cell (hexagon)
 A0    = hexagon_area(r0)                                # initial cell area
 V0    = hexagon_volume(rhex)                            # cell volume
 stdV0 = config['experimental']['stdV0'] * V0            # standard deviation of cell volume distribution
