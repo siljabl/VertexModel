@@ -4,11 +4,23 @@ from pathlib import Path
 # data_dir   = "data/simulated/raw/"
 # config_dir = "data/simulated/configs/"
 
-def decompose_input_path(filepath, data_dir):
+def decompose_input_path(filepath, dirpath):
+    """ 
+    Takes input path and returns filename and relative path from dir to file 
+
+    Parameters:
+    - filepath: path to file, as  path/to/dir/relative/path/to/file.ext
+    - dirpath:  path to directory, as path/to/dir/
+
+    Returns:
+    - file: filename with extension (if any)
+    - relative_parent: path between dir and file
+    """
 
     # Decompose input path
-    path_tail = filepath.split(data_dir)[-1]
-    filename  = Path(path_tail).name
-    parent    = f"{Path(path_tail).parent}/"
+    relative_path = filepath.split(dirpath)[-1]
+    file = Path(relative_path).name
+    relative_parent = f"{Path(relative_path).parent}/"
 
-    return parent, filename
+    return relative_parent, file
+

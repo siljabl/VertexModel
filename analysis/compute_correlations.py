@@ -11,6 +11,7 @@ import utils.vm_output_handling as vm_output
 from utils.path_handling      import decompose_input_path
 from utils.correlation_object import VMAutocorrelationObject
 
+obj_dir    = "data/simulated/obj/"
 data_dir   = "data/simulated/raw/"
 config_dir = "data/simulated/configs/"
 
@@ -24,17 +25,20 @@ parser.add_argument('-overwrite', type=bool,  help="Overwrite previous computati
 args = parser.parse_args()
 
 # Decompose input path
-parent, filename = decompose_input_path(args.filepath, data_dir)
+relative_parent, filename = decompose_input_path(args.filepath, data_dir)
+
+# Subdirectory exists, and create if not
+Path(f"{obj_dir}{relative_parent}").mkdir(parents=True, exist_ok=True)
 
 
 i = 1
-for path in Path(f"{data_dir}{parent}").glob(filename):
+for path in Path(f"{data_dir}{relative_parent}").glob(filename):
 
     # Load frames as vm objects
     list_vm, init_vm = vm_output.load(path)
 
     # Load config
-    config_path = f"{config_dir}{Path(path).stem}.json"
+    config_path = f"{config_dir}{relative_parent}{Path(path).stem}.json"
     config_file = config.load(config_path)
 
     # Get values from config
@@ -57,8 +61,8 @@ for path in Path(f"{data_dir}{parent}").glob(filename):
     velocities  = np.ma.array(velocities, mask=False)
 
     # Initialize correlation object
-    fname        = os.path.basename(path)
-    autocorr_obj = VMAutocorrelationObject(fname)
+    relative_fname = f"{relative_parent}{Path(path).stem}"
+    autocorr_obj   = VMAutocorrelationObject(relative_fname)
 
     # Compute spatial autocorrelations
     autocorr_obj.compute_spatial(positions, h_variation, 'hh', args.dr, args.rmax, t_avrg=True, overwrite=args.overwrite)

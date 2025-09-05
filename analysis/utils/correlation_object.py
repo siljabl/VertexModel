@@ -15,10 +15,8 @@ class VMAutocorrelationObject:
         - path_addition: path that redirects to the project folder. Mainly for running in notebooks
         """
         assert filename is not None
-        
-        root, _ = os.path.splitext(filename)
-        
-        self.path  = f"data/simulated/obj/{root}.autocorr"
+                
+        self.path  = f"data/simulated/obj/{filename}.autocorr"
 
         self.temporal = {}
         self.spatial  = {}
