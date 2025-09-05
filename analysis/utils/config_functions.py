@@ -1,12 +1,12 @@
 import json
 
-def load_config(config_path):
+def load(config_path):
     """Load configuration from a JSON file."""
     with open(config_path, 'r') as f:
         return json.load(f)
 
 
-def get_config_value(config, key):
+def get_value(config, key):
     """
     Retrieve a value from a nested dictionary given a key.
     

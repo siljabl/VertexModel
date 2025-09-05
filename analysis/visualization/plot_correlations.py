@@ -15,7 +15,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 mpl.use('Agg')
 
-from utils.config_functions   import load_config, get_config_value
+import utils.config_functions as     config
 from utils.correlation_object import VMAutocorrelationObject
 
 # Autocorrelation output directory
@@ -50,11 +50,11 @@ def sort_files(fnames, legend):
 
         # Load config to get plot label
         config_path = f"{config_dir}{corr_obj.fname}.json"
-        config = load_config(config_path)
+        config_file = config.load(config_path)
 
         # save in arrays
         file_list.append(fname)
-        label_list.append(get_config_value(config, legend))
+        label_list.append(config.get_value(config_file, legend))
 
     # Sort labels if legend is specified
     if legend != '':
