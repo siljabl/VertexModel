@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 mpl.use('Agg')
 
 import utils.config_functions as     config
+from utils.path_handling      import decompose_input_path
 from utils.correlation_object import VMAutocorrelationObject
 
 # Autocorrelation output directory
@@ -27,20 +28,21 @@ rmax = 20
 tmax = 99
 
 
-def sort_files(fnames, legend):
+def sort_files(fnames, legend, parent=''):
     """ 
     Goes through files to plot and returns sorted arrays of legend labels and files
 
     Parameters:
     - fnames: file name pattern. File names on form <fnames>.autocorr
     - legend: key in config that is used to label plot. Also used as title on legend.
+    - parent: path from autocorr_dir to file
     """
 
     file_list  = []
     label_list = []
 
     # Aquire labels from config
-    for path in Path(autocorr_dir).glob(f"{fnames}.autocorr"):
+    for path in Path(f"{autocorr_dir}{parent}").glob(f"{fnames}.autocorr"):
 
         # File path
         fname = f"{Path(path).stem}"
@@ -94,12 +96,15 @@ def save_plot(figure, out_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Plot all defined autocorrelations")
-    parser.add_argument('fnames',   type=str, help="Defines files to plot. Filename is on form <fnames>.autocorr")
+    parser.add_argument('filepath', type=str, help="Defines path to files to plot. Filename is on form <'path/to/file*'>.autocorr")
     parser.add_argument('variable', type=str, help="Variable to plot correlation of (varvar)")
     parser.add_argument('type',     type=str, help="Type of correlation (t or r)")
     parser.add_argument('-legend',  type=str, help="Add legend (str)",                  default='')
     parser.add_argument('-cmap',    type=str, help="Specify matplotlib colormap (str)", default='plasma')
     args = parser.parse_args()
+
+    # Decompose input path
+    parent, filename = decompose_input_path(args.filepath, autocorr_dir)
 
     # Assert temporal or spatial correlation
     assert args.type in ['r', 't'], "Wrong correlation variable. Must be r or t"
@@ -108,10 +113,10 @@ def main():
     initialize_figure(args.variable, args.type)
 
     # Sort data sets by legend value
-    files, labels = sort_files(args.fnames, args.legend)
+    files, labels = sort_files(filename, args.legend, parent)
 
     # Assert correct file name
-    assert len(files) > 0, f"No files matches filename: {autocorr_dir}{args.fnames}.autocorr"
+    assert len(files) > 0, f"No files matches filename: {args.filepath}.autocorr"
 
     # Define line colors
     cmap   = mpl.colormaps[args.cmap]
@@ -126,14 +131,14 @@ def main():
         
         # Plot
         if args.type == "r":
-            out_path = f"results/spatial_autocorrelation_{args.variable}_{args.fnames}.png"
+            out_path = f"results/spatial_autocorrelation_{args.variable}_{filename}.png"
 
             plt.plot(corr_obj.r_array[args.variable], corr_obj.spatial[args.variable],
                      color=color,
                      label=label)
         
         else:
-            out_path = f"results/temporal_autocorrelation_{args.variable}_{args.fnames}.png"
+            out_path = f"results/temporal_autocorrelation_{args.variable}_{filename}.png"
 
             plt.plot(corr_obj.t_array[args.variable], corr_obj.temporal[args.variable], 
                      color=color, 

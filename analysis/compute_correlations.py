@@ -7,7 +7,9 @@ from pathlib import Path
 
 import utils.config_functions   as config
 import utils.vm_output_handling as vm_output
-from   utils.correlation_object import VMAutocorrelationObject
+
+from utils.path_handling      import decompose_input_path
+from utils.correlation_object import VMAutocorrelationObject
 
 data_dir   = "data/simulated/raw/"
 config_dir = "data/simulated/configs/"
@@ -22,9 +24,8 @@ parser.add_argument('-overwrite', type=bool,  help="Overwrite previous computati
 args = parser.parse_args()
 
 # Decompose input path
-path_tail = args.filepath.split(data_dir)[-1]
-filename  = Path(path_tail).name
-parent    = f"{Path(path_tail).parent}/"
+parent, filename = decompose_input_path(args.filepath, data_dir)
+
 
 i = 1
 for path in Path(f"{data_dir}{parent}").glob(filename):
