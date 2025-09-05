@@ -22,6 +22,10 @@ from utils.correlation_object import VMAutocorrelationObject
 autocorr_dir = "data/simulated/obj/"
 config_dir   = "data/simulated/configs/"
 
+# params
+rmax = 20
+tmax = 99
+
 
 def sort_files(fnames, legend):
     """ 
@@ -55,6 +59,7 @@ def sort_files(fnames, legend):
     # Sort labels if legend is specified
     if legend != '':
         
+        # Sort according to label value
         sorted_inds = np.argsort(label_list)
         sorted_file_list  = np.array(file_list)[sorted_inds]
         sorted_label_list = np.array(label_list)[sorted_inds]
@@ -74,12 +79,12 @@ def initialize_figure(varname, type):
     if type == 'r':
         plt.title(rf'$C_{{{varname}}}(r)$')
         plt.xlabel(r'$r~/~r_0$')
-        plt.hlines(0, 0, 20, linestyle="dashed", color="gray")
+        plt.hlines(0, 0, rmax, linestyle="dashed", color="gray")
 
     else:
         plt.title(rf'$C_{{{varname}}}(t)$')
         plt.xlabel(r'$t$')
-        plt.hlines(0, 0, 99, linestyle="dashed", color="gray")
+        plt.hlines(0, 0, tmax, linestyle="dashed", color="gray")
 
 
 
