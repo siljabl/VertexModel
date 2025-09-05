@@ -69,7 +69,7 @@ def sort_files(fnames, legend):
 def initialize_figure(varname, type):
     """ Create figure """
 
-    plt.figure(figsize=(6, 4))
+    plt.figure(figsize=(6, 4), dpi=300)
 
     if type == 'r':
         plt.title(rf'$C_{{{varname}}}(r)$')
