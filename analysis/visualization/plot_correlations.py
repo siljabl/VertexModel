@@ -43,13 +43,10 @@ def sort_files(fnames, legend):
     for path in Path(autocorr_dir).glob(f"{fnames}.autocorr"):
 
         # File path
-        fname = f"{os.path.basename(path)}"
-
-        # Load data
-        corr_obj = VMAutocorrelationObject(fname)
+        fname = f"{Path(path).stem}"
 
         # Load config to get plot label
-        config_path = f"{config_dir}{corr_obj.fname}.json"
+        config_path = f"{config_dir}{fname}.json"
         config_file = config.load(config_path)
 
         # save in arrays
