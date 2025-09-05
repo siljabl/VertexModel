@@ -27,10 +27,13 @@ def load(file):
 
 def get_cell_positions(list_vm):
     """ Get cell positions """
-    cells = list_vm[0].getVertexIndicesByType("centre")                 # indices of cell centres (from first frame)
 
+    # indices of cell centres (from first frame)
+    cells = list_vm[0].getVertexIndicesByType("centre")
+
+    # unwrap positions of centres
     positions = np.ma.array(list(map(
-        lambda vm: itemgetter(*cells)(vm.getPositions(wrapped=False)),      # unwrapped positions of centres
+        lambda vm: itemgetter(*cells)(vm.getPositions(wrapped=False)), 
         list_vm)))
 
     return positions
@@ -38,8 +41,11 @@ def get_cell_positions(list_vm):
 
 def get_cell_heights(list_vm):
     """ Get cell heights """
-    cells = list_vm[0].getVertexIndicesByType("centre")                 # indices of cell centres (from first frame)
 
+    # indices of cell centres (from first frame)
+    cells = list_vm[0].getVertexIndicesByType("centre")
+
+    # unwrap cell heights
     heights = np.ma.array(list(map(
         lambda vm: itemgetter(*cells)(vm.vertexForces["surface"].height.copy()),
         list_vm)))
@@ -49,10 +55,13 @@ def get_cell_heights(list_vm):
 
 def get_cell_volumes(list_vm):
     """ Get cell volumes """
-    cells = list_vm[0].getVertexIndicesByType("centre")                 # indices of cell centres (from first frame)
 
+    # indices of cell centres (from first frame)
+    cells = list_vm[0].getVertexIndicesByType("centre")
+
+    # unwrap cell volumes
     volumes = np.ma.array(list(map(
-        lambda vm: itemgetter(*cells)(vm.vertexForces["surface"].volume.copy()),  # unwrapped positions of centres
+        lambda vm: itemgetter(*cells)(vm.vertexForces["surface"].volume.copy()), 
         list_vm)))
 
     return volumes
@@ -60,10 +69,13 @@ def get_cell_volumes(list_vm):
 
 def get_cell_velocities(list_vm):
     """ Get cell volumes """
-    cells = list_vm[0].getVertexIndicesByType("centre")                 # indices of cell centres (from first frame)
 
+    # indices of cell centres (from first frame)
+    cells = list_vm[0].getVertexIndicesByType("centre")
+
+    # unwrap cell velocities at cell centers
     velocities = np.ma.array(list(map(
-        lambda vm: itemgetter(*cells)(vm.velocities.copy()),  # unwrapped positions of centres
+        lambda vm: itemgetter(*cells)(vm.velocities.copy()), 
         list_vm)))
 
     return velocities
