@@ -1,12 +1,9 @@
-#import os
+
 import sys
 import pickle
 import argparse
 import subprocess
 import scipy as sc
-
-import matplotlib
-matplotlib.use('Agg')
 
 from tempfile import mkdtemp
 from datetime import datetime
@@ -18,12 +15,6 @@ from cells.init import movie_sh_fname
 from utils.vm_functions       import *
 from utils.exception_handlers import save_snapshot
 from utils.config_functions   import load_config, save_config
-
-
-# not needed?
-#sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-#print(os.path.join(os.path.dirname(__file__), '..'))
-
 
 
 # Command-line argument parsing
