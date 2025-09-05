@@ -3,6 +3,7 @@ import sys
 import pickle
 import argparse
 import subprocess
+import numpy as np
 import scipy as sc
 
 from tempfile import mkdtemp
@@ -30,9 +31,11 @@ config = load_config(config_path)
 
 # Define paths for output
 fname = f"nodivision_{datetime.today().strftime('%Y%m%d_%H%M')}"
+
 path_to_config = f"data/simulated/configs/{fname}.json"
 path_to_output = f"data/simulated/raw/{fname}.p"
 path_to_movies = f"data/simulated/videos/{fname}.p"
+
 print("Simulation name: ", fname)
 
 _frames_dir = mkdtemp()
@@ -43,9 +46,9 @@ print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
 # PARAMETERS
 
 # Lattice
-seed  = config['simulation']['seed']                    # random number generator seed
-Ngrid = config['simulation']['Nvertices']               # number of vertices in each dimension. Ncell = Ngrid**2 / 3
-r0    = config['simulation']['rgrid']                   # length scale of triangular lattice
+VMseed = config['simulation']['VMseed']                 # random number generator seed for vertex model object
+Ngrid  = config['simulation']['Nvertices']              # number of vertices in each dimension. Ncell = Ngrid**2 / 3
+r0     = config['simulation']['rgrid']                  # length scale of triangular lattice
 
 
 # Cell size
@@ -56,6 +59,7 @@ V0    = hexagon_volume(rhex)                            # cell volume
 stdV0 = config['experimental']['stdV0'] * V0            # standard deviation of cell volume distribution
 Vmin  = config['experimental']['Vmin']  * V0            # lower limit on volume
 Vmax  = config['experimental']['Vmax']  * V0            # upper limit on volume
+Vseed = config['simulation']['Vseed']                   # random number generator seed for volume distribution
 
 # Forces
 Lambda = config['physics']['Lambda']                    # surface tension
@@ -79,11 +83,12 @@ save_config(path_to_config, config)
 # INITIALISATION
 
 # Vertex model object
-vm = VertexModel(seed)                                          # initialise vertex model object
+vm = VertexModel(VMseed)                                        # initialise vertex model object
 vm.initRegularTriangularLattice(size=Ngrid, hexagonArea=A0)     # initialise periodic system
 
 
 # Add forces
+np.random.seed(Vseed)
 vm.addActiveBrownianForce("abp", v0, taup)                      # centre active Brownian force
 vm.addSurfaceForce("surface", Lambda, V0, tauV)                 # surface tension force
 vm.vertexForces["surface"].volume = dict(map(                   # set cell volume

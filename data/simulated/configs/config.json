@@ -9,7 +9,8 @@
     },
 
     "simulation": {
-	"seed": 0,
+	"VMseed": 0,
+	"Vseed": 0,
 	"Nvertices": 42,
 	"rgrid": 1,
 	"dt": 1e-2,
