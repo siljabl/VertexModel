@@ -18,8 +18,7 @@ class VMAutocorrelationObject:
         
         root, _ = os.path.splitext(filename)
         
-        self.fname = root
-        self.path  = f"data/simulated/obj/{self.fname}.autocorr"
+        self.path  = f"data/simulated/obj/{root}.autocorr"
 
         self.temporal = {}
         self.spatial  = {}
@@ -47,9 +46,6 @@ class VMAutocorrelationObject:
         with open(f"{path_addition}{self.path}", 'rb') as f:
             state = pickle.load(f)
         
-        # verify that loading correct file
-        assert self.fname == state.get('fname', '')
-
         self.temporal = state.get('temporal', {})
         self.spatial  = state.get('spatial', {})
         self.t_array  = state.get('t_array', {})
@@ -65,7 +61,6 @@ class VMAutocorrelationObject:
 
          # Prepare state dictionary to save
         state = {
-            'fname':    self.fname,
             'temporal': self.temporal,
             'spatial':  self.spatial,
             't_array':  self.t_array,
