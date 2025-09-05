@@ -1,5 +1,12 @@
-import os, sys, pickle, subprocess, traceback, argparse
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+#import os
+import sys
+import pickle
+import argparse
+import subprocess
+import scipy as sc
+
+from tempfile import mkdtemp
+from datetime import datetime
 
 from cells.bind import VertexModel
 from cells.plot import plot
@@ -8,25 +15,25 @@ from cells.init import movie_sh_fname
 from utils.exception_handlers import save_snapshot
 from utils.config_functions   import load_config, save_config
 
-import numpy as np
-import scipy as sc
-import matplotlib.pyplot as plt
-from operator import itemgetter
-from tempfile import mkdtemp
-from datetime import datetime
+
+# not needed?
+#sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+#print(os.path.join(os.path.dirname(__file__), '..'))
 
 
-# command-line argument parsing
+
+# Command-line argument parsing
 parser = argparse.ArgumentParser(description="Run simulation without activity to relax the initial conditions")
 parser.add_argument('--config', type=str, default='data/simulated/configs/config.json')
 args = parser.parse_args()
 
 
-# load existing configuration
+# Load config file
 config_path = args.config
 config = load_config(config_path)
 
-# set ouput paths
+
+# Define paths for output
 fname = f"nodivision_{datetime.today().strftime('%Y%m%d_%H%M')}"
 path_to_config = f"data/simulated/configs/{fname}.json"
 path_to_output = f"data/simulated/raw/{fname}.p"
@@ -45,19 +52,19 @@ seed  = config['simulation']['seed']                    # random number generato
 Ngrid = config['simulation']['Nvertices']               # number of vertices in each dimension. Ncell = Ngrid**2 / 3
 
 # Cell size
-rhex  = config['physics']['rhex']                      # reference side lenght of regular cell
-rho   = config['physics']['rho']                   # r6 / r0, defines compression/stretching of cells
-A0    = (3**(3/2) / 2) * (rhex / rho)**2                # area of regular hexagon
-V0    = (3**2 / 2) * rhex**3                            # corresponding volume
+rhex  = config['physics']['rhex']                       # reference side lenght of regular hexagon
+rho   = config['physics']['rho']                        # rho = r6 / r0, defines compression/stretching of cells. (r0 is lenght scale of triangular lattice) 
+A0    = (3**(3/2) / 2) * (rhex / rho)**2                # initial cell area
+V0    = (3**2 / 2) * rhex**3                            # cell volume
 stdV0 = config['experimental']['stdV0'] * V0            # standard deviation of cell volume distribution
-Vmin  = config['experimental']['Vmin']  * V0            # lower limit on colume
+Vmin  = config['experimental']['Vmin']  * V0            # lower limit on volume
 Vmax  = config['experimental']['Vmax']  * V0            # upper limit on volume
 
 # Forces
 Lambda = config['physics']['Lambda']                    # surface tension
 tauV   = config['physics']['tauV']                      # inverse increase rate in V0 unit
-v0     = config['physics']['v0']
-taup   = config['physics']['taup']
+v0     = config['physics']['v0']                        # self-propulsion velocity
+taup   = config['physics']['taup']                      # self-propulsion persistence time
 
 # Integration
 dt      = config['simulation']['dt']                    # integration time step

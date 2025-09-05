@@ -1,4 +1,7 @@
 import os
+import sys
+import traceback
+
 from cells.plot import plot
 
 
