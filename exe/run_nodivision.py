@@ -5,6 +5,9 @@ import argparse
 import subprocess
 import scipy as sc
 
+import matplotlib
+matplotlib.use('Agg')
+
 from tempfile import mkdtemp
 from datetime import datetime
 
@@ -12,6 +15,7 @@ from cells.bind import VertexModel
 from cells.plot import plot
 from cells.init import movie_sh_fname
 
+from utils.vm_functions       import *
 from utils.exception_handlers import save_snapshot
 from utils.config_functions   import load_config, save_config
 
@@ -53,9 +57,10 @@ Ngrid = config['simulation']['Nvertices']               # number of vertices in 
 
 # Cell size
 rhex  = config['physics']['rhex']                       # reference side lenght of regular hexagon
-rho   = config['physics']['rho']                        # rho = r6 / r0, defines compression/stretching of cells. (r0 is lenght scale of triangular lattice) 
-A0    = (3**(3/2) / 2) * (rhex / rho)**2                # initial cell area
-V0    = (3**2 / 2) * rhex**3                            # cell volume
+rho   = config['physics']['rho']                        # defines compression/stretching of cells
+r0    = rhex / rho                                      # lenght scale of triangular lattice
+A0    = hexagon_area(r0)                                # initial cell area
+V0    = hexagon_volume(rhex)                            # cell volume
 stdV0 = config['experimental']['stdV0'] * V0            # standard deviation of cell volume distribution
 Vmin  = config['experimental']['Vmin']  * V0            # lower limit on volume
 Vmax  = config['experimental']['Vmax']  * V0            # upper limit on volume
@@ -71,25 +76,25 @@ dt      = config['simulation']['dt']                    # integration time step
 delta   = config['simulation']['delta']                 # length below which T1s are triggered
 epsilon = config['simulation']['epsilon']               # edges have length delta+epsilon after T1s
 period  = config['simulation']['period']                # saving frequence
-Nsteps  = config['simulation']['Nsteps']                # don't understand exactly what this is.
+Nsteps  = config['simulation']['Nsteps']                # number of steps/frames in simulation
 
 
-# save simulation-specific config file
+# Save simulation-specific config file
 save_config(path_to_config, config)
 
 
 
 # INITIALISATION
 
-# vertex model object
-vm = VertexModel(seed)                                         # initialise vertex model object
-vm.initRegularTriangularLattice(size=Ngrid, hexagonArea=A0) # initialise periodic system
+# Vertex model object
+vm = VertexModel(seed)                                          # initialise vertex model object
+vm.initRegularTriangularLattice(size=Ngrid, hexagonArea=A0)     # initialise periodic system
 
 
-# add forces
-vm.addActiveBrownianForce("abp", v0, taup)                     # centre active Brownian force
-vm.addSurfaceForce("surface", Lambda, V0, tauV)                # surface tension force
-vm.vertexForces["surface"].volume = dict(map(                  # set cell volume
+# Add forces
+vm.addActiveBrownianForce("abp", v0, taup)                      # centre active Brownian force
+vm.addSurfaceForce("surface", Lambda, V0, tauV)                 # surface tension force
+vm.vertexForces["surface"].volume = dict(map(                   # set cell volume
     lambda i: (i, sc.stats.truncnorm((Vmin-V0)/stdV0, (Vmax-V0)/stdV0, loc=V0, scale=stdV0).rvs()),
     vm.vertexForces["surface"].volume))
 
