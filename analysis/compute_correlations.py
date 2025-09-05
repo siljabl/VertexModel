@@ -14,7 +14,7 @@ config_dir = "data/simulated/configs/"
 
 # Command-line argument parsing
 parser = argparse.ArgumentParser(description="Computes correlations on simulation data and save as pickle")
-parser.add_argument('files',       type=str,   help="Defines files to do computations on. Should be full file name (using * if necessary).")
+parser.add_argument('files',      type=str,   help="Defines files to do computations on. Should be full file name (using * if necessary).")
 parser.add_argument('-dr',        type=float, help="Spatial step size (float)",                                     default='1')
 parser.add_argument('-rmax',      type=float, help="Max distance to coompute correlation for (float)",              default='20')
 parser.add_argument('-tfrac',     type=float, help="Fraction of total duration to compute correlation for (float)", default='0.5')

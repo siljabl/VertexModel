@@ -6,6 +6,7 @@ import subprocess
 import numpy as np
 import scipy as sc
 
+from pathlib  import Path
 from tempfile import mkdtemp
 from datetime import datetime
 
@@ -28,9 +29,8 @@ args = parser.parse_args()
 config_path = args.config
 config = load_config(config_path)
 
-
 # Define paths for output
-fname = f"nodivision_{datetime.today().strftime('%Y%m%d_%H%M')}"
+fname = f"{Path(__file__).stem}_{datetime.today().strftime('%Y%m%d_%H%M')}"
 
 path_to_config = f"data/simulated/configs/{fname}.json"
 path_to_output = f"data/simulated/raw/{fname}.p"
