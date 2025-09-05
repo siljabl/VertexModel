@@ -23,10 +23,6 @@ from utils.correlation_object import VMAutocorrelationObject
 obj_dir    = "data/simulated/obj/"
 config_dir = "data/simulated/configs/"
 
-# params
-rmax = 20
-tmax = 99
-
 
 def sort_files(fnames, legend, relative_path=''):
     """ 
@@ -51,9 +47,12 @@ def sort_files(fnames, legend, relative_path=''):
         config_path = f"{config_dir}{relative_path}{fname}.json"
         config_file = config.load(config_path)
 
+        # Get values from
+        label = config.get_value(config_file, legend)
+
         # save in arrays
         file_list.append(f"{relative_path}{fname}")
-        label_list.append(config.get_value(config_file, legend))
+        label_list.append(label)
 
     # Sort labels if legend is specified
     if legend != '':
@@ -78,12 +77,12 @@ def initialize_figure(varname, type):
     if type == 'r':
         plt.title(rf'$C_{{{varname}}}(r)$')
         plt.xlabel(r'$r~/~r_0$')
-        plt.hlines(0, 0, rmax, linestyle="dashed", color="gray")
+        plt.axhline(0, 0, 1, linestyle="dashed", color="gray")
 
     else:
         plt.title(rf'$C_{{{varname}}}(t)$')
         plt.xlabel(r'$t$')
-        plt.hlines(0, 0, tmax, linestyle="dashed", color="gray")
+        plt.hlines(0, 0, 1, linestyle="dashed", color="gray")
 
 
 
