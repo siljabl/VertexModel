@@ -32,7 +32,6 @@ Path(f"{obj_dir}{relative_parent}").mkdir(parents=True, exist_ok=True)
 
 
 for path in Path(f"{data_dir}{relative_parent}").glob(f"{filename}*"):
-    print(path)
 
     # Load frames as vm objects
     list_vm, init_vm = vm_output.load(path)

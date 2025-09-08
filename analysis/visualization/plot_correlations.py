@@ -83,7 +83,7 @@ def initialize_figure(varname, type):
     else:
         plt.title(rf'$C_{{{varname}}}(t)$')
         plt.xlabel(r'$t$')
-        plt.hlines(0, 0, 1, linestyle="dashed", color="gray")
+        plt.axhline(0, 0, 1, linestyle="dashed", color="gray")
 
 
 
