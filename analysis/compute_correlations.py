@@ -1,6 +1,6 @@
 from cells.bind import VertexModel
 
-import os
+#import os
 import argparse
 import numpy as np
 from pathlib import Path
@@ -17,7 +17,7 @@ config_dir = "data/simulated/configs/"
 
 # Command-line argument parsing
 parser = argparse.ArgumentParser(description="Computes correlations on simulation data and save as pickle")
-parser.add_argument('filepath',   type=str,   help="Defines path to files to do computations on, as 'path/to/file*'")
+parser.add_argument('filepath',   type=str,   help="Defines path to files to do computations on, typically data/simulated/raw/dir/filepattern")
 parser.add_argument('-dr',        type=float, help="Spatial step size (float)",                                     default='1')
 parser.add_argument('-rmax',      type=float, help="Max distance to coompute correlation for (float)",              default='20')
 parser.add_argument('-tfrac',     type=float, help="Fraction of total duration to compute correlation for (float)", default='0.5')
@@ -31,8 +31,8 @@ relative_parent, filename = decompose_input_path(args.filepath, data_dir)
 Path(f"{obj_dir}{relative_parent}").mkdir(parents=True, exist_ok=True)
 
 
-i = 1
-for path in Path(f"{data_dir}{relative_parent}").glob(filename):
+for path in Path(f"{data_dir}{relative_parent}").glob(f"{filename}*"):
+    print(path)
 
     # Load frames as vm objects
     list_vm, init_vm = vm_output.load(path)
