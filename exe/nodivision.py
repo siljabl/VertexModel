@@ -81,8 +81,8 @@ taup   = config['physics']['taup']                      # self-propulsion persis
 dt      = config['simulation']['dt']                    # integration time step
 delta   = config['simulation']['delta']                 # length below which T1s are triggered
 epsilon = config['simulation']['epsilon']               # edges have length delta+epsilon after T1s
-period  = config['simulation']['period']                # saving frequence
-Nframes = config['simulation']['Nframes']                # number of steps/frames in simulation
+period  = config['simulation']['period']                # frame period
+Nframes = config['simulation']['Nframes']               # number of frames in simulation
 
 
 # Save simulation-specific config file
@@ -111,8 +111,8 @@ vm.vertexForces["surface"].volume = dict(map(                   # set cell volum
 # SIMULATION
 
 # outputs
-with open(f"{path_to_output}{fname}.p", "wb") as dump: pass           # output file is created
-fig, ax = plot(vm, fig=None, ax=None)                   # initialise plot with first frame
+with open(f"{path_to_output}{fname}.p", "wb") as dump: pass     # output file is created
+fig, ax = plot(vm, fig=None, ax=None)                           # initialise plot with first frame
 
 
 # simulation
