@@ -17,7 +17,7 @@
 	"delta": 0.02,
 	"epsilon": 0.002,
 	"period": 100,
-	"Nsteps": 10
+	"Nsteps": 100
     },
 
     "experimental": {
