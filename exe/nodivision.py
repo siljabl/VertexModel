@@ -82,7 +82,7 @@ dt      = config['simulation']['dt']                    # integration time step
 delta   = config['simulation']['delta']                 # length below which T1s are triggered
 epsilon = config['simulation']['epsilon']               # edges have length delta+epsilon after T1s
 period  = config['simulation']['period']                # saving frequence
-Nsteps  = config['simulation']['Nsteps']                # number of steps/frames in simulation
+Nframes = config['simulation']['Nframes']                # number of steps/frames in simulation
 
 
 # Save simulation-specific config file
@@ -117,7 +117,7 @@ fig, ax = plot(vm, fig=None, ax=None)                   # initialise plot with f
 
 # simulation
 frame = 0
-for step in range(0, Nsteps):
+for step in range(0, Nframes):
     # output is appended to file
     with open(f"{path_to_output}{fname}.p", "ab") as dump: pickle.dump(vm, dump)
 

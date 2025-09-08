@@ -13,7 +13,7 @@ def load(file):
         while True:
             try:
                 vm = pickle.load(dump)
-                vm.nintegrate(1,0)
+                vm.nintegrate(1,0)              # integrate so output corresponds to correct frame/timestep 
                 assert type(vm) is VertexModel  # check pickled object is a vertex model
                 if vm.time == 0: 
                     init_vm = vm
