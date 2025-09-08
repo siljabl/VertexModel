@@ -30,7 +30,7 @@ def sort_files(fnames, legend, relative_parent=''):
     Goes through files to plot and returns sorted arrays of legend labels and files
 
     Parameters:
-    - fnames: file name pattern. File names on form <fnames>.autocorr
+    - fnames: file name pattern. File names on form <fnames>*.autocorr
     - legend: key in config that is used to label plot. Also used as title on legend.
     - relative_parent: path from obj_dir to file
     """
@@ -39,7 +39,7 @@ def sort_files(fnames, legend, relative_parent=''):
     label_list = []
 
     # Aquire labels from config
-    for path in Path(f"{obj_dir}{relative_parent}").glob(f"{fnames}.autocorr"):
+    for path in Path(f"{obj_dir}{relative_parent}").glob(f"{fnames}*.autocorr"):
 
         # File path
         fname = f"{Path(path).stem}"
@@ -77,12 +77,12 @@ def initialize_figure(varname, type):
 
     if type == 'r':
         plt.title(rf'$C_{{{varname}}}(r)$')
-        plt.xlabel(r'$r~/~r_0$')
+        plt.xlabel(r'$r~/~r_6^*$')
         plt.axhline(0, 0, 1, linestyle="dashed", color="gray")
 
     else:
         plt.title(rf'$C_{{{varname}}}(t)$')
-        plt.xlabel(r'$t$')
+        plt.xlabel(r'$t~/~\tau_p$')
         plt.axhline(0, 0, 1, linestyle="dashed", color="gray")
 
 
@@ -96,7 +96,7 @@ def save_plot(figure, out_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Plot all defined autocorrelations")
-    parser.add_argument('filepath', type=str, help="Path to files to plot. Typically 'data/simulated/obj/file*'. Filename is on form <'path/to/file*'>.autocorr")
+    parser.add_argument('filepath', type=str, help="Path to files to plot. Typically 'data/simulated/obj/file'. Filename is on form <'path/to/file'>*.autocorr")
     parser.add_argument('param',    type=str, help="Parameter to plot correlation of (varvar)")
     parser.add_argument('var',      type=str, help="Correlation variable (t or r)")
     parser.add_argument('-legend',  type=str, help="Add legend (str)",                  default='')
@@ -131,7 +131,12 @@ def main():
 
         # Load data
         corr_obj = VMAutocorrelationObject(fname)
-        
+
+        # Load config
+        config_path = f"{config_dir}{fname}.json"
+        config_file = config.load(config_path)
+
+       
         # Plot
         if args.var == "r":
             out_path = f"{fig_dir}{relative_parent}spatial_autocorrelation_{args.param}_{filename}.png"
@@ -144,7 +149,9 @@ def main():
         else:
             out_path = f"{fig_dir}{relative_parent}temporal_autocorrelation_{args.param}_{filename}.png"
 
-            plt.plot(corr_obj.t_array[args.param], corr_obj.temporal[args.param], 
+            # Get persistence time 
+            taup = config.get_value(config_file, 'taup')
+            plt.plot(corr_obj.t_array[args.param] / taup, corr_obj.temporal[args.param], 
                      '-',
                      color=color, 
                      label=label)

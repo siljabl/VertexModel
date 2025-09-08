@@ -75,7 +75,8 @@ def get_cell_velocities(list_vm):
 
     # unwrap cell velocities at cell centers
     velocities = np.ma.array(list(map(
-        lambda vm: itemgetter(*cells)(vm.velocities.copy()), 
+        #lambda vm: itemgetter(*cells)(vm.velocities.copy()), #.getCentreVelocities()
+        lambda vm: itemgetter(*cells)(vm.getCentreVelocities().copy()),
         list_vm)))
 
     return velocities
