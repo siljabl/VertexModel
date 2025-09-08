@@ -13,6 +13,7 @@ def load(file):
         while True:
             try:
                 vm = pickle.load(dump)
+                vm.nintegrate(1,0)
                 assert type(vm) is VertexModel  # check pickled object is a vertex model
                 if vm.time == 0: 
                     init_vm = vm
