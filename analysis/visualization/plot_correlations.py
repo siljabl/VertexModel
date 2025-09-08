@@ -137,6 +137,7 @@ def main():
             out_path = f"{fig_dir}{relative_parent}spatial_autocorrelation_{args.param}_{filename}.png"
 
             plt.plot(corr_obj.r_array[args.param], corr_obj.spatial[args.param],
+                     '-',
                      color=color,
                      label=label)
         
@@ -144,6 +145,7 @@ def main():
             out_path = f"{fig_dir}{relative_parent}temporal_autocorrelation_{args.param}_{filename}.png"
 
             plt.plot(corr_obj.t_array[args.param], corr_obj.temporal[args.param], 
+                     '-',
                      color=color, 
                      label=label)
         
