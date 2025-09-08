@@ -12,12 +12,12 @@
     "simulation": {
 	"VMseed": 0,
 	"Vseed": 0,
-	"Nvertices": 42,
+	"Nvertices": 24,
 	"dt": 1e-2,
 	"delta": 0.02,
 	"epsilon": 0.002,
-	"period": 10,
-	"Nsteps": 100
+	"period": 100,
+	"Nsteps": 10
     },
 
     "experimental": {
