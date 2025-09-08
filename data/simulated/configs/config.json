@@ -16,7 +16,7 @@
 	"dt": 1e-2,
 	"delta": 0.02,
 	"epsilon": 0.002,
-	"period": 100,
+	"period": 10,
 	"Nsteps": 100
     },
 
