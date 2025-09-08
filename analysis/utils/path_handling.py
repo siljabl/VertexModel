@@ -1,8 +1,5 @@
 from pathlib import Path
 
-"""
-This file should probably be replaced by the use of Path
-"""
 
 
 def decompose_input_path(filepath, dirpath):

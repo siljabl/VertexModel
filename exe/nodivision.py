@@ -54,16 +54,17 @@ print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
 
 # PARAMETERS
 
+# Cell size
+rhex  = config['physics']['rhex']                       # reference side lenght of regular cell (hexagon)
+rho   = config['physics']['rho']                        # defines compression/stretching of cells
+
 # Lattice
 VMseed = config['simulation']['VMseed']                 # random number generator seed for vertex model object
-Ngrid  = 6#config['simulation']['Nvertices']              # number of vertices in each dimension. Ncell = Ngrid**2 / 3
-r0     = config['simulation']['rgrid']                  # length scale of triangular lattice
+Ngrid  = config['simulation']['Nvertices']              # number of vertices in each dimension. Ncell = Ngrid**2 / 3
+rgrid  = rhex / rho                                     # length scale of triangular lattice
 
-
-# Cell size
-rho   = config['physics']['rho']                        # defines compression/stretching of cells
-rhex  = rho * r0                                        # reference side lenght of regular cell (hexagon)
-A0    = hexagon_area(r0)                                # initial cell area
+# Cell distributions
+A0    = hexagon_area(rgrid)                             # initial cell area
 V0    = hexagon_volume(rhex)                            # cell volume
 stdV0 = config['experimental']['stdV0'] * V0            # standard deviation of cell volume distribution
 Vmin  = config['experimental']['Vmin']  * V0            # lower limit on volume
@@ -81,7 +82,7 @@ dt      = config['simulation']['dt']                    # integration time step
 delta   = config['simulation']['delta']                 # length below which T1s are triggered
 epsilon = config['simulation']['epsilon']               # edges have length delta+epsilon after T1s
 period  = config['simulation']['period']                # saving frequence
-Nsteps  = 10#config['simulation']['Nsteps']                # number of steps/frames in simulation
+Nsteps  = config['simulation']['Nsteps']                # number of steps/frames in simulation
 
 
 # Save simulation-specific config file
