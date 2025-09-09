@@ -65,7 +65,7 @@ def main():
 
     # Load config file
     config_path = args.config
-    config = load_config(config_path)
+    config_file = load_config(config_path)
 
     # If additional parameters were provided, update the config
     if args.params:
@@ -79,23 +79,25 @@ def main():
             value = float(args.params[i + 1])
             
             # Update the config dictionary
-            update_value(config, key, value)
+            update_value(config_file, key, value)
 
     # Save simulation-specific config file
-    save_config(f"{path_to_config}{fname}.json", config)
+    save_config(f"{path_to_config}{fname}.json", config_file)
 
 
 
     # LOAD PARAMETERS
+
+    config = config_file                                    # for readability                             
 
     # Define cell
     rhex  = config['physics']['rhex']                       # reference side lenght of regular cell (hexagon)
     rho   = config['physics']['rho']                        # defines compression/stretching of cells
 
     # Lattice
-    seed = config['simulation']['seed']                     # random number generator seed
-    Ngrid  = config['simulation']['Nvertices']              # number of vertices in each dimension. Ncell = Ngrid**2 / 3
-    rgrid  = rhex / rho                                     # length scale of triangular lattice
+    seed  = config['simulation']['seed']                    # random number generator seed
+    Ngrid = config['simulation']['Nvertices']               # number of vertices in each dimension. Ncell = Ngrid**2 / 3
+    rgrid = rhex / rho                                      # length scale of triangular lattice
 
     # Cell distributions
     A0    = hexagon_area(rgrid)                             # initial cell area

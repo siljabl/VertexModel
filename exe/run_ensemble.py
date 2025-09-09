@@ -14,17 +14,17 @@ output_path = "data/simulated/raw/"
 movies_path = "data/simulated/videos/"
 
 
-def create_ouput_directory(script, config, seed, prefix=None):
+def create_ouput_directory(script, config_file, seed, prefix=None):
     """
     Generates standard name and creates directory
     """
     
     # Number of cells in simulation
-    Ngrid  = get_value(config, 'Nvertices')
+    Ngrid  = get_value(config_file, 'Nvertices')
     Ncells = Ngrid ** 2 / 3
 
     # Streching/compression of cells
-    rho = get_value(config, 'rho')
+    rho = get_value(config_file, 'rho')
 
     # Name on directory
     directory = f"{Path(script).stem}_N{int(Ncells)}_rho{int(100*rho)}_seed{seed}"
@@ -61,7 +61,7 @@ def main():
     args = parser.parse_args()
 
     # Load configurations
-    config = load_config(args.config)
+    config_file = load_config(args.config)
 
     # Set simulation seed
     if args.seed == None:
@@ -69,7 +69,7 @@ def main():
     np.random.seed(args.seed)
 
     # Create subfolder for ensemble
-    output_dir = create_ouput_directory(args.script, config, args.seed)
+    output_dir = create_ouput_directory(args.script, config_file, args.seed)
 
     # Prepare the commands for each run
     commands = []
