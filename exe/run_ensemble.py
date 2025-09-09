@@ -13,6 +13,7 @@ from utils.config_functions import *
 config_path = "data/simulated/configs/"
 output_path = "data/simulated/raw/"
 movies_path = "data/simulated/videos/"
+object_path = "data/simulated/obj/"
 
 
 def create_ouput_directory(script, config_file, seed, prefix=None):
@@ -36,6 +37,8 @@ def create_ouput_directory(script, config_file, seed, prefix=None):
     Path(f"{config_path}{directory}/").mkdir(parents=True, exist_ok=True)
     Path(f"{output_path}{directory}/").mkdir(parents=True, exist_ok=True)
     Path(f"{movies_path}{directory}/").mkdir(parents=True, exist_ok=True)
+    Path(f"{object_path}{directory}/").mkdir(parents=True, exist_ok=True)
+    Path(f"{object_path}{directory}/averages").mkdir(parents=True, exist_ok=True)
 
     return directory
 
