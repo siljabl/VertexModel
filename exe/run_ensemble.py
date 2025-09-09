@@ -1,54 +1,79 @@
-import os
-import json
+import argparse
 import subprocess
-import glob
-import pickle
+
+from pathlib  import Path
 from datetime import datetime
 
+from cells.exponents import float_to_letters
+
+from utils.config_functions import *
+
 # Define paths
-config_path = 'data/config/run_configs/'
-output_path = 'data/obj/'
+config_path = "data/simulated/configs/"
+output_path = "data/simulated/raw/"
+movies_path = "data/simulated/videos/"
 
-def load_configurations(config_path):
-    """Load all configuration JSON files from the specified directory."""
-    config_files = glob.glob(os.path.join(config_path, '*.json'))
-    configs = []
-    for config_file in config_files:
-        with open(config_file, 'r') as f:
-            config = json.load(f)
-            configs.append((config_file, config))  # Tuple of (filename, config)
-    return configs
 
-def run_simulation(config):
-    """Run the simulation using the specified configuration."""
-    config_file, parameters = config
-    # You can pass any command-line arguments needed for your script
-    subprocess.run(['python', 'exe/run_simulation.py', config_file], check=True)
-    return parameters  # Return parameters to potentially save or log
 
-def save_results(results, timestamp):
-    """Save the results (parameters) to a pickle file."""
-    output_file = os.path.join(output_path, f'analysis_results_{timestamp}.pkl')
-    with open(output_file, 'wb') as f:
-        pickle.dump(results, f)
+def create_ouput_directory(script, config, prefix=None):
+    """
+    Generates standard name and creates directory
+    """
+    
+    # Number of cells in simulation
+    Ngrid  = get_value(config, 'Nvertices')
+    Ncells = Ngrid ** 2 / 3
 
-def main():
+    # Streching/compression of cells
+    rho = get_value(config, 'rho')
+
+    # Seed/stamp/identifier
+
+    # Name on directory
+    directory = f"{Path(script).stem}_N{int(Ncells)}_rho{int(100*rho)}"    # add seed/identifier
+
+    # Create folders
+    Path(f"{config_path}{directory}/").mkdir(parents=True, exist_ok=True)
+    Path(f"{output_path}{directory}/").mkdir(parents=True, exist_ok=True)
+    Path(f"{movies_path}{directory}/").mkdir(parents=True, exist_ok=True)
+
+    return directory
+
+
+
+if __name__ == "__main__":
+
+    # Command-line argument parsing
+    parser = argparse.ArgumentParser(description="Run several runs")
+    parser.add_argument('script',         type=str,  help='Simulation script')
+    parser.add_argument('-N', '--nruns',  type=int,  help="Number of runs to so", default=2)
+    parser.add_argument('-s', '--seed',   type=int,  help="Number of runs to so", default=2)
+    parser.add_argument('-c', '--config', type=str,  help='Path to config file',  default='data/simulated/configs/config.json')
+    parser.add_argument('-p', '--params', nargs='*', help='Additional parameters in the form key_value')  # remove?
+    args = parser.parse_args()
+
     # Load configurations
-    configs = load_configurations(config_path)
-    results = []
+    config = load_config(args.config)
+
+    # Create subfolder for ensemble
+    dir = create_ouput_directory(args.script, config)
+
+    # Update config
+    # with specific seed
+    # also add new parameters?
+
+    # Prepare the command to run the simulation
+    command = [
+        'python', 
+        args.script,
+        '--dir', dir,
+        '--config', args.config
+    ]
+    subprocess.run(command, check=True)
+    
 
     # Timestamp for saving results
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
 
-    # Run simulations for each configuration
-    for config in configs:
-        print(f"Running simulation with configuration: {config[0]}")
-        parameters = run_simulation(config)
-        results.append(parameters)
-
     # Save the results
-    save_results(results, timestamp)
-    print(f"All simulations completed. Results saved in: {output_path}")
-
-if __name__ == "__main__":
-    main()
+    #print(f"All simulations completed. Results saved in: {output_path}")
