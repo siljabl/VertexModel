@@ -4,6 +4,7 @@ import subprocess
 import numpy as np
 
 from pathlib import Path
+from datetime import datetime
 from multiprocessing import Pool
 from utils.config_functions import *
 
@@ -27,7 +28,9 @@ def create_ouput_directory(script, config_file, seed, prefix=None):
     rho = get_value(config_file, 'rho')
 
     # Name on directory
-    directory = f"{Path(script).stem}_N{int(Ncells)}_rho{int(100*rho)}_seed{seed}"
+    timestamp = datetime.now().strftime('%Y%m%d')
+    directory = f"{Path(script).stem}_{timestamp}_seed{seed}"
+    #directory = f"{Path(script).stem}_N{int(Ncells)}_rho{int(100*rho)}_seed{seed}"
 
     # Create folders
     Path(f"{config_path}{directory}/").mkdir(parents=True, exist_ok=True)

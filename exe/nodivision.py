@@ -21,6 +21,21 @@ import matplotlib
 matplotlib.use("Agg")
 
 
+def filename(config_file, sufix=''):
+        # Number of cells in simulation
+    Ngrid  = get_value(config_file, 'Nvertices')
+    Ncells = Ngrid ** 2 / 3
+
+    # Streching/compression of cells
+    rho = get_value(config_file, 'rho')
+
+    # Name on directory
+    filename = f"{Path(__file__).stem}_N{int(Ncells)}_rho{int(100*rho)}_{sufix}"
+
+    return filename
+
+
+
 def main():
     # Command-line argument parsing
     parser = argparse.ArgumentParser(description="Run simulation constant cell volume and active brownian motion")
@@ -46,15 +61,6 @@ def main():
     Path(path_to_movies).mkdir(parents=True, exist_ok=True)
 
        
-    # Use script name and timing as name on output
-    if args.run_id == None:
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        fname     = f"{Path(__file__).stem}_{timestamp}"
-    else:
-        timestamp = datetime.now().strftime('%Y%m%d')
-        fname     = f"{Path(__file__).stem}_{timestamp}_run{args.run_id}"
-    print("Simulation name: ", fname)
-
     # Save frames in temporary directory
     _frames_dir = mkdtemp()
     print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
@@ -80,6 +86,17 @@ def main():
             
             # Update the config dictionary
             update_value(config_file, key, value)
+
+
+    # Use script name and timing as name on output
+    if args.run_id == None:
+        sufix = datetime.now().strftime('%Y%m%d_%H%M%S')
+    else:
+        sufix = f"run{args.run_id}"
+
+    fname = filename(config_file, sufix)
+    print("Simulation name: ", fname)
+
 
     # Save simulation-specific config file
     save_config(f"{path_to_config}{fname}.json", config_file)
