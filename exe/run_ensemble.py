@@ -1,5 +1,10 @@
+import time
 import argparse
 import subprocess
+
+
+import numpy as np
+
 
 from pathlib  import Path
 from datetime import datetime
@@ -15,7 +20,7 @@ movies_path = "data/simulated/videos/"
 
 
 
-def create_ouput_directory(script, config, prefix=None):
+def create_ouput_directory(script, config, seed, prefix=None):
     """
     Generates standard name and creates directory
     """
@@ -27,10 +32,8 @@ def create_ouput_directory(script, config, prefix=None):
     # Streching/compression of cells
     rho = get_value(config, 'rho')
 
-    # Seed/stamp/identifier
-
     # Name on directory
-    directory = f"{Path(script).stem}_N{int(Ncells)}_rho{int(100*rho)}"    # add seed/identifier
+    directory = f"{Path(script).stem}_N{int(Ncells)}_rho{int(100*rho)}_seed{seed}"
 
     # Create folders
     Path(f"{config_path}{directory}/").mkdir(parents=True, exist_ok=True)
@@ -40,6 +43,10 @@ def create_ouput_directory(script, config, prefix=None):
     return directory
 
 
+def generate_seed(digits):
+    return int(time.time()) % 10 ** digits
+
+
 
 if __name__ == "__main__":
 
@@ -47,20 +54,27 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run several runs")
     parser.add_argument('script',         type=str,  help='Simulation script')
     parser.add_argument('-N', '--nruns',  type=int,  help="Number of runs to so", default=2)
-    parser.add_argument('-s', '--seed',   type=int,  help="Number of runs to so", default=2)
+    parser.add_argument('-s', '--seed',   type=int,  help="Simulation seed",    default=None)
     parser.add_argument('-c', '--config', type=str,  help='Path to config file',  default='data/simulated/configs/config.json')
-    parser.add_argument('-p', '--params', nargs='*', help='Additional parameters in the form key_value')  # remove?
+    parser.add_argument('-p', '--params', nargs='*', help='Additional parameters in the form key_value')
     args = parser.parse_args()
 
     # Load configurations
     config = load_config(args.config)
 
-    # Create subfolder for ensemble
-    dir = create_ouput_directory(args.script, config)
+    # Set simulation seed
+    if args.seed == None:
+        args.seed = generate_seed(3)
+    np.random.seed(args.seed)
 
-    # Update config
+    # Create subfolder for ensemble
+    dir = create_ouput_directory(args.script, config, args.seed)
+
+
     # with specific seed
     # also add new parameters?
+
+    # Update config
 
     # Prepare the command to run the simulation
     command = [
