@@ -81,6 +81,9 @@ if __name__ == "__main__":
         update_value(config, 'VMseed', VMseeds[run])
         update_value(config, 'Vseed',  Vseeds[run])
 
+        # Save with updated seeds
+        save_config(args.config, config)
+
         # Prepare the command to run the simulation
         command = [
             'python', 
