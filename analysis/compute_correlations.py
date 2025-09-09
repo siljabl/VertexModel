@@ -11,6 +11,7 @@ import utils.vm_output_handling as vm_output
 from utils.path_handling      import decompose_input_path
 from utils.correlation_object import VMAutocorrelationObject
 
+# Define paths
 obj_dir    = "data/simulated/obj/"
 data_dir   = "data/simulated/raw/"
 config_dir = "data/simulated/configs/"

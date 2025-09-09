@@ -19,7 +19,7 @@ import utils.config_functions as     config
 from utils.path_handling      import decompose_input_path
 from utils.correlation_object import VMAutocorrelationObject
 
-# Autocorrelation output directory
+# Define paths
 obj_dir    = "data/simulated/obj/"
 fig_dir    = "results/"
 config_dir = "data/simulated/configs/"
