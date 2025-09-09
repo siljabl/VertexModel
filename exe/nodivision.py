@@ -25,7 +25,8 @@ def main():
     # Command-line argument parsing
     parser = argparse.ArgumentParser(description="Run simulation constant cell volume and active brownian motion")
     parser.add_argument('-d', '--dir',    type=str,  help='Save in subfolders data/*/dir/. Creates dir if not existing.', default='')
-    parser.add_argument('-c', '--config', type=str,  help='Path to config file',        default='data/simulated/configs/config.json')
+    parser.add_argument('-c', '--config', type=str,  help='Path to config file',                       default='data/simulated/configs/config.json')
+    parser.add_argument('-i', '--run_id', type=int,  help='Identity to separate parallel runs',        default=None)
     parser.add_argument('-p', '--params', nargs='*', help='Additional parameters in the form key_value')
     args = parser.parse_args()
 
@@ -44,9 +45,13 @@ def main():
     Path(path_to_output).mkdir(parents=True, exist_ok=True)
     Path(path_to_movies).mkdir(parents=True, exist_ok=True)
 
+       
     # Use script name and timing as name on output
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    fname     = f"{Path(__file__).stem}_{timestamp}"
+    if args.run_id == None:
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        fname     = f"{Path(__file__).stem}_{timestamp}"
+    else:
+        fname     = f"{Path(__file__).stem}_id{args.run_id}"
     print("Simulation name: ", fname)
 
     # Save frames in temporary directory
