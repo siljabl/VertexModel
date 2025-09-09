@@ -13,46 +13,70 @@ from cells.bind import VertexModel
 from cells.plot import plot
 from cells.init import movie_sh_fname
 
+from utils.config_functions   import *
 from utils.vm_functions       import *
 from utils.exception_handlers import save_snapshot
-from utils.config_functions   import load_config, save_config
 
 import matplotlib
 matplotlib.use("Agg")
 
 
-# Command-line argument parsing
-parser = argparse.ArgumentParser(description="Run simulation without activity to relax the initial conditions")
-parser.add_argument('-config', type=str, help='Path to config file', default='data/simulated/configs/config.json')
-parser.add_argument('-dir',    type=str, help='Save in subfolders data/*/dir/. Creates dir if not existing.', default='')
-args = parser.parse_args()
-
-
-# Load config file
-config_path = args.config
-config = load_config(config_path)
-
-# Check if subfolders exists, if not create
-if args.dir != '':
-    args.dir = f"{args.dir}/"
-path_to_config = f"data/simulated/configs/{args.dir}"
-path_to_output = f"data/simulated/raw/{args.dir}"
-path_to_movies = f"data/simulated/videos/{args.dir}"
-
-Path(path_to_config).mkdir(parents=True, exist_ok=True)
-Path(path_to_output).mkdir(parents=True, exist_ok=True)
-Path(path_to_movies).mkdir(parents=True, exist_ok=True)
-
-
-# Use script name and timing as name on output
-fname = f"{Path(__file__).stem}_{datetime.today().strftime('%Y%m%d_%H%M')}"
-print("Simulation name: ", fname)
-
-# Save frames in temporary directory
-_frames_dir = mkdtemp()
-print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
-
 def main():
+    # Command-line argument parsing
+    parser = argparse.ArgumentParser(description="Run simulation without activity to relax the initial conditions")
+    parser.add_argument('-config', type=str,  help='Path to config file', default='data/simulated/configs/config.json')
+    parser.add_argument('-dir',    type=str,  help='Save in subfolders data/*/dir/. Creates dir if not existing.', default='')
+    parser.add_argument('-params', nargs='*', help='Additional parameters in the form key_value')
+    args = parser.parse_args()
+
+
+
+    # DEFINE PATHS
+
+    # Check if subfolders exists, if not create
+    if args.dir != '':
+        args.dir = f"{args.dir}/"
+    path_to_config = f"data/simulated/configs/{args.dir}"
+    path_to_output = f"data/simulated/raw/{args.dir}"
+    path_to_movies = f"data/simulated/videos/{args.dir}"
+
+    Path(path_to_config).mkdir(parents=True, exist_ok=True)
+    Path(path_to_output).mkdir(parents=True, exist_ok=True)
+    Path(path_to_movies).mkdir(parents=True, exist_ok=True)
+
+    # Use script name and timing as name on output
+    fname = f"{Path(__file__).stem}_{datetime.today().strftime('%Y%m%d_%H%M')}"
+    print("Simulation name: ", fname)
+
+    # Save frames in temporary directory
+    _frames_dir = mkdtemp()
+    print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
+
+
+
+    # CONFIG
+
+    # Load config file
+    config_path = args.config
+    config = load_config(config_path)
+
+    # If additional parameters were provided, update the config
+    if args.params:
+        # Ensure we have an even number of parameters
+        if len(args.params) % 2 != 0:
+            raise ValueError("Parameters should be provided in pairs of key value.")
+        
+        # Iterate over the arguments in pairs
+        for i in range(0, len(args.params), 2):
+            key = args.params[i]
+            value = args.params[i + 1]
+            # Update the config dictionary
+            update_value(config, key, value)
+
+    # Save simulation-specific config file
+    save_config(f"{path_to_config}{fname}.json", config)
+
+
 
     # LOAD PARAMETERS
 
@@ -86,9 +110,6 @@ def main():
     period  = config['simulation']['period']                # period between frames
     Nframes = config['simulation']['Nframes']               # number of frames in simulation
 
-
-    # Save simulation-specific config file
-    save_config(f"{path_to_config}{fname}.json", config)
 
 
     # INITIALISATION
