@@ -80,8 +80,7 @@ def main():
             '--dir',    output_dir,
             '--config', args.config,
             '--run_id', str(run),
-            '--params', 'VMseed', str(np.random.randint(1e3)),
-                        'Vseed',  str(np.random.randint(1e3))
+            '--params', 'seed', str(np.random.randint(1e3))
         ]
         commands.append(command)
 

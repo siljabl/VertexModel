@@ -93,7 +93,7 @@ def main():
     rho   = config['physics']['rho']                        # defines compression/stretching of cells
 
     # Lattice
-    VMseed = config['simulation']['VMseed']                 # random number generator seed for vertex model object
+    seed = config['simulation']['seed']                     # random number generator seed
     Ngrid  = config['simulation']['Nvertices']              # number of vertices in each dimension. Ncell = Ngrid**2 / 3
     rgrid  = rhex / rho                                     # length scale of triangular lattice
 
@@ -103,7 +103,6 @@ def main():
     stdV0 = config['experimental']['stdV0'] * V0            # standard deviation of cell volume distribution
     Vmin  = config['experimental']['Vmin']  * V0            # lower limit on volume
     Vmax  = config['experimental']['Vmax']  * V0            # upper limit on volume
-    Vseed = config['simulation']['Vseed']                   # random number generator seed for volume distribution
 
     # Forces
     Lambda = config['physics']['Lambda']                    # surface tension
@@ -122,13 +121,15 @@ def main():
 
     # INITIALISATION
 
+    # Set seed
+    np.random.seed(seed)
+
     # Vertex model object
-    vm = VertexModel(VMseed)                                        # initialise vertex model object
+    vm = VertexModel(np.random.randint(1e5))                        # initialise vertex model object
     vm.initRegularTriangularLattice(size=Ngrid, hexagonArea=A0)     # initialise periodic system
 
 
     # Add forces
-    np.random.seed(Vseed)
     vm.addActiveBrownianForce("abp", v0, taup)                      # centre active Brownian force
     vm.addSurfaceForce("surface", Lambda, V0, tauV)                 # surface tension force
 
