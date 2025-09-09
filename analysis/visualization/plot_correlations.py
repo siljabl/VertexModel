@@ -99,8 +99,8 @@ def main():
     parser.add_argument('filepath', type=str, help="Path to files to plot. Typically 'data/simulated/obj/file'. Filename is on form <'path/to/file'>*.autocorr")
     parser.add_argument('param',    type=str, help="Parameter to plot correlation of (varvar)")
     parser.add_argument('var',      type=str, help="Correlation variable (t or r)")
-    parser.add_argument('-legend',  type=str, help="Add legend (str)",                  default='')
-    parser.add_argument('-cmap',    type=str, help="Specify matplotlib colormap (str)", default='plasma')
+    parser.add_argument('--legend',  type=str, help="Add legend (str)",                  default='')
+    parser.add_argument('--cmap',    type=str, help="Specify matplotlib colormap (str)", default='plasma')
     args = parser.parse_args()
 
     # Decompose input path
