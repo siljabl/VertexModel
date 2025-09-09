@@ -105,6 +105,7 @@ def main():
 
     # Decompose input path
     relative_parent, filename = decompose_input_path(args.filepath, obj_dir)
+    print(relative_parent, filename)
 
     # Subdirectory exists, and create if not
     Path(f"{fig_dir}{relative_parent}").mkdir(parents=True, exist_ok=True)
@@ -119,7 +120,7 @@ def main():
     files, labels = sort_files(filename, args.legend, relative_parent)
 
     # Assert correct file name
-    assert len(files) > 0, f"No files matches filename: {args.filepath}.autocorr"
+    assert len(files) > 0, f"No files matches filename: {args.filepath}*.autocorr"
 
     # Define line colors
     cmap   = mpl.colormaps[args.cmap]

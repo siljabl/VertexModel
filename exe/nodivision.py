@@ -81,7 +81,7 @@ taup   = config['physics']['taup']                      # self-propulsion persis
 dt      = config['simulation']['dt']                    # integration time step
 delta   = config['simulation']['delta']                 # length below which T1s are triggered
 epsilon = config['simulation']['epsilon']               # edges have length delta+epsilon after T1s
-period  = config['simulation']['period']                # frame period
+period  = config['simulation']['period']                # period between frames
 Nframes = config['simulation']['Nframes']               # number of frames in simulation
 
 

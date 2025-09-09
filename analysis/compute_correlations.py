@@ -19,8 +19,9 @@ config_dir = "data/simulated/configs/"
 parser = argparse.ArgumentParser(description="Computes correlations on simulation data and save as pickle")
 parser.add_argument('filepath',   type=str,   help="Defines path to files to do computations on, typically data/simulated/raw/dir/filepattern")
 parser.add_argument('-dr',        type=float, help="Spatial step size (float)",                                     default='1')
-parser.add_argument('-rmax',      type=float, help="Max distance to compute correlation for (float)",              default='20')
+parser.add_argument('-rmax',      type=float, help="Max distance to compute correlation for (float)",               default='20')
 parser.add_argument('-tfrac',     type=float, help="Fraction of total duration to compute correlation for (float)", default='0.5')
+parser.add_argument('-mean_var'   type=float, help="Variable to take mean over in <x - <x>_var> (t or cell)",       default='t')
 parser.add_argument('-overwrite', type=bool,  help="Overwrite previous computations (True/False)",                  default=False)
 args = parser.parse_args()
 
@@ -53,10 +54,16 @@ for path in Path(f"{data_dir}{relative_parent}").glob(f"{filename}*"):
 
     areas = np.ma.array(volumes / heights)
 
+    # Define mean variable axis
+    if args.mean_var == 't':
+        mean_var = 1
+    elif args.mean_var == 'cell': 
+        mean_var = 0
+
     # Subtract mean
-    h_variation = np.ma.array(heights - np.mean(heights, axis=1, keepdims=True), mask=False)
-    A_variation = np.ma.array(areas   - np.mean(areas,   axis=1, keepdims=True), mask=False)
-    V_variation = np.ma.array(volumes - np.mean(volumes, axis=1, keepdims=True), mask=False)
+    h_variation = np.ma.array(heights - np.mean(heights, axis=mean_var, keepdims=True), mask=False)
+    A_variation = np.ma.array(areas   - np.mean(areas,   axis=mean_var, keepdims=True), mask=False)
+    V_variation = np.ma.array(volumes - np.mean(volumes, axis=mean_var, keepdims=True), mask=False)
     velocities  = np.ma.array(velocities, mask=False)
 
     # Initialize correlation object
