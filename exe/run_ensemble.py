@@ -79,7 +79,7 @@ def main():
             args.script,
             '--dir',    output_dir,
             '--config', args.config,
-            '--run_id', run,
+            '--run_id', str(run),
             '--params', 'VMseed', str(np.random.randint(1e3)),
                         'Vseed',  str(np.random.randint(1e3))
         ]

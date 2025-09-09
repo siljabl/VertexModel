@@ -51,7 +51,8 @@ def main():
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         fname     = f"{Path(__file__).stem}_{timestamp}"
     else:
-        fname     = f"{Path(__file__).stem}_id{args.run_id}"
+        timestamp = datetime.now().strftime('%Y%m%d')
+        fname     = f"{Path(__file__).stem}_{timestamp}_run{args.run_id}"
     print("Simulation name: ", fname)
 
     # Save frames in temporary directory
