@@ -24,9 +24,9 @@ matplotlib.use("Agg")
 def main():
     # Command-line argument parsing
     parser = argparse.ArgumentParser(description="Run simulation constant cell volume and active brownian motion")
-    parser.add_argument('--dir',    type=str,  help='Save in subfolders data/*/dir/. Creates dir if not existing.', default='')
-    parser.add_argument('--config', type=str,  help='Path to config file',        default='data/simulated/configs/config.json')
-    parser.add_argument('--params', nargs='*', help='Additional parameters in the form key_value')
+    parser.add_argument('-d', '--dir',    type=str,  help='Save in subfolders data/*/dir/. Creates dir if not existing.', default='')
+    parser.add_argument('-c', '--config', type=str,  help='Path to config file',        default='data/simulated/configs/config.json')
+    parser.add_argument('-p', '--params', nargs='*', help='Additional parameters in the form key_value')
     args = parser.parse_args()
 
 
