@@ -21,7 +21,7 @@ parser.add_argument('filepath',   type=str,   help="Defines path to files to do 
 parser.add_argument('-dr',        type=float, help="Spatial step size (float)",                                     default='1')
 parser.add_argument('-rmax',      type=float, help="Max distance to compute correlation for (float)",               default='20')
 parser.add_argument('-tfrac',     type=float, help="Fraction of total duration to compute correlation for (float)", default='0.5')
-parser.add_argument('-mean_var'   type=float, help="Variable to take mean over in <x - <x>_var> (t or cell)",       default='t')
+parser.add_argument('-mean_var',   type=float, help="Variable to take mean over in <x - <x>_var> (t or cell)",       default='t')
 parser.add_argument('-overwrite', type=bool,  help="Overwrite previous computations (True/False)",                  default=False)
 args = parser.parse_args()
 
