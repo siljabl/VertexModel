@@ -27,6 +27,10 @@ def update_value(config, key, val):
     Returns:
         value: The value associated with the key, or None if the key does not exist.
     """
+
+    if int(val) == val:
+        val = int(val)
+
     for sub_dict in config.values():
         if isinstance(sub_dict, dict) and key in sub_dict:
             sub_dict[key] = val

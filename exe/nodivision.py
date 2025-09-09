@@ -24,8 +24,8 @@ matplotlib.use("Agg")
 def main():
     # Command-line argument parsing
     parser = argparse.ArgumentParser(description="Run simulation without activity to relax the initial conditions")
-    parser.add_argument('--config', type=str,  help='Path to config file', default='data/simulated/configs/config.json')
     parser.add_argument('--dir',    type=str,  help='Save in subfolders data/*/dir/. Creates dir if not existing.', default='')
+    parser.add_argument('--config', type=str,  help='Path to config file',        default='data/simulated/configs/config.json')
     parser.add_argument('--params', nargs='*', help='Additional parameters in the form key_value')
     args = parser.parse_args()
 
@@ -68,8 +68,9 @@ def main():
         
         # Iterate over the arguments in pairs
         for i in range(0, len(args.params), 2):
-            key = args.params[i]
-            value = args.params[i + 1]
+            key   = args.params[i]
+            value = float(args.params[i + 1])
+            
             # Update the config dictionary
             update_value(config, key, value)
 
