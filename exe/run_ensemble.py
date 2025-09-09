@@ -44,6 +44,7 @@ def create_ouput_directory(script, config, seed, prefix=None):
 
 
 def generate_seed(digits):
+    """ Generates random seed below 1e<digits> """
     return int(time.time()) % 10 ** digits
 
 
@@ -54,7 +55,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run several runs")
     parser.add_argument('script',         type=str,  help='Simulation script')
     parser.add_argument('-N', '--nruns',  type=int,  help="Number of runs to so", default=2)
-    parser.add_argument('-s', '--seed',   type=int,  help="Simulation seed",    default=None)
+    parser.add_argument('-s', '--seed',   type=int,  help="Simulation seed",      default=None)
     parser.add_argument('-c', '--config', type=str,  help='Path to config file',  default='data/simulated/configs/config.json')
     parser.add_argument('-p', '--params', nargs='*', help='Additional parameters in the form key_value')
     args = parser.parse_args()
@@ -68,26 +69,25 @@ if __name__ == "__main__":
     np.random.seed(args.seed)
 
     # Create subfolder for ensemble
-    dir = create_ouput_directory(args.script, config, args.seed)
+    output_dir = create_ouput_directory(args.script, config, args.seed)
 
+    # Define run-specific seeds
+    VMseeds = np.random.randint(1e3, size=10)      # vertex model object seed
+    Vseeds  = np.random.randint(1e3, size=10)      # volume distribution seed
 
-    # with specific seed
-    # also add new parameters?
+    for run in range(args.nruns):
 
-    # Update config
+        # Update config
+        update_value(config, 'VMseed', VMseeds[run])
+        update_value(config, 'Vseed',  Vseeds[run])
 
-    # Prepare the command to run the simulation
-    command = [
-        'python', 
-        args.script,
-        '--dir', dir,
-        '--config', args.config
-    ]
-    subprocess.run(command, check=True)
-    
-
-    # Timestamp for saving results
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-
-    # Save the results
-    #print(f"All simulations completed. Results saved in: {output_path}")
+        # Prepare the command to run the simulation
+        command = [
+            'python', 
+            args.script,
+            '--dir', output_dir,
+            '--config', args.config
+        ]
+        subprocess.run(command, check=True)
+        
+    print(f"All simulations completed. Results saved in: {output_dir}")
