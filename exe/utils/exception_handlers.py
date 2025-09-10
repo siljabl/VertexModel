@@ -2,14 +2,14 @@ import os
 import sys
 import traceback
 
-from cells.plot import plot
+from utils.plotting_functions import plot
 
 
-def save_snapshot(vm, fig, ax, _frames_dir, index):
+def save_snapshot(vm, fig, ax, _frames_dir, index, cbar_zero='hexagon'):
     """ Saves simulation snapshot while taking care of syntax errors """
     
     # update plot
-    plot(vm, fig=fig, ax=ax, update=True)
+    plot(vm, fig=fig, ax=ax, update=True, cbar_zero=cbar_zero)
 
     # save frame
     while True:

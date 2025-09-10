@@ -10,11 +10,11 @@ from tempfile import mkdtemp
 from datetime import datetime
 
 from cells.bind import VertexModel
-from cells.plot import plot
 from cells.init import movie_sh_fname
 
 from utils.config_functions   import *
 from utils.vm_functions       import *
+from utils.plotting_functions import plot
 from utils.exception_handlers import save_snapshot
 
 import matplotlib
@@ -162,7 +162,7 @@ def main():
 
     # outputs
     with open(f"{path_to_output}{fname}.p", "wb") as dump: pass     # output file is created
-    fig, ax = plot(vm, fig=None, ax=None)                           # initialise plot with first frame
+    fig, ax = plot(vm, fig=None, ax=None, cbar_zero='average')                           # initialise plot with first frame
 
 
     # simulation
@@ -172,7 +172,7 @@ def main():
         with open(f"{path_to_output}{fname}.p", "ab") as dump: pickle.dump(vm, dump)
 
         # plot snapshot
-        save_snapshot(vm, fig, ax, _frames_dir, frame)
+        save_snapshot(vm, fig, ax, _frames_dir, frame, cbar_zero='average')
         frame += 1
 
         # integrate
