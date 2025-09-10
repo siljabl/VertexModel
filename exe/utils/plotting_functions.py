@@ -48,6 +48,7 @@ def plot(vm, fig=None, ax=None, update=True, only_set=False,
     vertex_indices : bool
         Write indices alongside vertices. (default: False)
     cbar_zero : defines which value to center colorbar around.  (default: 'hexagon')
+        NOTE: takes 'absolute', 'hexagon', or 'average'. Only implemented for "surface"
 
 
     Returns
@@ -177,6 +178,10 @@ def plot(vm, fig=None, ax=None, update=True, only_set=False,
                 cbar_area.set_label(
                     r"$(h_i - \bar{h})/\bar{h}$",
                     rotation=270, labelpad=_cbar_labelpad)
+            elif cbar_zero == 'absolute':
+                cbar_area.set_label(
+                    r"$h_i / r_6^*$",
+                    rotation=270, labelpad=_cbar_labelpad)
             if surface_force.parameters["tauV"] == 0 or True:
                 pass
             else:
@@ -271,7 +276,7 @@ def plot(vm, fig=None, ax=None, update=True, only_set=False,
         facecolors="none", edgecolors="none")
     cells = vm.getVertexIndicesByType("centre")
 
-    assert cbar_zero == 'hexagon' or cbar_zero == 'average'
+    assert cbar_zero == 'hexagon' or cbar_zero == 'average' or cbar_zero == 'absolute'
 
     if cbar_zero == 'hexagon':
 
@@ -302,6 +307,14 @@ def plot(vm, fig=None, ax=None, update=True, only_set=False,
         
         s_val = list(map(               # colour according to height
             lambda i: (heights[i] - np.mean(h)) / np.mean(h),
+            cells))
+        
+    if cbar_zero == 'absolute':
+        assert "surface_force" in locals()
+        assert surface_force.parameters["tauV"] == 0 or True
+        
+        s_val = list(map(               # colour according to height
+            lambda i: heights[i],
             cells))
  
 

@@ -160,9 +160,11 @@ def main():
 
     # SIMULATION
 
+    cbar_zero = 'absolute'
+
     # outputs
     with open(f"{path_to_output}{fname}.p", "wb") as dump: pass     # output file is created
-    fig, ax = plot(vm, fig=None, ax=None, cbar_zero='average')                           # initialise plot with first frame
+    fig, ax = plot(vm, fig=None, ax=None, cbar_zero=cbar_zero)                           # initialise plot with first frame
 
 
     # simulation
@@ -172,7 +174,7 @@ def main():
         with open(f"{path_to_output}{fname}.p", "ab") as dump: pickle.dump(vm, dump)
 
         # plot snapshot
-        save_snapshot(vm, fig, ax, _frames_dir, frame, cbar_zero='average')
+        save_snapshot(vm, fig, ax, _frames_dir, frame, cbar_zero=cbar_zero)
         frame += 1
 
         # integrate
