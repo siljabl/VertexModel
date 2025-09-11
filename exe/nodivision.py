@@ -108,16 +108,16 @@ def main():
 
     config = config_file                                    # for readability                             
 
-    # Define cell
-    rhex  = config['physics']['rhex']                       # reference side lenght of regular cell (hexagon)
-    rho   = config['physics']['rho']                        # defines compression/stretching of cells
-
     # Lattice
     seed  = config['simulation']['seed']                    # random number generator seed
     Ngrid = config['simulation']['Nvertices']               # number of vertices in each dimension. Ncell = Ngrid**2 / 3
-    rgrid = rhex / rho                                      # length scale of triangular lattice
+    Lgrid = config['simulation']['Lgrid']                   # length of lattice
+    rgrid = Lgrid / Ngrid                                   # length scale of triangular lattice
+    #rgrid = rhex / rho                                      # length scale of triangular lattice
 
-    # Cell distributions
+    # Cell
+    rhex  = config['physics']['rhex']                       # reference side lenght of regular cell (hexagon)
+    #rho   = config['physics']['rho']                        # defines compression/stretching of cells
     A0    = hexagon_area(rgrid)                             # initial cell area
     V0    = hexagon_volume(rhex)                            # cell volume
     stdV0 = config['experimental']['stdV0'] * V0            # standard deviation of cell volume distribution

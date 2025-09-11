@@ -19,11 +19,11 @@ config_dir = "data/simulated/configs/"
 # Command-line argument parsing
 parser = argparse.ArgumentParser(description="Computes correlations on simulation data and save as pickle")
 parser.add_argument('filepath',    type=str,   help="Defines path to files to do computations on, typically data/simulated/raw/dir/filepattern")
-parser.add_argument('--dr',        type=float, help="Spatial step size (float)",                                        default='1')
+parser.add_argument('--dr',        type=float, help="Spatial step size (float)",                                       default='1')
 parser.add_argument('--rfrac',     type=float, help="Max distance to compute correlation for (float)",                 default='0.5')
-parser.add_argument('--tfrac',     type=float, help="Fraction of total duration to compute correlation for (float)",    default='0.5')
+parser.add_argument('--tfrac',     type=float, help="Fraction of total duration to compute correlation for (float)",   default='0.5')
 parser.add_argument('--mean_var',  type=str,   help="Variable to take mean over in <x - <x>_var> (t or cell). Default: t",      default='t')
-parser.add_argument('-o', '--overwrite', type=bool,  help="Overwrite previous computations (True/False)",                  default=False)
+parser.add_argument('-o', '--overwrite', type=bool,  help="Overwrite previous computations (True/False)",              default=False)
 args = parser.parse_args()
 
 # Decompose input path
@@ -43,9 +43,10 @@ for path in Path(f"{data_dir}{relative_parent}").glob(f"{filename}*"):
     config_file = config.load(config_path)
 
     # Get values from config
-    rho    = config.get_value(config_file, 'rho')
-    rhex   = config.get_value(config_file, 'rhex')
-    Nsteps = config.get_value(config_file, 'Nsteps')
+    rho     = config.get_value(config_file, 'rho' )
+    rhex    = config.get_value(config_file, 'rhex') 
+    Nframes = config.get_value(config_file, 'Nframes')
+    Ngrid   = config.get_value(config_file, 'Nvertices')
     # rmax = 
 
     # Get cell properties
@@ -70,20 +71,20 @@ for path in Path(f"{data_dir}{relative_parent}").glob(f"{filename}*"):
 
     # Initialize correlation object
     relative_fname = f"{relative_parent}{Path(path).stem}"
-    autocorr_obj   = VMAutocorrelationObject(relative_fname)
+    autocorr_obj   = VMAutocorrelationObject(relative_fname) 
 
-    # Upper limit on distance
-    L    = (np.sqrt(3) / 2) * Nsteps * rhex / rho     # size of system in smallest axis
+    # Upper limit on distance 
+    L    = (np.sqrt(3) / 2) * Ngrid * rhex / rho     # size of system in shortest direction
     rmax = L * args.rfrac
 
     # Compute spatial autocorrelations
     autocorr_obj.compute_spatial(positions, h_variation, 'hh', args.dr, rmax, t_avrg=True, overwrite=args.overwrite)
     autocorr_obj.compute_spatial(positions, A_variation, 'AA', args.dr, rmax, t_avrg=True, overwrite=args.overwrite)
     autocorr_obj.compute_spatial(positions, V_variation, 'VV', args.dr, rmax, t_avrg=True, overwrite=args.overwrite)
-    autocorr_obj.compute_spatial(positions, [velocities[:,:,0], velocities[:,:,1]], 'vv', args.dr, rmax, t_avrg=True, overwrite=args.overwrite)
+    autocorr_obj.compute_spatial(positions, [velocities[:,:,0], velocities[:,:,1]], 'vv', args.dr, rmax, t_avrg=True, overwrite=args.overwrite) 
 
-    # Upper limit on time difference
-    tmax = int(Nsteps * args.tfrac)
+    # Upper limit on t ime difference
+    tmax = int(Nframes * args.tfrac)
 
     # Compute temporal autocorrelations
     autocorr_obj.compute_temporal(h_variation, 'hh', tmax, t_avrg=True, overwrite=args.overwrite)

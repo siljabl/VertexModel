@@ -32,3 +32,10 @@ def hexagon_area(rhex):
 
     return (3**(3/2) / 2) * (rhex)**2
 
+
+def cell_density(Ngrid, Lgrid):
+    """ Computes the global cell density """
+    Ncell = Ngrid**2 / 3
+    Agrid = (np.sqrt(3) / 2) * Lgrid**2
+
+    return Ncell / Agrid
