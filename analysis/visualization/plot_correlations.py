@@ -105,7 +105,6 @@ def main():
 
     # Decompose input path
     relative_parent, filename = decompose_input_path(args.filepath, obj_dir)
-    print(relative_parent, filename)
 
     # Subdirectory exists, and create if not
     Path(f"{fig_dir}{relative_parent}").mkdir(parents=True, exist_ok=True)

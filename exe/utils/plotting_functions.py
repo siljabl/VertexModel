@@ -136,7 +136,7 @@ def plot(vm, fig=None, ax=None, update=True, only_set=False,
 
         plt.ioff()
         fig, ax = plt.subplots()
-        fig.set_size_inches(10, 10)                                         # set figure size
+        fig.set_size_inches(10, 10)                                  # set figure size
         try: fig.canvas.window().setFixedSize(fig.canvas.window().size())   # set window size
         except AttributeError: pass
 
@@ -353,6 +353,8 @@ def plot(vm, fig=None, ax=None, update=True, only_set=False,
     if "taur" in locals():
         title += r"$, \tau_r=%.1e$" % taur
     ax.set_title(title)
+    ax.set_xlabel(r"$x~/~r_6^*$")
+    ax.set_ylabel(r"$y~/~r_6^*$")     
 
     # update canvas
     if update: _update_canvas(fig)

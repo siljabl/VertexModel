@@ -1,6 +1,6 @@
 from cells.bind import VertexModel
 
-#import os
+import glob
 import argparse
 import numpy as np
 from pathlib import Path
@@ -18,29 +18,45 @@ config_dir = "data/simulated/configs/"
 
 # Command-line argument parsing
 parser = argparse.ArgumentParser(description="Computes correlations on simulation data and save as pickle")
-parser.add_argument('filepath',    type=str,   help="Defines path to files to do computations on, typically data/simulated/raw/dir/filepattern")
-parser.add_argument('--dr',        type=float, help="Spatial step size (float)",                                       default='1')
-parser.add_argument('--rfrac',     type=float, help="Max distance to compute correlation for (float)",                 default='0.5')
-parser.add_argument('--tfrac',     type=float, help="Fraction of total duration to compute correlation for (float)",   default='0.5')
-parser.add_argument('--mean_var',  type=str,   help="Variable to take mean over in <x - <x>_var> (t or cell). Default: t",      default='t')
-parser.add_argument('-o', '--overwrite', type=bool,  help="Overwrite previous computations (True/False)",              default=False)
+parser.add_argument('filepath',    type=str,   help="Defines path to files to do computations on, typically data/simulated/raw/dir/filepattern. filepattern should not be same as dir!")
+parser.add_argument('--dr',        type=float, help="Spatial step size (float)",                                            default='1')
+parser.add_argument('--rfrac',     type=float, help="Max distance to compute correlation for (float)",                      default='0.5')
+parser.add_argument('--tfrac',     type=float, help="Fraction of total duration to compute correlation for (float)",        default='0.5')
+parser.add_argument('--mean_var',  type=str,   help="Variable to take mean over in <x - <x>_var> (t or cell). Default: t",  default='t')
+parser.add_argument('-o', '--overwrite', type=bool,  help="Overwrite previous computations (True/False)",                   default=False)
 args = parser.parse_args()
 
-# Decompose input path
-relative_parent, filename = decompose_input_path(args.filepath, data_dir)
+# Allow variety of input styles
+relative_path = args.filepath.split(data_dir)[-1]
+
+# file is in data_dir 
+if len(relative_path.split("/")) == 1:
+    relative_parent = ""
+
+# input is directory
+elif relative_path.split("/")[-1] == "":
+    relative_parent = relative_path
+
+# file is in subdirectory (only works if fname is not in dirname)
+else:
+    fname = relative_path.split("/")[-1]
+    relative_parent = relative_path.split(fname)[0]
+
 
 # Subdirectory exists, and create if not
 Path(f"{obj_dir}{relative_parent}").mkdir(parents=True, exist_ok=True)
 
 
-for path in Path(f"{data_dir}{relative_parent}").glob(f"{filename}*"):
+for path in glob.glob(f"{args.filepath}*"):
 
     # Load frames as vm objects
     list_vm, init_vm = vm_output.load(path)
+    print(path)
 
     # Load config
     config_path = f"{config_dir}{relative_parent}{Path(path).stem}.json"
     config_file = config.load(config_path)
+    print(config_path)
 
     # Get values from config
     rhex    = config.get_value(config_file, 'rhex') 
@@ -68,8 +84,8 @@ for path in Path(f"{data_dir}{relative_parent}").glob(f"{filename}*"):
     velocities  = np.ma.array(velocities, mask=False)
 
     # Initialize correlation object
-    relative_fname = f"{relative_parent}{Path(path).stem}"
-    autocorr_obj   = VMAutocorrelationObject(relative_fname) 
+    print(path)
+    autocorr_obj = VMAutocorrelationObject(path)
 
     # Upper limit on distance
     rmax = Lgrid * args.rfrac

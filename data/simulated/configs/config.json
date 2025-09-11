@@ -5,7 +5,7 @@
         "tauV": 0,
         "Lambda": 1,
         "Vth/V0": 1.5,
-        "v0": 0.75,
+        "v0": 2,
         "taup": 5
     },
     "simulation": {

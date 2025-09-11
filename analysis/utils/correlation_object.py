@@ -1,9 +1,13 @@
 import os
 import pickle
 import numpy as np
+from pathlib import Path
 from datetime import datetime
 
 import utils.correlation_computations as compute
+
+data_dir = "data/simulated/raw/"
+obj_dir  = "data/simulated/obj/"
 
 class VMAutocorrelationObject:
     def __init__(self, filename, path_addition=''):
@@ -15,8 +19,7 @@ class VMAutocorrelationObject:
         - path_addition: path that redirects to the project folder. Mainly for running in notebooks
         """
         assert filename is not None
-                
-        self.path  = f"data/simulated/obj/{filename}.autocorr"
+        self.path  = f"{obj_dir}{Path(filename.split(data_dir)[-1]).with_suffix('')}.autocorr"
 
         self.temporal = {}
         self.spatial  = {}
@@ -53,6 +56,24 @@ class VMAutocorrelationObject:
         self.log      = state.get('log', {})
 
         print(f"State loaded from {path_addition}{self.path}.")
+
+
+    
+    def copy_structure(self, struct_path, path_addition=''):
+        """
+        Copies structure of object at struct_path
+        """
+
+        # Load pickle
+        with open(f"{path_addition}{struct_path}", 'rb') as f:
+            structure = pickle.load(f)
+
+        self.temporal = {key: np.ma.zeros_like(value) for key, value in structure.pop('temporal').items()}
+        self.spatial  = {key: np.ma.zeros_like(value) for key, value in structure.pop('spatial').items()}
+        self.t_array  = {key: np.ma.zeros_like(value) for key, value in structure.pop('t_array').items()}
+        self.r_array  = {key: np.ma.zeros_like(value) for key, value in structure.pop('r_array').items()}
+
+        print(f"Copied structure of {struct_path}")
 
 
 

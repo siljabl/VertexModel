@@ -1,16 +1,17 @@
-import os
+import glob
 import pickle
+import argparse
+
 import numpy as np
+from pathlib import Path
 from datetime import datetime
 
-def load_results(results_path):
-    """Load pickle results from the specified directory."""
-    results = []
-    for filename in os.listdir(results_path):
-        if filename.endswith('.pkl'):
-            with open(os.path.join(results_path, filename), 'rb') as f:
-                results.append(pickle.load(f))
-    return results
+from utils.path_handling import decompose_input_path
+from utils.correlation_object import VMAutocorrelationObject
+
+ensemble_dir = "data/simulated/obj/averages/"
+Path(ensemble_dir).mkdir(parents=True, exist_ok=True)
+
 
 def compute_average(results):
     """Compute average and standard deviation from the results."""
@@ -27,15 +28,40 @@ def save_ensemble_average(average, std_dev, timestamp):
         pickle.dump({'mean': average, 'std_dev': std_dev}, f)
 
 def main():
-    results_path = 'data/obj/ensembles/ensemble_YYYYMMDD_HHMM/run_specific_results/'  # Adjust accordingly
-    results = load_results(results_path)
-    
-    average, std_dev = compute_average(results)
-    
-    # Get current timestamp for naming the output file
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    
-    save_ensemble_average(average, std_dev, timestamp)
+    parser = argparse.ArgumentParser(description="Plot all defined autocorrelations")
+    parser.add_argument('filepath', type=str, help="Path to files to plot. Typically 'data/simulated/obj/file'. Filename is on form <'path/to/file'>*.autocorr")
+    args = parser.parse_args()
+
+    # List all files
+    files_list   = glob.glob(f"{args.filepath}*.autocorr")
+    autocorr_tmp = VMAutocorrelationObject(files_list[0])
+
+    # Initialize ensemble correlation object
+    autocorr_obj = VMAutocorrelationObject(f"{str(Path(args.filepath).parent)}.autocorr")
+    autocorr_obj.copy_structure(autocorr_tmp.path)
+
+    assert set(autocorr_obj.temporal) == set(autocorr_obj.spatial)
+
+    Nfiles = len(files_list)
+    for file in files_list:
+        # Load autocorrelations of one state
+        autocorr_tmp = VMAutocorrelationObject(file)
+
+        # Compute average
+        for key in autocorr_obj.temporal.keys():
+            print(np.shape(autocorr_obj.temporal[key]), np.shape(autocorr_tmp.temporal[key]))
+            autocorr_obj.temporal[key] += autocorr_tmp.temporal[key] / Nfiles
+
+            print(np.shape(autocorr_obj.spatial[key]), np.shape(autocorr_tmp.spatial[key]))
+            autocorr_obj.spatial[key]  += autocorr_tmp.spatial[key]  / Nfiles
+
+    # Get distance and time difference arrays
+    autocorr_obj.t_array = autocorr_tmp.t_array
+    autocorr_obj.r_array = autocorr_tmp.r_array
+
+    autocorr_obj.save_pickle()
+
 
 if __name__ == "__main__":
     main()
+
