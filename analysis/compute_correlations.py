@@ -18,7 +18,7 @@ config_dir = "data/simulated/configs/"
 
 # Command-line argument parsing
 parser = argparse.ArgumentParser(description="Computes correlations on simulation data and save as pickle")
-parser.add_argument('filepath',    type=str,   help="Defines path to files to do computations on, typically data/simulated/raw/dir/filepattern. filepattern should not be same as dir!")
+parser.add_argument('filepath',    type=str,   help="Defines path to file or dir, typically: data/simulated/raw/dir/.")
 parser.add_argument('--dr',        type=float, help="Spatial step size (float)",                                            default='1')
 parser.add_argument('--rfrac',     type=float, help="Max distance to compute correlation for (float)",                      default='0.5')
 parser.add_argument('--tfrac',     type=float, help="Fraction of total duration to compute correlation for (float)",        default='0.5')
@@ -26,25 +26,36 @@ parser.add_argument('--mean_var',  type=str,   help="Variable to take mean over 
 parser.add_argument('-o', '--overwrite', type=bool,  help="Overwrite previous computations (True/False)",                   default=False)
 args = parser.parse_args()
 
+
+
 # Allow variety of inputs
 relative_path = args.filepath.split(data_dir)[-1]
 
-# file is in data_dir 
-if len(relative_path.split("/")) == 1:
-    relative_parent = ""
+# file is in subdir
+if len(relative_path.split("/")) > 1:
+    # input is directory
+    if relative_path.split("/")[-1] == "":
+        dir = relative_path
 
-# input is directory
-elif relative_path.split("/")[-1] == "":
-    relative_parent = relative_path
+    # file is in subdirectory (only works if fname is not in dirname)
+    else:
+        fname = relative_path.split("/")[-1]
+        dir = relative_path.split(fname)[0]
 
-# file is in subdirectory (only works if fname is not in dirname)
+    # update paths for input and output
+    obj_dir  = f"data/simulated/obj/{dir}"
+    data_dir = f"data/simulated/raw/{dir}"
+
+    # config file for entire folder
+    config_path = f"{config_dir}{dir.split('/')[0]}.json"
+
 else:
-    fname = relative_path.split("/")[-1]
-    relative_parent = relative_path.split(fname)[0]
-
+    # run specific config file
+    config_path = f"{config_dir}{Path(args.filepath).stem}.json"
 
 # Subdirectory exists, and create if not
-Path(f"{obj_dir}{relative_parent}").mkdir(parents=True, exist_ok=True)
+Path(f"{obj_dir}").mkdir(parents=True, exist_ok=True)
+
 
 
 for path in glob.glob(f"{args.filepath}*"):
@@ -53,7 +64,6 @@ for path in glob.glob(f"{args.filepath}*"):
     list_vm, init_vm = vm_output.load(path)
 
     # Load config
-    config_path = f"{config_dir}{relative_parent}{Path(path).stem}.json"
     config_file = config.load(config_path)
 
     # Get values from config

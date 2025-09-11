@@ -2,6 +2,7 @@ from cells.bind import VertexModel
 
 import os
 import sys
+import glob
 import argparse
 import numpy as np
 from pathlib import Path
@@ -20,7 +21,7 @@ from utils.path_handling      import decompose_input_path
 from utils.correlation_object import VMAutocorrelationObject
 
 # Define paths
-obj_dir    = "data/simulated/obj/"
+obj_dir    = "data/simulated/obj/average/"
 fig_dir    = "results/"
 config_dir = "data/simulated/configs/"
 
@@ -38,15 +39,15 @@ def sort_files(fnames, legend, relative_parent=''):
     file_list  = []
     label_list = []
 
+    # Load config to get plot label
+    config_path = f"data/simulated/configs/{fname}.json"
+    config_file = config.load(config_path)
+
     # Aquire labels from config
     for path in Path(f"{obj_dir}{relative_parent}").glob(f"{fnames}*.autocorr"):
 
         # File path
         fname = f"{Path(path).stem}"
-
-        # Load config to get plot label
-        config_path = f"{config_dir}{relative_parent}{fname}.json"
-        config_file = config.load(config_path)
 
         # Get values from
         label = config.get_value(config_file, legend)
@@ -104,10 +105,11 @@ def main():
     args = parser.parse_args()
 
     # Decompose input path
-    relative_parent, filename = decompose_input_path(args.filepath, obj_dir)
+    fname = Path(args.filepath).stem
+    dir   = Path(args.filepath).parent
 
     # Subdirectory exists, and create if not
-    Path(f"{fig_dir}{relative_parent}").mkdir(parents=True, exist_ok=True)
+    Path(f"{fig_dir}{fname}").mkdir(parents=True, exist_ok=True)
 
     # Assert temporal or spatial correlation
     assert args.var in ['r', 't'], "Wrong correlation variable. Must be r or t"
@@ -115,50 +117,39 @@ def main():
     # Create figure and plot line at 0 
     initialize_figure(args.param, args.var)
 
-    # Sort data sets by legend value
-    files, labels = sort_files(filename, args.legend, relative_parent)
+    # # Sort data sets by legend value
+    # files, labels = sort_files(filename, args.legend, relative_parent)
 
     # Assert correct file name
-    assert len(files) > 0, f"No files matches filename: {args.filepath}*.autocorr"
+    #assert len(files) > 0, f"No files matches filename: {args.filepath}*.autocorr"
 
     # Define line colors
-    cmap   = mpl.colormaps[args.cmap]
-    colors = cmap(np.linspace(0.1, 0.9, len(files)))
+    #cmap   = mpl.colormaps[args.cmap]
+    #colors = cmap(np.linspace(0.1, 0.9, len(files)))
 
 
-    # Plot each data set
-    for fname, label, color in zip(files, labels, colors):
 
-        # Load data
-        corr_obj = VMAutocorrelationObject(out_path=fname)
+    # Load data
+    corr_obj = VMAutocorrelationObject(out_path=args.filepath)
 
-        # Load config
-        config_path = f"{config_dir}{fname}.json"
-        config_file = config.load(config_path)
+    # Load config
+    config_path = f"{config_dir}/{fname}.json"
+    config_file = config.load(config_path)
 
-       
-        # Plot
-        if args.var == "r":
-            out_path = f"{fig_dir}{relative_parent}spatial_autocorrelation_{args.param}_{filename}.png"
+    
+    # Plot
+    if args.var == "r":
+        out_path = f"{fig_dir}{fname}/spatial_autocorrelation_{args.param}.png"
 
-            plt.plot(corr_obj.r_array[args.param], corr_obj.spatial[args.param],
-                     '-',
-                     color=color,
-                     label=label)
+        plt.plot(corr_obj.r_array[args.param], corr_obj.spatial[args.param])
+    
+    else:
+        out_path = f"{fig_dir}{fname}/temporal_autocorrelation_{args.param}.png"
+
+        # Get persistence time 
+        taup = config.get_value(config_file, 'taup')
+        plt.plot(corr_obj.t_array[args.param] / taup, corr_obj.temporal[args.param])
         
-        else:
-            out_path = f"{fig_dir}{relative_parent}temporal_autocorrelation_{args.param}_{filename}.png"
-
-            # Get persistence time 
-            taup = config.get_value(config_file, 'taup')
-            plt.plot(corr_obj.t_array[args.param] / taup, corr_obj.temporal[args.param], 
-                     '-',
-                     color=color, 
-                     label=label)
-        
-    # Add legend
-    if args.legend != '':
-        plt.legend(title=rf'$\{args.legend}$')
 
     # Save plot
     plt.tight_layout()
