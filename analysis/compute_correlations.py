@@ -43,11 +43,9 @@ for path in Path(f"{data_dir}{relative_parent}").glob(f"{filename}*"):
     config_file = config.load(config_path)
 
     # Get values from config
-    rho     = config.get_value(config_file, 'rho' )
     rhex    = config.get_value(config_file, 'rhex') 
     Nframes = config.get_value(config_file, 'Nframes')
-    Ngrid   = config.get_value(config_file, 'Nvertices')
-    # rmax = 
+    Lgrid   = config.get_value(config_file, 'Lgrid')
 
     # Get cell properties
     positions  = vm_output.get_cell_positions(list_vm)
@@ -73,9 +71,8 @@ for path in Path(f"{data_dir}{relative_parent}").glob(f"{filename}*"):
     relative_fname = f"{relative_parent}{Path(path).stem}"
     autocorr_obj   = VMAutocorrelationObject(relative_fname) 
 
-    # Upper limit on distance 
-    L    = (np.sqrt(3) / 2) * Ngrid * rhex / rho     # size of system in shortest direction
-    rmax = L * args.rfrac
+    # Upper limit on distance
+    rmax = Lgrid * args.rfrac
 
     # Compute spatial autocorrelations
     autocorr_obj.compute_spatial(positions, h_variation, 'hh', args.dr, rmax, t_avrg=True, overwrite=args.overwrite)

@@ -43,7 +43,7 @@ def main():
     parser.add_argument('-c', '--config', type=str,  help='Path to config file',                       default='data/simulated/configs/config.json')
     parser.add_argument('-i', '--run_id', type=int,  help='Identity to separate parallel runs',        default=None)
     parser.add_argument('-p', '--params', nargs='*', help='Additional parameters in the form key_value')
-    parser.add_argument('--cbar0',        type=str,  help='How define 0 level of cbar in vm video',    default='hexagon')
+    parser.add_argument('--cbar0',        type=str,  help='How define 0 level of cbar in vm video',    default='average')
     args = parser.parse_args()
 
 
