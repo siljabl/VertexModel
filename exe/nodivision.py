@@ -27,10 +27,10 @@ def filename(config_file, sufix=''):
     Ncells = Ngrid ** 2 / 3
 
     # Streching/compression of cells
-    rho = get_value(config_file, 'rho')
+    Lgrid = get_value(config_file, 'Lgrid')
 
     # Name on directory
-    filename = f"{Path(__file__).stem}_N{int(Ncells)}_rho{int(100*rho)}_{sufix}"
+    filename = f"{Path(__file__).stem}_N{int(Ncells)}_L{int(Lgrid)}_{sufix}"
 
     return filename
 
@@ -99,10 +99,7 @@ def main():
     print("Simulation name: ", fname)
 
 
-    # Save simulation-specific config file
-    save_config(f"{path_to_config}{fname}.json", config_file)
-
-
+ 
 
     # LOAD PARAMETERS
 
@@ -113,11 +110,9 @@ def main():
     Ngrid = config['simulation']['Nvertices']               # number of vertices in each dimension. Ncell = Ngrid**2 / 3
     Lgrid = config['simulation']['Lgrid']                   # length of lattice
     rgrid = Lgrid / Ngrid                                   # length scale of triangular lattice
-    #rgrid = rhex / rho                                      # length scale of triangular lattice
 
     # Cell
     rhex  = config['physics']['rhex']                       # reference side lenght of regular cell (hexagon)
-    #rho   = config['physics']['rho']                        # defines compression/stretching of cells
     A0    = hexagon_area(rgrid)                             # initial cell area
     V0    = hexagon_volume(rhex)                            # cell volume
     stdV0 = config['experimental']['stdV0'] * V0            # standard deviation of cell volume distribution
@@ -136,6 +131,13 @@ def main():
     epsilon = config['simulation']['epsilon']               # edges have length delta+epsilon after T1s
     period  = config['simulation']['period']                # period between frames
     Nframes = config['simulation']['Nframes']               # number of frames in simulation
+
+
+    rho = cell_density(Ngrid, Lgrid)
+    update_value(config_file, 'rho', rho)
+    
+    # Save simulation-specific config file
+    save_config(f"{path_to_config}{fname}.json", config_file)
 
 
 

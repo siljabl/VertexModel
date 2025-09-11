@@ -1,6 +1,7 @@
 {
     "physics": {
         "rhex": 1,
+        "rho": 1,
         "tauV": 0,
         "Lambda": 1,
         "Vth/V0": 1.5,
@@ -9,8 +10,8 @@
     },
     "simulation": {
         "seed": 207,
-        "L": 24,
         "Nvertices": 24,
+        "Lgrid": 24,
         "dt": 0.01,
         "delta": 0.02,
         "epsilon": 0.002,
