@@ -1,4 +1,6 @@
 import time
+import glob
+import shutil
 import argparse
 import subprocess
 import numpy as np
@@ -59,7 +61,7 @@ def main():
     # Command-line argument parsing
     parser = argparse.ArgumentParser(description="Run several runs")
     parser.add_argument('script',         type=str,  help='Simulation script')
-    parser.add_argument('-N', '--nruns',  type=int,  help="Number of runs to so",         default=2)
+    parser.add_argument('-N', '--Nruns',  type=int,  help="Number of runs to so",         default=2)
     parser.add_argument('-P', '--npool',  type=int,  help="Number of parallel processes", default=16)
     parser.add_argument('-s', '--seed',   type=int,  help="Simulation seed",              default=None)
     parser.add_argument('-c', '--config', type=str,  help='Path to config file',  default='data/simulated/configs/config.json')
@@ -79,7 +81,7 @@ def main():
 
     # Prepare the commands for each run
     commands = []
-    for run in range(args.nruns):
+    for run in range(args.Nruns):
         command = [
             'python', 
             args.script,
@@ -97,6 +99,21 @@ def main():
         pool.map(run_simulation, commands)
 
     print(f"All simulations completed. Results saved in: {output_dir}")
+
+
+    # Load random config
+    path_to_random_run = glob.glob(f"{config_path}{output_dir}/*.json")[0]
+    config_file = load_config(path_to_random_run)
+    
+    # Update with ensemble seed
+    update_value(config_file, key='seed', val=args.seed)
+    
+    # Add number of runs/states in ensemble
+    config_file['Nruns'] = args.Nruns
+
+    # Save and delete folder
+    save_config(f"{config_path}{output_dir}.json", config_file)
+    shutil.rmtree(f"{config_path}{output_dir}")
 
 if __name__ == "__main__":
     main()

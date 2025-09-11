@@ -45,8 +45,12 @@ def sort_files(fnames, legend, relative_parent=''):
         fname = f"{Path(path).stem}"
 
         # Load config to get plot label
-        config_path = f"{config_dir}{relative_parent}{fname}.json"
-        config_file = config.load(config_path)
+        try:
+            config_path = f"{config_dir}{relative_parent}{fname}.json"
+            config_file = config.load(config_path)
+        except:
+            config_path = f"{config_dir}{fname}.json"
+            config_file = config.load(config_path)
 
         # Get values from
         label = config.get_value(config_file, legend)
@@ -99,8 +103,8 @@ def main():
     parser.add_argument('filepath', type=str, help="Path to files to plot. Typically 'data/simulated/obj/file'. Filename is on form <'path/to/file'>*.autocorr")
     parser.add_argument('param',    type=str, help="Parameter to plot correlation of (varvar)")
     parser.add_argument('var',      type=str, help="Correlation variable (t or r)")
-    parser.add_argument('--legend',  type=str, help="Add legend (str)",                  default='')
-    parser.add_argument('--cmap',    type=str, help="Specify matplotlib colormap (str)", default='plasma')
+    parser.add_argument('-l', '--legend',  type=str, help="Add legend (str)",                  default='')
+    parser.add_argument('-c', '--cmap',    type=str, help="Specify matplotlib colormap (str)", default='plasma')
     args = parser.parse_args()
 
     # Decompose input path

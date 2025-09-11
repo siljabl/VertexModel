@@ -22,7 +22,11 @@ matplotlib.use("Agg")
 
 
 def filename(config_file, sufix=''):
-        # Number of cells in simulation
+
+    # Date
+    date = datetime.now().strftime('%Y%m%d')
+
+    # Number of cells in simulation
     Ngrid  = get_value(config_file, 'Nvertices')
     Ncells = Ngrid ** 2 / 3
 
@@ -30,7 +34,7 @@ def filename(config_file, sufix=''):
     Lgrid = get_value(config_file, 'Lgrid')
 
     # Name on directory
-    filename = f"N{int(Ncells)}_L{int(Lgrid)}_{sufix}"
+    filename = f"{date}_N{int(Ncells)}_L{int(Lgrid)}_{sufix}"
 
     return filename
 
@@ -93,17 +97,6 @@ def main():
             update_value(config_file, key, value)
 
 
-    # Use script name and timing as name on output
-    if args.run_id == None:
-        sufix = datetime.now().strftime('%Y%m%d_%H%M')
-    else:
-        sufix = f"run{args.run_id}"
-
-    fname = filename(config_file, sufix)
-    print("Simulation name: ", fname)
-
-
- 
 
     # LOAD PARAMETERS
 
@@ -141,6 +134,9 @@ def main():
     update_value(config_file, 'rho', rho)
     
     # Save simulation-specific config file
+    fname = filename(config_file, f"seed{seed}")
+    print("Simulation name: ", fname)
+
     save_config(f"{path_to_config}{fname}.json", config_file)
 
 

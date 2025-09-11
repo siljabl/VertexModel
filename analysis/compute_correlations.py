@@ -42,7 +42,6 @@ else:
     fname = relative_path.split("/")[-1]
     relative_parent = relative_path.split(fname)[0]
 
-print(relative_parent)
 
 # Subdirectory exists, and create if not
 Path(f"{obj_dir}{relative_parent}").mkdir(parents=True, exist_ok=True)
@@ -52,12 +51,10 @@ for path in glob.glob(f"{args.filepath}*"):
 
     # Load frames as vm objects
     list_vm, init_vm = vm_output.load(path)
-    print(path)
 
     # Load config
     config_path = f"{config_dir}{relative_parent}{Path(path).stem}.json"
     config_file = config.load(config_path)
-    print(config_path)
 
     # Get values from config
     rhex    = config.get_value(config_file, 'rhex') 
@@ -85,7 +82,6 @@ for path in glob.glob(f"{args.filepath}*"):
     velocities  = np.ma.array(velocities, mask=False)
 
     # Initialize correlation object
-    print(path)
     autocorr_obj = VMAutocorrelationObject(in_path=path)
 
     # Upper limit on distance

@@ -20,7 +20,6 @@ class VMAutocorrelationObject:
         """
         assert in_path != None or out_path != None, 'Must provide either in_path or out_path'
 
-
         if in_path != None:
             filename = f"{Path(in_path.split(data_dir)[-1]).with_suffix('')}"
         elif out_path != None:
