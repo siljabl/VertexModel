@@ -130,7 +130,7 @@ def main():
     for fname, label, color in zip(files, labels, colors):
 
         # Load data
-        corr_obj = VMAutocorrelationObject(fname)
+        corr_obj = VMAutocorrelationObject(out_path=fname)
 
         # Load config
         config_path = f"{config_dir}{fname}.json"

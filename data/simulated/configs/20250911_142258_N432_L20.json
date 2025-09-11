@@ -1,8 +1,7 @@
 {
-    "script":"",
-    "date": "",
     "physics": {
         "rhex": 1,
+        "rho": 1.2470765814495917,
         "tauV": 0,
         "Lambda": 1,
         "Vth/V0": 1.5,
@@ -12,12 +11,12 @@
     "simulation": {
         "seed": 207,
         "Nvertices": 36,
-        "Lgrid": 50,
+        "Lgrid": 20,
         "dt": 0.01,
         "delta": 0.02,
         "epsilon": 0.002,
         "period": 100,
-        "Nframes": 100
+        "Nframes": 10
     },
     "experimental": {
         "stdV0": 0.4,

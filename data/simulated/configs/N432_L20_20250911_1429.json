@@ -1,6 +1,6 @@
 {
-    "script":"",
-    "date": "",
+    "script": "/home/silja/Documents/VertexModel/exe/nodivision.py",
+    "date": "20250911_142934",
     "physics": {
         "rhex": 1,
         "tauV": 0,
@@ -12,12 +12,12 @@
     "simulation": {
         "seed": 207,
         "Nvertices": 36,
-        "Lgrid": 50,
+        "Lgrid": 20,
         "dt": 0.01,
         "delta": 0.02,
         "epsilon": 0.002,
         "period": 100,
-        "Nframes": 100
+        "Nframes": 10
     },
     "experimental": {
         "stdV0": 0.4,

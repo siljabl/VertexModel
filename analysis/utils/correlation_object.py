@@ -10,7 +10,7 @@ data_dir = "data/simulated/raw/"
 obj_dir  = "data/simulated/obj/"
 
 class VMAutocorrelationObject:
-    def __init__(self, filename, path_addition=''):
+    def __init__(self, in_path=None, out_path=None, path_addition=''):
         """
         Initializes the autocorrelation object and checks if pickle exists.
 
@@ -18,8 +18,16 @@ class VMAutocorrelationObject:
         - filname: name of simulation data (and pickle)
         - path_addition: path that redirects to the project folder. Mainly for running in notebooks
         """
-        assert filename is not None
-        self.path  = f"{obj_dir}{Path(filename.split(data_dir)[-1]).with_suffix('')}.autocorr"
+        assert in_path != None or out_path != None, 'Must provide either in_path or out_path'
+
+
+        if in_path != None:
+            filename = f"{Path(in_path.split(data_dir)[-1]).with_suffix('')}"
+        elif out_path != None:
+            filename = f"{Path(out_path.split(obj_dir)[-1]).with_suffix('')}"
+        
+        self.in_path  = f"{data_dir}{filename}.p"
+        self.out_path = f"{obj_dir}{filename}.autocorr"
 
         self.temporal = {}
         self.spatial  = {}
@@ -29,10 +37,10 @@ class VMAutocorrelationObject:
                     'r': {}}
 
         # Check if the state file exists and load it if it does
-        if os.path.exists(f"{path_addition}{self.path}"):
+        if os.path.exists(f"{path_addition}{self.out_path}"):
             self.load_state(path_addition=path_addition)
         else:
-            print(f"No saved state file found at {path_addition}{self.path}. Starting fresh with provided data.")
+            print(f"No saved state file found at {path_addition}{self.out_path}. Starting fresh with provided data.")
 
 
 
@@ -45,7 +53,7 @@ class VMAutocorrelationObject:
         """
         
         # Load pickle
-        with open(f"{path_addition}{self.path}", 'rb') as f:
+        with open(f"{path_addition}{self.out_path}", 'rb') as f:
             state = pickle.load(f)
         
         # Update object
@@ -55,7 +63,7 @@ class VMAutocorrelationObject:
         self.r_array  = state.get('r_array', {})
         self.log      = state.get('log', {})
 
-        print(f"State loaded from {path_addition}{self.path}.")
+        print(f"State loaded from {path_addition}{self.out_path}.")
 
 
     
@@ -90,10 +98,10 @@ class VMAutocorrelationObject:
         }
         
         # Save
-        with open(f"{path_addition}{self.path}", 'wb') as f:
+        with open(f"{path_addition}{self.out_path}", 'wb') as f:
             pickle.dump(state, f)
 
-        print(f"State saved to {path_addition}{self.path}")
+        print(f"State saved to {path_addition}{self.out_path}")
 
 
 

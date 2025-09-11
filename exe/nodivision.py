@@ -30,7 +30,7 @@ def filename(config_file, sufix=''):
     Lgrid = get_value(config_file, 'Lgrid')
 
     # Name on directory
-    filename = f"{Path(__file__).stem}_N{int(Ncells)}_L{int(Lgrid)}_{sufix}"
+    filename = f"N{int(Ncells)}_L{int(Lgrid)}_{sufix}"
 
     return filename
 
@@ -73,6 +73,10 @@ def main():
     # Load config file
     config_path = args.config
     config_file = load_config(config_path)
+    
+    # Add script and date
+    config_file["script"] = __file__
+    config_file["date"]   = datetime.now().strftime('%Y%m%d_%H%M%S')
 
     # If additional parameters were provided, update the config
     if args.params:
@@ -91,7 +95,7 @@ def main():
 
     # Use script name and timing as name on output
     if args.run_id == None:
-        sufix = datetime.now().strftime('%Y%m%d_%H%M%S')
+        sufix = datetime.now().strftime('%Y%m%d_%H%M')
     else:
         sufix = f"run{args.run_id}"
 

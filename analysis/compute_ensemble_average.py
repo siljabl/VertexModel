@@ -9,6 +9,7 @@ from datetime import datetime
 from utils.path_handling import decompose_input_path
 from utils.correlation_object import VMAutocorrelationObject
 
+obj_dir = "data/simulated/obj/"
 ensemble_dir = "data/simulated/obj/averages/"
 Path(ensemble_dir).mkdir(parents=True, exist_ok=True)
 
@@ -21,11 +22,7 @@ def compute_average(results):
     std_dev = np.std(stacked_results, axis=0)
     return mean, std_dev
 
-def save_ensemble_average(average, std_dev, timestamp):
-    """Save the ensemble average and standard deviation to a file."""
-    output_file = f"data/obj/ensembles/ensemble_average_{timestamp}.pkl"
-    with open(output_file, 'wb') as f:
-        pickle.dump({'mean': average, 'std_dev': std_dev}, f)
+
 
 def main():
     parser = argparse.ArgumentParser(description="Plot all defined autocorrelations")
@@ -34,25 +31,23 @@ def main():
 
     # List all files
     files_list   = glob.glob(f"{args.filepath}*.autocorr")
-    autocorr_tmp = VMAutocorrelationObject(files_list[0])
+    autocorr_tmp = VMAutocorrelationObject(out_path=files_list[0])
 
     # Initialize ensemble correlation object
-    autocorr_obj = VMAutocorrelationObject(f"{str(Path(args.filepath).parent)}.autocorr")
-    autocorr_obj.copy_structure(autocorr_tmp.path)
-
+    out_path = f"{ensemble_dir}{Path(args.filepath).stem}"
+    autocorr_obj = VMAutocorrelationObject(out_path=out_path)
+    autocorr_obj.copy_structure(autocorr_tmp.out_path)
+    
     assert set(autocorr_obj.temporal) == set(autocorr_obj.spatial)
 
     Nfiles = len(files_list)
     for file in files_list:
         # Load autocorrelations of one state
-        autocorr_tmp = VMAutocorrelationObject(file)
+        autocorr_tmp = VMAutocorrelationObject(out_path=file)
 
         # Compute average
         for key in autocorr_obj.temporal.keys():
-            print(np.shape(autocorr_obj.temporal[key]), np.shape(autocorr_tmp.temporal[key]))
             autocorr_obj.temporal[key] += autocorr_tmp.temporal[key] / Nfiles
-
-            print(np.shape(autocorr_obj.spatial[key]), np.shape(autocorr_tmp.spatial[key]))
             autocorr_obj.spatial[key]  += autocorr_tmp.spatial[key]  / Nfiles
 
     # Get distance and time difference arrays

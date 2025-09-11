@@ -26,7 +26,7 @@ parser.add_argument('--mean_var',  type=str,   help="Variable to take mean over 
 parser.add_argument('-o', '--overwrite', type=bool,  help="Overwrite previous computations (True/False)",                   default=False)
 args = parser.parse_args()
 
-# Allow variety of input styles
+# Allow variety of inputs
 relative_path = args.filepath.split(data_dir)[-1]
 
 # file is in data_dir 
@@ -42,6 +42,7 @@ else:
     fname = relative_path.split("/")[-1]
     relative_parent = relative_path.split(fname)[0]
 
+print(relative_parent)
 
 # Subdirectory exists, and create if not
 Path(f"{obj_dir}{relative_parent}").mkdir(parents=True, exist_ok=True)
@@ -85,7 +86,7 @@ for path in glob.glob(f"{args.filepath}*"):
 
     # Initialize correlation object
     print(path)
-    autocorr_obj = VMAutocorrelationObject(path)
+    autocorr_obj = VMAutocorrelationObject(in_path=path)
 
     # Upper limit on distance
     rmax = Lgrid * args.rfrac
