@@ -10,8 +10,8 @@
     },
     "simulation": {
         "seed": 207,
-        "Nvertices": 24,
-        "Lgrid": 24,
+        "Nvertices": 30,
+        "Lgrid": 64,
         "dt": 0.01,
         "delta": 0.02,
         "epsilon": 0.002,

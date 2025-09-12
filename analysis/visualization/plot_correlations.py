@@ -157,8 +157,3 @@ else:
 plt.tight_layout()
 plt.savefig(out_path)
 print(f"Plot saved to {out_path}")
-
-
-# if __name__ == "__main__":
-#     main()
-
