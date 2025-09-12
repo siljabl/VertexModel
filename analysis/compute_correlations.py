@@ -8,7 +8,6 @@ from pathlib import Path
 import utils.config_functions   as config
 import utils.vm_output_handling as vm_output
 
-from utils.path_handling      import decompose_input_path
 from utils.correlation_object import VMAutocorrelationObject
 
 # Define paths
@@ -23,9 +22,9 @@ parser.add_argument('--dr',        type=float, help="Spatial step size (float)",
 parser.add_argument('--rfrac',     type=float, help="Max distance to compute correlation for (float)",                      default='0.5')
 parser.add_argument('--tfrac',     type=float, help="Fraction of total duration to compute correlation for (float)",        default='0.5')
 parser.add_argument('--mean_var',  type=str,   help="Variable to take mean over in <x - <x>_var> (t or cell). Default: t",  default='t')
-parser.add_argument('-o', '--overwrite', type=bool,  help="Overwrite previous computations (True/False)",                   default=False)
+parser.add_argument('--overwrite',             help="Overwrite previous computations",   action='store_true')
+parser.add_argument('--shared_config',         help="Shared config files",               action='store_true')
 args = parser.parse_args()
-
 
 
 # Allow variety of inputs
@@ -46,12 +45,14 @@ if len(relative_path.split("/")) > 1:
     obj_dir  = f"data/simulated/obj/{dir}"
     data_dir = f"data/simulated/raw/{dir}"
 
-    # config file for entire folder
-    config_path = f"{config_dir}{dir.split('/')[0]}.json"
+    if args.shared_config:
+        # config file for entire folder
+        config_path = f"{config_dir}{dir.split('/')[0]}.json"
+    else:
+        config_dir = f"data/simulated/configs/{dir}"
+    
+print(f"Computing correlations of files in {data_dir} with config files in {config_dir}.\n")
 
-else:
-    # run specific config file
-    config_path = f"{config_dir}{Path(args.filepath).stem}.json"
 
 # Subdirectory exists, and create if not
 Path(f"{obj_dir}").mkdir(parents=True, exist_ok=True)
@@ -62,6 +63,10 @@ for path in glob.glob(f"{args.filepath}*"):
 
     # Load frames as vm objects
     list_vm, init_vm = vm_output.load(path)
+
+    # run specific config file
+    if not args.shared_config:
+        config_path = f"{config_dir}{Path(path).stem}.json"
 
     # Load config
     config_file = config.load(config_path)

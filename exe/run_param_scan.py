@@ -1,3 +1,4 @@
+""" Dummy script that might be included later """
 import time
 import glob
 import shutil
@@ -23,13 +24,6 @@ def create_ouput_directory(script, config_file, seed, prefix=None):
     Generates standard name and creates directory
     """
     
-    # Number of cells in simulation
-    Ngrid  = get_value(config_file, 'Nvertices')
-    Ncells = Ngrid ** 2 / 3
-
-    # Streching/compression of cells
-    rho = get_value(config_file, 'rho')
-
     # Name on directory
     timestamp = datetime.now().strftime('%Y%m%d')
     directory = f"{Path(script).stem}_{timestamp}_seed{seed}"
@@ -40,7 +34,6 @@ def create_ouput_directory(script, config_file, seed, prefix=None):
     Path(f"{output_path}{directory}/").mkdir(parents=True, exist_ok=True)
     Path(f"{movies_path}{directory}/").mkdir(parents=True, exist_ok=True)
     Path(f"{object_path}{directory}/").mkdir(parents=True, exist_ok=True)
-    Path(f"{object_path}{directory}/averages").mkdir(parents=True, exist_ok=True)
 
     return directory
 
@@ -60,13 +53,22 @@ def main():
 
     # Command-line argument parsing
     parser = argparse.ArgumentParser(description="Run several runs")
-    parser.add_argument('script',         type=str,  help='Simulation script')
-    parser.add_argument('-N', '--Nruns',  type=int,  help="Number of runs to so",         default=2)
-    parser.add_argument('-P', '--npool',  type=int,  help="Number of parallel processes", default=16)
-    parser.add_argument('-s', '--seed',   type=int,  help="Simulation seed",              default=None)
-    parser.add_argument('-c', '--config', type=str,  help='Path to config file',          default='data/simulated/configs/config.json')
-    #parser.add_argument('-p', '--params', nargs='*', help='Additional parameters in the form key_value')
+    parser.add_argument('script',         type=str,   help='Simulation script')
+    parser.add_argument('param',          type=str,   help="Parameter to scan")
+    parser.add_argument('-l', '--list',   nargs='*',  help="List of parameter values",     default=None)
+    parser.add_argument('--min',          type=float, help="Min value of parameter (linear range)", default=None)
+    parser.add_argument('--max',          type=float, help="Max value of parameter (linear range))", default=None)
+    parser.add_argument('-N', '--Nruns',  type=int,   help="Number of runs to so",         default=6)
+    parser.add_argument('-P', '--npool',  type=int,   help="Number of parallel processes", default=16)
+    parser.add_argument('-s', '--seed',   type=int,   help="Simulation seed",              default=None)
+    parser.add_argument('-c', '--config', type=str,   help='Path to config file',          default='data/simulated/configs/config_nodivision.json')
     args = parser.parse_args()
+
+    assert args.min != None or args.list != None, f"Must provide either min/max or list of values for {args.param}"
+    if args.list == None:
+        param_range = np.linspace(args.min, args.max, args.Nruns)
+    else:
+        param_range = [param for param in args.list]
 
     # Load configurations
     config_file = load_config(args.config)
@@ -81,14 +83,15 @@ def main():
 
     # Prepare the commands for each run
     commands = []
-    for run in range(args.Nruns):
+    for run, param in zip(range(args.Nruns), param_range):
         command = [
             'python', 
             args.script,
             '--dir',    output_dir,
             '--config', args.config,
             '--run_id', str(run),
-            '--params', 'seed', str(np.random.randint(1e3))
+            '--params', 'seed',     str(np.random.randint(1e3)),
+                        args.param, str(param)
         ]
         commands.append(command)
 
@@ -100,20 +103,6 @@ def main():
 
     print(f"All simulations completed. Results saved in: {output_dir}")
 
-
-    # Load random config
-    path_to_random_run = glob.glob(f"{config_path}{output_dir}/*.json")[0]
-    config_file = load_config(path_to_random_run)
-    
-    # Update with ensemble seed
-    update_value(config_file, key='seed', val=args.seed)
-    
-    # Add number of runs/states in ensemble
-    config_file['Nruns'] = args.Nruns
-
-    # Save and delete folder
-    save_config(f"{config_path}{output_dir}.json", config_file)
-    shutil.rmtree(f"{config_path}{output_dir}")
 
 if __name__ == "__main__":
     main()
