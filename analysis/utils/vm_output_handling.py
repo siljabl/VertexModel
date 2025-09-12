@@ -5,10 +5,11 @@ from operator import itemgetter
 from cells.bind import VertexModel
 
 
-def load(file):
+def load(file, init_time=1):
     """ Loads vm object and returns as list """
     
     list_vm = []
+    init_vm = []
     with open(file, "rb") as dump:
         while True:
             try:
@@ -16,10 +17,10 @@ def load(file):
                 assert type(vm) is VertexModel  # check pickled object is a vertex model
                 
                 vm.nintegrate(1,0)              # integrate so output corresponds to correct frame/timestep 
-                if vm.time == 0: 
-                    init_vm = vm
-                    continue                    # save first frame as init_vm
-                list_vm += [vm]                 # append frame to list_vm
+                if vm.time < init_time: 
+                    init_vm += [vm]             # save first frames as init_vm
+                else:
+                    list_vm += [vm]             # append frame to list_vm
             except EOFError:
                 break                           # stop when we have read the whole file
 
