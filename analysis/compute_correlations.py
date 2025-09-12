@@ -26,8 +26,6 @@ parser.add_argument('--overwrite',             help="Overwrite previous computat
 parser.add_argument('--shared_config',         help="Shared config files",               action='store_true')
 args = parser.parse_args()
 
-print(args.shared_config)
-
 
 # Allow variety of inputs
 relative_path = args.filepath.split(data_dir)[-1]
