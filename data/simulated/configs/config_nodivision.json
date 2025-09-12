@@ -16,7 +16,7 @@
         "delta": 0.02,
         "epsilon": 0.002,
         "period": 100,
-        "Nframes": 500
+        "Nframes": 1000
     },
     "experimental": {
         "stdV0": 0.4,
