@@ -15,7 +15,7 @@ from utils.config_functions import *
 config_path = "data/simulated/configs/"
 output_path = "data/simulated/raw/"
 movies_path = "data/simulated/videos/"
-object_path = "data/simulated/obj/"
+#object_path = "data/simulated/processed/"
 
 
 

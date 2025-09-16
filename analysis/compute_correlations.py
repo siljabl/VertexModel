@@ -11,7 +11,7 @@ import utils.vm_output_handling as vm_output
 from utils.correlation_object import VMAutocorrelationObject
 
 # Define paths
-obj_dir    = "data/simulated/obj/"
+obj_dir    = "data/simulated/processed/"
 data_dir   = "data/simulated/raw/"
 config_dir = "data/simulated/configs/"
 
@@ -42,7 +42,7 @@ if len(relative_path.split("/")) > 1:
         dir = relative_path.split(fname)[0]
 
     # update paths for input and output
-    obj_dir     = f"data/simulated/obj/{dir}"
+    obj_dir     = f"data/simulated/processed/{dir}"
     data_dir    = f"data/simulated/raw/{dir}"
     config_path = f"{config_dir}{dir.split('/')[0]}.json"
 
