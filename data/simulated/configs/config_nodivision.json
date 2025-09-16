@@ -4,19 +4,19 @@
     "physics": {
         "rhex": 1,
         "tauV": 0,
-        "Lambda": 2,
-        "v0": 2,
+        "Lambda": 1,
+        "v0": 1,
         "taup": 1
     },
     "simulation": {
         "seed": 207,
         "Nvertices": 30,
-        "Lgrid": 36,
+        "Lgrid": 64,
         "dt": 0.01,
         "delta": 0.02,
         "epsilon": 0.002,
         "period": 100,
-        "Nframes": 20
+        "Nframes": 200
     },
     "experimental": {
         "stdV0": 0.4,

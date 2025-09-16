@@ -1,7 +1,12 @@
+# Ignore
 simulation/
 data/
 venv/
 docs/
 analysis/notebooks
 .emacs
+
+
+# Do not ignore
+data/simulated/configs/config*
 
