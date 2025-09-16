@@ -1,17 +1,17 @@
 {
-    "script":"",
+    "script": "",
     "date": "",
     "physics": {
         "rhex": 1,
         "tauV": 0,
-        "Lambda": 1,
-        "v0": 1,
+        "Lambda": 2,
+        "v0": 2,
         "taup": 1
     },
     "simulation": {
         "seed": 207,
         "Nvertices": 30,
-        "Lgrid": 64,
+        "Lgrid": 36,
         "dt": 0.01,
         "delta": 0.02,
         "epsilon": 0.002,

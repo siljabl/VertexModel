@@ -42,9 +42,10 @@ def main():
     parser = argparse.ArgumentParser(description="Run simulation constant cell volume and active brownian motion")
     parser.add_argument('-d', '--dir',    type=str,  help='Save in subfolders data/*/dir/. Creates dir if not existing.', default='')
     parser.add_argument('-c', '--config', type=str,  help='Path to config file',                       default='data/simulated/configs/config_nodivision.json')
+    parser.add_argument('-i', '--run_id', type=int,  help='Identity to separate parallel runs',        default=None)
     parser.add_argument('-p', '--params', nargs='*', help='Additional parameters in the form key_value')
     parser.add_argument('--cbar0',        type=str,  help='How define 0 level of cbar in vm video',    default='absolute')
-    parser.add_argument('--ensemble',                help='Defines whether run is part of ensemble execution', action='store_true')
+    parser.add_argument('--ensemble',                 help='Defines whether run is part of ensemble execution', action='store_true')
     args = parser.parse_args()
 
 
@@ -88,7 +89,7 @@ def main():
         # Iterate over the arguments in pairs
         for i in range(0, len(args.params), 2):
             key   = args.params[i]
-            value = float(args.params[i + 1])
+            value = args.params[i + 1]
             
             # Update the config dictionary
             update_value(config_file, key, value)
@@ -133,7 +134,7 @@ def main():
     # Save simulation-specific config file
     fname = create_filename(config_file, args.ensemble)
     print("Simulation name: ", fname)
-    
+
     save_config(f"{path_to_config}{fname}.json", config_file)
 
 
@@ -146,7 +147,7 @@ def main():
     # Vertex model object
     vm = VertexModel(np.random.randint(1e5))                        # initialise vertex model object
     vm.initRegularTriangularLattice(size=Ngrid, hexagonArea=A0)     # initialise periodic system
-    print(vm.systemSize)
+
 
     # Add forces
     vm.addActiveBrownianForce("abp", v0, taup)                      # centre active Brownian force

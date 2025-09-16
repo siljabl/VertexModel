@@ -23,10 +23,9 @@ def update_value(config, key, val):
     Parameters:
         config (dict): The nested configuration dictionary.
         key (str): The key to search for.
-        
-    Returns:
-        value: The value associated with the key, or None if the key does not exist.
+        val: The value associated with the key, or None if the key does not exist.
     """
+    val = float(val)
 
     # Transform to int
     if int(val) == val:

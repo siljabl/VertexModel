@@ -70,9 +70,10 @@ def main():
     parser = argparse.ArgumentParser(description="Run several runs")
     parser.add_argument('script',         type=str,  help='Simulation script')
     parser.add_argument('-N', '--Nruns',  type=int,  help="Number of runs to so",         default=2)
-    parser.add_argument('-P', '--npool',  type=int,  help="Number of parallel processes", default=16)
+    parser.add_argument('-P', '--Npool',  type=int,  help="Number of parallel processes", default=16)
     parser.add_argument('-s', '--seed',   type=int,  help="Simulation seed",              default=None)
     parser.add_argument('-c', '--config', type=str,  help='Path to config file',          default='data/simulated/configs/config.json')
+
     args = parser.parse_args()
 
     # Load configurations
@@ -100,7 +101,7 @@ def main():
         commands.append(command)
 
     # Use multiprocessing to run the simulations in parallel
-    with Pool(processes=args.npool) as pool:
+    with Pool(processes=args.Npool) as pool:
 
         # Execute the list of commands in parallel
         pool.map(run_simulation, commands)
