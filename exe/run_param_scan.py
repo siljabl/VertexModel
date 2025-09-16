@@ -14,32 +14,6 @@ from utils.config_functions import *
 from run_ensemble import create_dirname
 
 
-# Define paths
-config_path = "data/simulated/configs/"
-output_path = "data/simulated/raw/"
-movies_path = "data/simulated/videos/"
-object_path = "data/simulated/obj/"
-
-
-# def create_ouput_directory(script, config_file, seed, prefix=None):
-#     """
-#     Generates standard name and creates directory
-#     """
-    
-#     # Name on directory
-#     timestamp = datetime.now().strftime('%Y%m%d')
-#     directory = f"{Path(script).stem}_{timestamp}_seed{seed}"
-#     #directory = f"{Path(script).stem}_N{int(Ncells)}_rho{int(100*rho)}_seed{seed}"
-
-#     # Create folders
-#     Path(f"{config_path}{directory}/").mkdir(parents=True, exist_ok=True)
-#     Path(f"{output_path}{directory}/").mkdir(parents=True, exist_ok=True)
-#     Path(f"{movies_path}{directory}/").mkdir(parents=True, exist_ok=True)
-#     Path(f"{object_path}{directory}/").mkdir(parents=True, exist_ok=True)
-
-#     return directory
-
-
 def generate_seed(digits):
     """ Generates random seed below 1e<digits> """
     return int(time.time()) % 10 ** digits
@@ -59,12 +33,9 @@ def main():
     parser.add_argument('param',          type=str,   help="Parameter to scan")
     parser.add_argument('-l', '--list',   nargs='*',  help="List of parameter values",                  default=None)
     parser.add_argument('-r', '--range',  nargs='*',  help="Linear parameter range (min, max, Nparam)", default=None)
-    #parser.add_argument('-N', '--Nparam', type=int,   help="Number of parameter values to do",       default=6)
-    #parser.add_argument('--min',          type=float, help="Min value of parameter (linear range)",  default=None)
-    #parser.add_argument('--max',          type=float, help="Max value of parameter (linear range))", default=None)
-    parser.add_argument('-N', '--Nruns',  type=int,   help="Number of runs to do in ensemble",       default=2)
-    parser.add_argument('-P', '--Npool',  type=int,   help="Number of parallel processes",           default=16)
-    parser.add_argument('-s', '--seed',   type=int,   help="Simulation seed",                        default=None)
+    parser.add_argument('-s', '--seed',   type=int,   help="Simulation seed",                           default=None)
+    parser.add_argument('-N', '--Nruns',  type=int,   help="Number of runs to do in ensemble",          default=2)
+    parser.add_argument('-P', '--Npool',  type=int,   help="Number of parallel processes",              default=16)
     parser.add_argument('-c', '--config', type=str,   help='Path to config file', default='data/simulated/configs/config_nodivision.json')
     parser.add_argument('--ensemble',                 help='Defines whether run is part of ensemble execution', action='store_true')
     args = parser.parse_args()
@@ -106,7 +77,7 @@ def main():
                 '--config', args.config
             ]
 
-            subprocess.run(command, check=True)
+            run_simulation(command)
 
     else:
         
