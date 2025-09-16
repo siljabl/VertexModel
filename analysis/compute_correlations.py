@@ -45,6 +45,12 @@ if len(relative_path.split("/")) > 1:
     obj_dir     = f"data/simulated/obj/{dir}"
     data_dir    = f"data/simulated/raw/{dir}"
     config_path = f"{config_dir}{dir.split('/')[0]}.json"
+
+    # only states of ensembles are saved in common folder
+    ensemble = True
+
+else:
+    ensemble = False
     
 print(f"Computing correlations of files in {data_dir} with config files in {config_dir}.\n")
 
@@ -54,63 +60,63 @@ Path(f"{obj_dir}").mkdir(parents=True, exist_ok=True)
 
 
 
-# for path in glob.glob(f"{args.filepath}*"):
+for path in glob.glob(f"{args.filepath}*"):
 
-#     # Load frames as vm objects
-#     list_vm, init_vm = vm_output.load(path)
+    # Load frames as vm objects
+    list_vm, init_vm = vm_output.load(path)
 
-#     # run specific config file
-#     if not args.shared_config:
-#         config_path = f"{config_dir}{Path(path).stem}.json"
+    # run specific config file
+    if not ensemble:
+        config_path = f"{config_dir}{Path(path).stem}.json"
 
-#     # Load config
-#     config_file = config.load(config_path)
+    # Load config
+    config_file = config.load(config_path)
 
-#     # Get values from config
-#     rhex    = config.get_value(config_file, 'rhex') 
-#     Nframes = config.get_value(config_file, 'Nframes')
-#     Lgrid   = config.get_value(config_file, 'Lgrid')
+    # Get values from config
+    rhex    = config.get_value(config_file, 'rhex') 
+    Nframes = config.get_value(config_file, 'Nframes')
+    Lgrid   = config.get_value(config_file, 'Lgrid')
 
-#     # Get cell properties
-#     positions  = vm_output.get_cell_positions(list_vm)
-#     heights    = vm_output.get_cell_heights(list_vm)
-#     volumes    = vm_output.get_cell_volumes(list_vm)
-#     velocities = vm_output.get_cell_velocities(list_vm)
+    # Get cell properties
+    positions  = vm_output.get_cell_positions(list_vm)
+    heights    = vm_output.get_cell_heights(list_vm)
+    volumes    = vm_output.get_cell_volumes(list_vm)
+    velocities = vm_output.get_cell_velocities(list_vm)
 
-#     areas = np.ma.array(volumes / heights)
+    areas = np.ma.array(volumes / heights)
 
-#     # Define mean variable axis
-#     if args.mean_var == 't':
-#         mean_var = 1
-#     elif args.mean_var == 'cell': 
-#         mean_var = 0
+    # Define mean variable axis
+    if args.mean_var == 't':
+        mean_var = 1
+    elif args.mean_var == 'cell': 
+        mean_var = 0
 
-#     # Subtract mean
-#     h_variation = np.ma.array(heights - np.mean(heights, axis=mean_var, keepdims=True), mask=False)
-#     A_variation = np.ma.array(areas   - np.mean(areas,   axis=mean_var, keepdims=True), mask=False)
-#     V_variation = np.ma.array(volumes - np.mean(volumes, axis=mean_var, keepdims=True), mask=False)
-#     velocities  = np.ma.array(velocities, mask=False)
+    # Subtract mean
+    h_variation = np.ma.array(heights - np.mean(heights, axis=mean_var, keepdims=True), mask=False)
+    A_variation = np.ma.array(areas   - np.mean(areas,   axis=mean_var, keepdims=True), mask=False)
+    V_variation = np.ma.array(volumes - np.mean(volumes, axis=mean_var, keepdims=True), mask=False)
+    velocities  = np.ma.array(velocities, mask=False)
 
-#     # Initialize correlation object
-#     autocorr_obj = VMAutocorrelationObject(in_path=path)
+    # Initialize correlation object
+    autocorr_obj = VMAutocorrelationObject(in_path=path)
 
-#     # Upper limit on distance
-#     rmax = Lgrid * args.rfrac
+    # Upper limit on distance
+    rmax = Lgrid * args.rfrac
 
-#     # Compute spatial autocorrelations
-#     autocorr_obj.compute_spatial(positions, h_variation, 'hh', args.dr, rmax, t_avrg=True, overwrite=args.overwrite)
-#     autocorr_obj.compute_spatial(positions, A_variation, 'AA', args.dr, rmax, t_avrg=True, overwrite=args.overwrite)
-#     autocorr_obj.compute_spatial(positions, V_variation, 'VV', args.dr, rmax, t_avrg=True, overwrite=args.overwrite)
-#     autocorr_obj.compute_spatial(positions, [velocities[:,:,0], velocities[:,:,1]], 'vv', args.dr, rmax, t_avrg=True, overwrite=args.overwrite) 
+    # Compute spatial autocorrelations
+    autocorr_obj.compute_spatial(positions, h_variation, 'hh', args.dr, rmax, t_avrg=True, overwrite=args.overwrite)
+    autocorr_obj.compute_spatial(positions, A_variation, 'AA', args.dr, rmax, t_avrg=True, overwrite=args.overwrite)
+    autocorr_obj.compute_spatial(positions, V_variation, 'VV', args.dr, rmax, t_avrg=True, overwrite=args.overwrite)
+    autocorr_obj.compute_spatial(positions, [velocities[:,:,0], velocities[:,:,1]], 'vv', args.dr, rmax, t_avrg=True, overwrite=args.overwrite) 
 
-#     # Upper limit on t ime difference
-#     tmax = int(Nframes * args.tfrac)
+    # Upper limit on t ime difference
+    tmax = int(Nframes * args.tfrac)
 
-#     # Compute temporal autocorrelations
-#     autocorr_obj.compute_temporal(h_variation, 'hh', tmax, t_avrg=True, overwrite=args.overwrite)
-#     autocorr_obj.compute_temporal(A_variation, 'AA', tmax, t_avrg=True, overwrite=args.overwrite)
-#     autocorr_obj.compute_temporal(V_variation, 'VV', tmax, t_avrg=True, overwrite=args.overwrite)
-#     autocorr_obj.compute_temporal([velocities[:,:,0], velocities[:,:,1]], 'vv', tmax, t_avrg=True, overwrite=args.overwrite)
+    # Compute temporal autocorrelations
+    autocorr_obj.compute_temporal(h_variation, 'hh', tmax, t_avrg=True, overwrite=args.overwrite)
+    autocorr_obj.compute_temporal(A_variation, 'AA', tmax, t_avrg=True, overwrite=args.overwrite)
+    autocorr_obj.compute_temporal(V_variation, 'VV', tmax, t_avrg=True, overwrite=args.overwrite)
+    autocorr_obj.compute_temporal([velocities[:,:,0], velocities[:,:,1]], 'vv', tmax, t_avrg=True, overwrite=args.overwrite)
 
-#     # Save autocorrelation as .autocorr
-#     autocorr_obj.save_pickle()
+    # Save autocorrelation as .autocorr
+    autocorr_obj.save_pickle()
