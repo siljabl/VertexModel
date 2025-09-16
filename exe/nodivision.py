@@ -42,7 +42,6 @@ def main():
     parser = argparse.ArgumentParser(description="Run simulation constant cell volume and active brownian motion")
     parser.add_argument('-d', '--dir',    type=str,  help='Save in subfolders data/*/dir/. Creates dir if not existing.', default='')
     parser.add_argument('-c', '--config', type=str,  help='Path to config file',                       default='data/simulated/configs/config_nodivision.json')
-    parser.add_argument('-i', '--run_id', type=int,  help='Identity to separate parallel runs',        default=None)
     parser.add_argument('-p', '--params', nargs='*', help='Additional parameters in the form key_value')
     parser.add_argument('--cbar0',        type=str,  help='How define 0 level of cbar in vm video',    default='absolute')
     parser.add_argument('--ensemble',                 help='Defines whether run is part of ensemble execution', action='store_true')

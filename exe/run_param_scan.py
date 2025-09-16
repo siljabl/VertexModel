@@ -72,7 +72,7 @@ def main():
     assert args.range != None or args.list != None, f"Must provide either range or list of values for {args.param}"
 
     if args.list == None:
-        assert len(args.range) == 3, f"Wrong input format on range, should be '-r <min> <max> <Nparam>'"
+        assert len(args.range) == 3, f"Wrong format on input '--range'. Should be '-r <min> <max> <Nparam>'"
         param_range = np.linspace(args.range[0], args.range[1], args.range[2])
     else:
         param_range = [param for param in args.list]
