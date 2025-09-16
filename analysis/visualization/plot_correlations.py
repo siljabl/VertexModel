@@ -144,7 +144,7 @@ def main():
     if args.var == "r":
         out_path = f"{fig_dir}{fname}/spatial_autocorrelation_{args.param}.png"
 
-        plt.plot(corr_obj.r_array[args.param], corr_obj.spatial[args.param])
+        plt.plot(corr_obj.r_array[args.param], corr_obj.spatial[args.param], '.-')
     
     else:
         out_path = f"{fig_dir}{fname}/temporal_autocorrelation_{args.param}.png"

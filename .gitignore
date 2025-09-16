@@ -1,5 +1,6 @@
 # Ignore
 simulation/
+cells/
 data/
 venv/
 docs/
