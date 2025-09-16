@@ -96,6 +96,7 @@ for path in glob.glob(f"{args.filepath}*"):
     A_variation = np.ma.array(areas   - np.mean(areas,   axis=mean_var, keepdims=True), mask=False)
     V_variation = np.ma.array(volumes - np.mean(volumes, axis=mean_var, keepdims=True), mask=False)
     velocities  = np.ma.array(velocities, mask=False)
+    velocities  = [velocities[:,:,0], velocities[:,:,1]]
 
     # Initialize correlation object
     autocorr_obj = VMAutocorrelationObject(in_path=path)
@@ -107,7 +108,7 @@ for path in glob.glob(f"{args.filepath}*"):
     autocorr_obj.compute_spatial(positions, h_variation, 'hh', args.dr, rmax, t_avrg=True, overwrite=args.overwrite)
     autocorr_obj.compute_spatial(positions, A_variation, 'AA', args.dr, rmax, t_avrg=True, overwrite=args.overwrite)
     autocorr_obj.compute_spatial(positions, V_variation, 'VV', args.dr, rmax, t_avrg=True, overwrite=args.overwrite)
-    autocorr_obj.compute_spatial(positions, [velocities[:,:,0], velocities[:,:,1]], 'vv', args.dr, rmax, t_avrg=True, overwrite=args.overwrite) 
+    autocorr_obj.compute_spatial(positions, velocities,  'vv', args.dr, rmax, t_avrg=True, overwrite=args.overwrite) 
 
     # Upper limit on t ime difference
     tmax = int(Nframes * args.tfrac)
@@ -116,7 +117,7 @@ for path in glob.glob(f"{args.filepath}*"):
     autocorr_obj.compute_temporal(h_variation, 'hh', tmax, t_avrg=True, overwrite=args.overwrite)
     autocorr_obj.compute_temporal(A_variation, 'AA', tmax, t_avrg=True, overwrite=args.overwrite)
     autocorr_obj.compute_temporal(V_variation, 'VV', tmax, t_avrg=True, overwrite=args.overwrite)
-    autocorr_obj.compute_temporal([velocities[:,:,0], velocities[:,:,1]], 'vv', tmax, t_avrg=True, overwrite=args.overwrite)
+    autocorr_obj.compute_temporal(velocities,  'vv', tmax, t_avrg=True, overwrite=args.overwrite)
 
     # Save autocorrelation as .autocorr
     autocorr_obj.save_pickle()
