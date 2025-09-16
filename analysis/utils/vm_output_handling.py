@@ -5,7 +5,7 @@ from operator import itemgetter
 from cells.bind import VertexModel
 
 
-def load(file, init_time=1):
+def load(file, init_time=100):
     """ Loads vm object and returns as list """
     
     list_vm = []
