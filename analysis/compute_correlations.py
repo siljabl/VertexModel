@@ -42,8 +42,8 @@ if len(relative_path.split("/")) > 1:
         dir = relative_path.split(fname)[0]
 
     # update paths for input and output
-    obj_dir     = f"data/simulated/processed/{dir}"
-    data_dir    = f"data/simulated/raw/{dir}"
+    obj_dir     = f"{obj_dir}{dir}"
+    data_dir    = f"{data_dir}{dir}"
     config_path = f"{config_dir}{dir.split('/')[0]}.json"
 
     # only states of ensembles are saved in common folder

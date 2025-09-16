@@ -7,7 +7,7 @@ from datetime import datetime
 import utils.correlation_computations as compute
 
 data_dir = "data/simulated/raw/"
-obj_dir  = "data/simulated/obj/"
+obj_dir  = "data/simulated/processed/"
 
 class VMAutocorrelationObject:
     def __init__(self, in_path=None, out_path=None, path_addition=''):
