@@ -18,24 +18,20 @@ from utils.vm_functions       import *
 from utils.plotting_functions import plot
 from utils.exception_handlers import save_snapshot
 
+from run_ensemble import create_dirname
+
 import matplotlib
 matplotlib.use("Agg")
 
 
-def filename(config_file, sufix=''):
+def create_filename(config_file, ensemble=False):
 
-    # Date
-    date = datetime.now().strftime('%Y%m%d')
+    seed = get_value(config_file, 'seed')
 
-    # Number of cells in simulation
-    Ngrid  = get_value(config_file, 'Nvertices')
-    Ncells = Ngrid ** 2 / 3
-
-    # Streching/compression of cells
-    Lgrid = get_value(config_file, 'Lgrid')
-
-    # Name on directory
-    filename = f"{date}_N{int(Ncells)}_L{int(Lgrid)}_{sufix}"
+    if ensemble:
+        filename = f"{Path(__file__).stem}_seed{seed}"
+    else:
+        filename = create_dirname(f"{Path(__file__).stem}.py", config_file, filename=True)
 
     return filename
 
@@ -46,9 +42,9 @@ def main():
     parser = argparse.ArgumentParser(description="Run simulation constant cell volume and active brownian motion")
     parser.add_argument('-d', '--dir',    type=str,  help='Save in subfolders data/*/dir/. Creates dir if not existing.', default='')
     parser.add_argument('-c', '--config', type=str,  help='Path to config file',                       default='data/simulated/configs/config_nodivision.json')
-    parser.add_argument('-i', '--run_id', type=int,  help='Identity to separate parallel runs',        default=None)
     parser.add_argument('-p', '--params', nargs='*', help='Additional parameters in the form key_value')
     parser.add_argument('--cbar0',        type=str,  help='How define 0 level of cbar in vm video',    default='absolute')
+    parser.add_argument('--ensemble',                help='Defines whether run is part of ensemble execution', action='store_true')
     args = parser.parse_args()
 
 
@@ -135,9 +131,9 @@ def main():
     update_value(config_file, 'rho', rho)
     
     # Save simulation-specific config file
-    fname = filename(config_file, f"seed{seed}")
+    fname = create_filename(config_file, args.ensemble)
     print("Simulation name: ", fname)
-
+    
     save_config(f"{path_to_config}{fname}.json", config_file)
 
 
@@ -150,7 +146,7 @@ def main():
     # Vertex model object
     vm = VertexModel(np.random.randint(1e5))                        # initialise vertex model object
     vm.initRegularTriangularLattice(size=Ngrid, hexagonArea=A0)     # initialise periodic system
-
+    print(vm.systemSize)
 
     # Add forces
     vm.addActiveBrownianForce("abp", v0, taup)                      # centre active Brownian force

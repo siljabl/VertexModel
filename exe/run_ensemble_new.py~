@@ -39,7 +39,7 @@ def create_dirname(script, config_file, filename=False):
     # Name on directory
     timestamp = datetime.now().strftime('%Y%m%d')
     directory = f"{Path(script).stem}_{timestamp}_N{Ngrid}_L{Lgrid}_Lambda{Lambda}_v0{v0}_taup{taup}"
-
+    #directory = f"{Path(script).stem}_N{Ngrid}_L{Lgrid}_Lambda{Lambda}_v0{v0}_taup{taup}"
 
     if not filename:
         # Create folders
@@ -84,7 +84,7 @@ def main():
     np.random.seed(args.seed)
 
     # Create subfolder for ensemble
-    output_dir = create_dirname(args.script, config_file)
+    output_dir = create_dirname(args.script, config_file, args.seed)
 
     # Prepare the commands for each run
     commands = []

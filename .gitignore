@@ -1,7 +1,7 @@
 simulation/
-data/experimental
-data/simulated/videos
+data/
 venv/
-.emacs
-analysis/notebooks/
 docs/
+analysis/notebooks
+.emacs
+
