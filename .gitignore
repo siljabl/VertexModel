@@ -6,7 +6,7 @@ venv/
 docs/
 analysis/notebooks
 .emacs
-*/__pycache__/
+exe/__pycache__/
 */*/__pycache/
 
 
