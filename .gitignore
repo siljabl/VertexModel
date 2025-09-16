@@ -6,8 +6,7 @@ venv/
 docs/
 analysis/notebooks
 .emacs
-exe/__pycache__/
-*/*/__pycache/
+__pycache__/
 
 
 # Do not ignore
