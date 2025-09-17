@@ -1,5 +1,6 @@
 import os
 import sys
+import shutil
 import pickle
 import argparse
 import subprocess
@@ -189,7 +190,7 @@ def main():
                     "-y"])
     
     os.system('stty sane')
+    shutil.rmtree(_frames_dir)
 
 if __name__ == "__main__":
     main()
-
