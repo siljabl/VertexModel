@@ -45,7 +45,8 @@ def main():
     parser.add_argument('-c', '--config', type=str,  help='Path to config file',                       default='data/simulated/configs/config_nodivision.json')
     parser.add_argument('-p', '--params', nargs='*', help='Additional parameters in the form key_value')
     parser.add_argument('--cbar0',        type=str,  help='How define 0 level of cbar in vm video',    default='absolute')
-    parser.add_argument('--ensemble',                 help='Defines whether run is part of ensemble execution', action='store_true')
+    parser.add_argument('--frames_dir',   type=str,  help='Where to save frames',    default='data/simulated/frames/')
+    parser.add_argument('--ensemble',                help='Defines whether run is part of ensemble execution', action='store_true')
     args = parser.parse_args()
 
 
@@ -57,16 +58,15 @@ def main():
         args.dir = f"{args.dir}/"
     path_to_config = f"data/simulated/configs/{args.dir}"
     path_to_output = f"data/simulated/raw/{args.dir}"
-    path_to_movies = f"data/simulated/videos/{args.dir}"
+    path_to_frames = f"{args.frames_dir}/{args.dir}"
 
     Path(path_to_config).mkdir(parents=True, exist_ok=True)
     Path(path_to_output).mkdir(parents=True, exist_ok=True)
-    Path(path_to_movies).mkdir(parents=True, exist_ok=True)
+    Path(path_to_frames).mkdir(parents=True, exist_ok=True)
 
        
     # Save frames in temporary directory
-    _frames_dir = mkdtemp()
-    print("Save frames to temp directory \"%s\"." % _frames_dir, file=sys.stderr)
+    print("Save frames to temp directory \"%s\"." % path_to_frames, file=sys.stderr)
 
 
 
@@ -175,22 +175,22 @@ def main():
         with open(f"{path_to_output}{fname}.p", "ab") as dump: pickle.dump(vm, dump)
 
         # plot snapshot
-        save_snapshot(vm, fig, ax, _frames_dir, frame, cbar_zero=cbar_zero)
+        save_snapshot(vm, fig, ax, path_to_frames, frame, cbar_zero=cbar_zero)
         frame += 1
 
         # integrate
         vm.nintegrate(period, dt, delta, epsilon)
 
 
-    # make movie
-    subprocess.call([movie_sh_fname,
-                    "-d", _frames_dir,
-                    "-o", f"{path_to_movies}{fname}.mp4",
-                    "-p", sys.executable,
-                    "-y"])
+    # # make movie
+    # subprocess.call([movie_sh_fname,
+    #                 "-d", path_to_frames,
+    #                 "-o", f"{path_to_frames}{fname}.mp4",
+    #                 "-p", sys.executable,
+    #                 "-y"])
     
     os.system('stty sane')
-    shutil.rmtree(_frames_dir)
+    # shutil.rmtree(path_to_frames)
 
 if __name__ == "__main__":
     main()

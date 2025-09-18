@@ -22,39 +22,38 @@ from utils.correlation_object import VMAutocorrelationObject
 
 
 # Define paths
-obj_dir    = "data/simulated/obj/average/"
 fig_dir    = "results/"
 config_dir = "data/simulated/configs/"
 
 
-def sort_files(fnames, legend, relative_parent=''):
+def sort_files(fpattern, legend):
     """ 
     Goes through files to plot and returns sorted arrays of legend labels and files
 
     Parameters:
     - fnames: file name pattern. File names on form <fnames>*.autocorr
     - legend: key in config that is used to label plot. Also used as title on legend.
-    - relative_parent: path from obj_dir to file
     """
 
     file_list  = []
     label_list = []
 
-    # Load config to get plot label
-    config_path = f"data/simulated/configs/{fname}.json"
-    config_file = config.load(config_path)
-
     # Aquire labels from config
-    for path in Path(f"{obj_dir}{relative_parent}").glob(f"{fnames}*.autocorr"):
+    for path in glob.glob(f"{fpattern}*.autocorr"):
 
-        # File path
-        fname = f"{Path(path).stem}"
+        fname = Path(path).stem
+        if 'seed' in fname:
+            fname = Path(path).parent.stem
+
+        # Load config to get plot label
+        config_path = f"{config_dir}/{fname}.json"
+        config_file = config.load(config_path)
 
         # Get values from
         label = config.get_value(config_file, legend)
 
         # save in arrays
-        file_list.append(f"{relative_parent}{fname}")
+        file_list.append(path)
         label_list.append(label)
 
     # Sort labels if legend is specified
@@ -98,65 +97,74 @@ def save_plot(figure, out_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Plot all defined autocorrelations")
-    parser.add_argument('filepath', type=str, help="Path to files to plot. Typically 'data/simulated/obj/file'. Filename is on form <'path/to/file'>*.autocorr")
-    parser.add_argument('param',    type=str, help="Parameter to plot correlation of (varvar)")
-    parser.add_argument('var',      type=str, help="Correlation variable (t or r)")
-    parser.add_argument('--legend', type=str, help="Add legend (str)",                  default='')
-    parser.add_argument('--cmap',   type=str, help="Specify matplotlib colormap (str)", default='plasma')
+    parser.add_argument('filepattern',   type=str, help="Path to files to plot. Typically 'data/simulated/obj/file'. Filename is on form <'path/to/file'>*.autocorr")
+    parser.add_argument('param',         type=str, help="Parameter to plot correlation of (varvar)")
+    parser.add_argument('var',           type=str, help="Correlation variable (t or r)")
+    parser.add_argument('-l','--legend', type=str, help="Add legend (str)",                  default='')
+    parser.add_argument('-c','--cmap',   type=str, help="Specify matplotlib colormap (str)", default='plasma')
+    parser.add_argument('-o','--outdir', type=str, help="Output directory", default="results/")
     args = parser.parse_args()
-
-    # Decompose input path
-    fname = Path(args.filepath).stem
-    dir   = Path(args.filepath).parent
-
-    print(fname, dir)
-
-    # Subdirectory exists, and create if not
-    Path(f"{fig_dir}{fname}").mkdir(parents=True, exist_ok=True)
 
     # Assert temporal or spatial correlation
     assert args.var in ['r', 't'], "Wrong correlation variable. Must be r or t"
 
-    # Create figure and plot line at 0 
-    initialize_figure(args.param, args.var)
 
-    # # Sort data sets by legend value
-    # files, labels = sort_files(filename, args.legend, relative_parent)
+    # Sort data sets by legend value
+    files_list, labels_list = sort_files(args.filepattern, args.legend)
 
-    # Assert correct file name
-    #assert len(files) > 0, f"No files matches filename: {args.filepath}*.autocorr"
+    assert len(files_list) > 0, f"No files matches filename: {args.filepattern}*.autocorr"
+
 
     # Define line colors
-    #cmap   = mpl.colormaps[args.cmap]
-    #colors = cmap(np.linspace(0.1, 0.9, len(files)))
+    cmap   = mpl.colormaps[args.cmap]
+    colors = cmap(np.linspace(0.1, 0.9, len(files_list)))
 
 
+    # Plot each data set
+    initialize_figure(args.param, args.var)
+    for file, label, color in zip(files_list, labels_list, colors):
 
-    # Load data
-    corr_obj = VMAutocorrelationObject(out_path=args.filepath)
+        # Load data
+        corr_obj = VMAutocorrelationObject(out_path=file)
 
-    # Load config
-    config_path = f"{config_dir}/{fname}.json"
-    config_file = config.load(config_path)
+        # Load config
+        fname = Path(file).stem
+        if 'seed' in fname:
+            fname = Path(file).parent.stem
+            fig_dir = f"results/{fname}/"
+            Path(f"{fig_dir}").mkdir(parents=True, exist_ok=True)
 
-    
-    # Plot
-    if args.var == "r":
-        out_path = f"{fig_dir}{fname}/spatial_autocorrelation_{args.param}.png"
+        config_path = f"{config_dir}{fname}.json"
+        config_file = config.load(config_path)
 
-        plt.plot(corr_obj.r_array[args.param], corr_obj.spatial[args.param], '.-')
-    
-    else:
-        out_path = f"{fig_dir}{fname}/temporal_autocorrelation_{args.param}.png"
-
-        # Get persistence time 
-        taup = config.get_value(config_file, 'taup')
-        plt.plot(corr_obj.t_array[args.param] / taup, corr_obj.temporal[args.param])
+        # Plot
+        if args.var == "r":
+            plt.plot(corr_obj.r_array[args.param], corr_obj.spatial[args.param],
+                        '-',
+                        color=color,
+                        label=label)
         
+        else:
+            # Get persistence time 
+            taup = config.get_value(config_file, 'taup')
+            plt.plot(corr_obj.t_array[args.param] / taup, corr_obj.temporal[args.param], 
+                        '-',
+                        color=color, 
+                        label=label)
+        
+    # Add legend
+    if args.legend != '':
+        plt.legend(title=rf'${args.legend}$')
 
-    # Save plot
+    if args.var == "r":
+        out_path = f"{fig_dir}spatial_autocorrelation_{args.param}.png"
+    else:
+        out_path = f"{fig_dir}temporal_autocorrelation_{args.param}.png"
+
     plt.tight_layout()
-    save_plot(plt, out_path)
+    plt.savefig(out_path)
+    print(f"Plot saved to {out_path}")
+
 
 
 if __name__ == "__main__":
