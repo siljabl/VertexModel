@@ -20,8 +20,8 @@ movies_path = "data/simulated/videos/"
 if platform.node() != 'silja-work':
     print(f"Running simulation from {platform.node()}")
     config_path = "../../../../hdd_data/silja/VertexModel_data/simulated/configs/"
-    output_path = "../../../../hdd_data/silja/VertexModel_data/data/simulated/raw/"
-    movies_path = "../../../../hdd_data/silja/VertexModel_data/data/simulated/videos/"
+    output_path = "../../../../hdd_data/silja/VertexModel_data/simulated/raw/"
+    movies_path = "../../../../hdd_data/silja/VertexModel_data/simulated/videos/"
     print(f"Saving output in {output_path}")
 
 
