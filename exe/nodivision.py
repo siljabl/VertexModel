@@ -45,7 +45,7 @@ def main():
     parser.add_argument('-c', '--config', type=str,  help='Path to config file',                       default='data/simulated/configs/config_nodivision.json')
     parser.add_argument('-p', '--params', nargs='*', help='Additional parameters in the form key_value')
     parser.add_argument('--cbar0',        type=str,  help='How define 0 level of cbar in vm video',    default='absolute')
-    parser.add_argument('--frames_dir',   type=str,  help='Where to save frames',    default='data/simulated/frames/')
+    parser.add_argument('--frames_dir',   type=str,  help='Where to save frames',    default='../../../../hdd_data/silja/VertexModel_data/simulated/frames/')
     parser.add_argument('--ensemble',                help='Defines whether run is part of ensemble execution', action='store_true')
     args = parser.parse_args()
 

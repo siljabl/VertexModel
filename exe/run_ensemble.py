@@ -2,6 +2,7 @@ import time
 import glob
 import shutil
 import argparse
+import platform
 import subprocess
 import numpy as np
 
@@ -16,6 +17,12 @@ config_path = "data/simulated/configs/"
 output_path = "data/simulated/raw/"
 movies_path = "data/simulated/videos/"
 
+if platform.node() != 'silja-work':
+    print(f"Running simulation from {platform.node()}")
+    config_path = "../../../../hdd_data/silja/VertexModel_data/simulated/configs/"
+    output_path = "../../../../hdd_data/silja/VertexModel_data/data/simulated/raw/"
+    movies_path = "../../../../hdd_data/silja/VertexModel_data/data/simulated/videos/"
+    print(f"Saving output in {output_path}")
 
 
 def create_dirname(script, config_file, filename=False):
