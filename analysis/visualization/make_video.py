@@ -42,7 +42,10 @@ def main():
 
     if args.replot:
 
-        shutil.rmtree(path_to_frames)
+        try:
+            shutil.rmtree(path_to_frames)
+        except:
+            pass
         Path(path_to_frames).mkdir(parents=True, exist_ok=True)
 
         # load vm object
