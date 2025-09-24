@@ -1,4 +1,5 @@
 import sys
+import shutil
 import argparse
 import platform
 import subprocess
@@ -24,7 +25,7 @@ if platform.node() != 'silja-work':
     print(f"Running simulation from {platform.node()}")
     videos_dir = "../../../../hdd_data/silja/VertexModel_data/simulated/videos/"
     frames_dir = "../../../../hdd_data/silja/VertexModel_data/simulated/frames/"
-    
+
 
 def main():
     parser = argparse.ArgumentParser(description="Creates video from vm_output")
@@ -40,6 +41,8 @@ def main():
     path_to_videos = f"{videos_dir}{fname}"
 
     if args.replot:
+
+        shutil.rmtree(path_to_frames)
 
         # load vm object
         list_vm, init_vm = vm_output.load(args.path)
