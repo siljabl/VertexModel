@@ -1,5 +1,6 @@
 import sys
 import argparse
+import platform
 import subprocess
 from pathlib import Path
 
@@ -16,8 +17,14 @@ from utils.exception_handlers import save_snapshot
 import matplotlib
 matplotlib.use("Agg")
 
-videos_dir = "results/videos/"
+videos_dir = "data/simulated/videos/"
 frames_dir = "data/simulated/frames/"
+
+if platform.node() != 'silja-work':
+    print(f"Running simulation from {platform.node()}")
+    videos_dir = "../../../../hdd_data/silja/VertexModel_data/simulated/videos/"
+    frames_dir = "../../../../hdd_data/silja/VertexModel_data/simulated/frames/"
+    
 
 def main():
     parser = argparse.ArgumentParser(description="Creates video from vm_output")
