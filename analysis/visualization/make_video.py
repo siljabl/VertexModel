@@ -43,6 +43,7 @@ def main():
     if args.replot:
 
         shutil.rmtree(path_to_frames)
+        Path(path_to_frames).mkdir(parents=True, exist_ok=True)
 
         # load vm object
         list_vm, init_vm = vm_output.load(args.path)
@@ -51,7 +52,7 @@ def main():
         # outputs
         fig, ax = plot(list_vm[0], fig=None, ax=None, cbar_zero=args.cbar0)
 
-        frame = 0
+        frame = 1
         for vm in list_vm:
             # plot snapshot
             save_snapshot(vm, fig, ax, path_to_frames, frame, cbar_zero=args.cbar0)
