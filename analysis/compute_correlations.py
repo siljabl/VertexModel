@@ -115,7 +115,6 @@ def main():
 
         # Initialize correlation object
         autocorr_obj = VMAutocorrelationObject(in_path=path)
-        print(path
         
         if args.var == 'r' or args.var == 'all':
             # Upper limit on distance
