@@ -55,7 +55,7 @@ def main():
         # outputs
         fig, ax = plot(list_vm[0], fig=None, ax=None, cbar_zero=args.cbar0)
 
-        frame = 1
+        frame = 0
         for vm in list_vm:
             # plot snapshot
             save_snapshot(vm, fig, ax, path_to_frames, frame, cbar_zero=args.cbar0)
