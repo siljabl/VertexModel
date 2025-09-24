@@ -95,7 +95,7 @@ def save_plot(figure, out_path):
 
 
 def main():
-    fig_dir    = "results/"
+    fig_dir = "results/"
 
     parser = argparse.ArgumentParser(description="Plot all defined autocorrelations")
     parser.add_argument('filepattern',   type=str, help="Path to files to plot. Typically 'data/simulated/obj/file'. Filename is on form <'path/to/file'>*.autocorr")
@@ -104,7 +104,8 @@ def main():
     parser.add_argument('-l','--legend', type=str, help="Add legend (str)",                         default='')
     parser.add_argument('-c','--cmap',   type=str, help="Specify matplotlib colormap (str)",        default='plasma')
     parser.add_argument('-o','--outdir', type=str, help="Output directory",                         default="results/")
-    parser.add_argument('-x', '--xlim',  type=float, help="Upper fractional limit on x-axis (0-1)", default=1.0)
+    parser.add_argument('-x', '--xlim',  type=float, help="Upper limit on x-axis", default=9999)
+    parser.add_argument('-y', '--ylim',  type=float, help="Upper limit on x-axis", default=1.1)
     parser.add_argument('--xlog', action="store_true")
     parser.add_argument('--ylog', action="store_true")
     parser.add_argument('--log',  action="store_true")
@@ -136,7 +137,7 @@ def main():
         fname = Path(file).stem
         if 'seed' in fname:
             fname = Path(file).parent.stem
-            fig_dir = f"{fig_dir}/{fname}/"
+            fig_dir = f"results/{fname}/"
             Path(f"{fig_dir}").mkdir(parents=True, exist_ok=True)
 
         config_path = f"{config_dir}{fname}.json"
@@ -144,16 +145,20 @@ def main():
 
         # Plot
         if args.var == "r":
-            plt.plot(args.xlim * (corr_obj.r_array[args.param]), corr_obj.spatial[args.param],
-                        '-',
+            x = corr_obj.r_array[args.param]
+            y = corr_obj.spatial[args.param]
+            plt.plot(x[(x <= args.xlim) * (y <= args.ylim)], y[(x <= args.xlim) * (y <= args.ylim)],
+                        '.-',
                         color=color,
                         label=label)
         
         else:
-            # Get persistence time 
+            # Get persistence time
             taup = config.get_value(config_file, 'taup')
-            plt.plot(args.xlim * corr_obj.t_array[args.param] / taup, corr_obj.temporal[args.param], 
-                        '-',
+            x = corr_obj.t_array[args.param] / taup
+            y = corr_obj.temporal[args.param]
+            plt.plot(x[(x <= args.xlim) * (y <= args.ylim)], y[(x <= args.xlim) * (y <= args.ylim)],
+                        '.-',
                         color=color, 
                         label=label)
         

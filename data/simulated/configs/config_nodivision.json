@@ -5,8 +5,8 @@
         "rhex": 1,
         "tauV": 0,
         "Lambda": 1,
-        "v0": 5,
-        "taup": 1
+        "v0": 1,
+        "taup": 5
     },
     "simulation": {
         "seed": 207,
