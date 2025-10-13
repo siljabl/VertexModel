@@ -6,7 +6,8 @@
         "tauV": 0,
         "Lambda": 1,
         "v0": 1,
-        "taup": 5
+        "taup": 5,
+        "eta": 1
     },
     "simulation": {
         "seed": 207,

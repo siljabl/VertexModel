@@ -82,8 +82,7 @@ def initialize_figure(varname, type):
 
     else:
         plt.title(rf'$C_{{{varname}}}(t)$')
-        plt.xlabel(r'$t$')
-        #plt.xlabel(r'$t~/~\tau_p$')
+        plt.xlabel(r'$t~/~\tau_p$')
         plt.axhline(0, 0, 1, linestyle="dashed", color="gray")
 
     return fig
@@ -122,7 +121,7 @@ def plot_correlation(path, label, color, args):
     else:
         # Get persistence time
         taup = config.get_value(config_file, 'taup')
-        x = corr_obj.t_array[args.param]# / taup
+        x = corr_obj.t_array[args.param] / taup
         y = corr_obj.temporal[args.param]
         plt.plot(x[(x <= args.xlim) * (y <= args.ylim)], y[(x <= args.xlim) * (y <= args.ylim)],
                     args.fmt,
