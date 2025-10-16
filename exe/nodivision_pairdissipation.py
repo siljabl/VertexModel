@@ -42,31 +42,12 @@ def main():
     # Command-line argument parsing
     parser = argparse.ArgumentParser(description="Run simulation constant cell volume and active brownian motion")
     parser.add_argument('-d', '--dir',    type=str,  help='Save in subfolders data/*/dir/. Creates dir if not existing.', default='')
-    parser.add_argument('-c', '--config', type=str,  help='Path to config file',                       default='data/simulated/configs/config_nodivision.json')
+    parser.add_argument('-c', '--config', type=str,  help='Path to config file',                       default='data/simulated/configs/config_nodivision_pairdissipation.json')
     parser.add_argument('-p', '--params', nargs='*', help='Additional parameters in the form key_value')
     parser.add_argument('--cbar0',        type=str,  help='How define 0 level of cbar in vm video',    default='absolute')
     parser.add_argument('--frames_dir',   type=str,  help='Where to save frames',    default='data/simulated/frames/')
     parser.add_argument('--ensemble',                help='Defines whether run is part of ensemble execution', action='store_true')
     args = parser.parse_args()
-
-
-
-    # DEFINE PATHS
-
-    # Check if subfolders exists, if not create
-    if args.dir != '':
-        args.dir = f"{args.dir}/"
-    path_to_config = f"data/simulated/configs/{args.dir}"
-    path_to_output = f"data/simulated/raw/{args.dir}"
-    path_to_frames = f"{args.frames_dir}/{args.dir}"
-
-    Path(path_to_config).mkdir(parents=True, exist_ok=True)
-    Path(path_to_output).mkdir(parents=True, exist_ok=True)
-    Path(path_to_frames).mkdir(parents=True, exist_ok=True)
-
-       
-    # Save frames in temporary directory
-    print("Save frames to temp directory \"%s\"." % path_to_frames, file=sys.stderr)
 
 
 
@@ -129,12 +110,31 @@ def main():
     Nframes = config['simulation']['Nframes']               # number of frames in simulation
 
 
+
     rho = cell_density(Ngrid, Lgrid)
     update_value(config_file, 'rho', rho)
     
     # Save simulation-specific config file
     fname = create_filename(config_file, args.ensemble)
     print("Simulation name: ", fname)
+
+
+    # DEFINE PATHS
+
+    # Check if subfolders exists, if not create
+    if args.dir != '':
+        args.dir = f"{args.dir}/"
+    path_to_config = f"data/simulated/configs/{args.dir}"
+    path_to_output = f"data/simulated/raw/{args.dir}"
+    path_to_frames = f"{args.frames_dir}/{args.dir}/{fname}"
+
+    Path(path_to_config).mkdir(parents=True, exist_ok=True)
+    Path(path_to_output).mkdir(parents=True, exist_ok=True)
+    Path(path_to_frames).mkdir(parents=True, exist_ok=True)
+
+       
+    # Save frames in temporary directory
+    print("Save frames to temp directory \"%s\"." % path_to_frames, file=sys.stderr)
 
     save_config(f"{path_to_config}{fname}.json", config_file)
 
@@ -148,7 +148,6 @@ def main():
     # Vertex model object
     vm = VertexModel(np.random.randint(1e5))                        # initialise vertex model object
     vm.initRegularTriangularLattice(size=Ngrid, hexagonArea=A0)     # initialise periodic system
-
 
     # Add forces
     vm.addActiveBrownianForce("abp", v0, taup)                      # centre active Brownian force

@@ -37,6 +37,8 @@ def main():
 
     # set paths
     fname = Path(args.path).parent.stem
+    if fname == "raw":
+        fname = Path(args.path).stem
     path_to_frames = f"{frames_dir}{fname}"
     path_to_videos = f"{videos_dir}{fname}"
 
@@ -49,8 +51,7 @@ def main():
         Path(path_to_frames).mkdir(parents=True, exist_ok=True)
 
         # load vm object
-        list_vm, init_vm = vm_output.load(args.path)
-        print(list_vm[0].systemSize)
+        list_vm, init_vm = vm_output.load(args.path, init_time=50)
 
         # outputs
         fig, ax = plot(list_vm[0], fig=None, ax=None, cbar_zero=args.cbar0)
@@ -60,7 +61,6 @@ def main():
             # plot snapshot
             save_snapshot(vm, fig, ax, path_to_frames, frame, cbar_zero=args.cbar0)
             frame += 1
-
 
     # make movie
     subprocess.call([movie_sh_fname,
