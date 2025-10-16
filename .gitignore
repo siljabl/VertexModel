@@ -4,10 +4,10 @@ cells/
 data/
 venv/
 docs/
+mnt/
 analysis/notebooks
 .emacs
 __pycache__/
-
 
 # Do not ignore
 data/simulated/configs/config*

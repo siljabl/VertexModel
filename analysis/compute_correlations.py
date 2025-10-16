@@ -5,11 +5,80 @@ import argparse
 import platform
 import numpy as np
 from pathlib import Path
+from multiprocessing import Pool
 
 import utils.config_functions   as config
 import utils.vm_output_handling as vm_output
 
 from utils.correlation_object import VMAutocorrelationObject
+
+
+def vm_compute_correlation(path, config_path, args):
+    # Load frames as vm objects
+    list_vm, init_vm = vm_output.load(path)
+
+    # Load config
+    config_file = config.load(config_path)
+
+    # Get values from config
+    Nframes = config.get_value(config_file, 'Nframes')
+    Lgrid   = config.get_value(config_file, 'Lgrid')
+
+    # Get cell properties
+    positions  = vm_output.get_cell_positions(list_vm)
+    heights    = vm_output.get_cell_heights(list_vm)
+    volumes    = vm_output.get_cell_volumes(list_vm)
+    velocities = vm_output.get_cell_velocities(list_vm)
+
+    areas = np.ma.array(volumes / heights)
+
+    # Define mean variable axis
+    if args.mean_var == 't':
+        mean_var = 1
+    elif args.mean_var == 'cell': 
+        mean_var = 0
+
+    # Subtract mean
+    h_variation = np.ma.array(heights - np.mean(heights, axis=mean_var, keepdims=True), mask=False)
+    A_variation = np.ma.array(areas   - np.mean(areas,   axis=mean_var, keepdims=True), mask=False)
+    V_variation = np.ma.array(volumes - np.mean(volumes, axis=mean_var, keepdims=True), mask=False)
+    velocities  = [np.ma.array(velocities[:,:,0] - np.mean(velocities[:,:,0], axis=mean_var, keepdims=True), mask=False),
+                   np.ma.array(velocities[:,:,1] - np.mean(velocities[:,:,1], axis=mean_var, keepdims=True), mask=False)]
+
+    # Initialize correlation object
+    autocorr_obj = VMAutocorrelationObject(in_path=path)
+
+    if args.var == 'r' or args.var == 'all':
+        # Upper limit on distance
+        rmax = Lgrid * args.rfrac
+
+        # Compute spatial autocorrelations
+        if args.param == 'hh' or args.param == 'all':
+            autocorr_obj.compute_spatial(positions, h_variation, 'hh', args.dr, rmax, t_avrg=True, overwrite=args.overwrite)
+        if args.param == 'AA' or args.param == 'all':
+            autocorr_obj.compute_spatial(positions, A_variation, 'AA', args.dr, rmax, t_avrg=True, overwrite=args.overwrite)
+        if args.param == 'VV' or args.param == 'all':
+            autocorr_obj.compute_spatial(positions, V_variation, 'VV', args.dr, rmax, t_avrg=True, overwrite=args.overwrite)
+        if args.param == 'vv' or args.param == 'all':
+            autocorr_obj.compute_spatial(positions, velocities,  'vv', args.dr, rmax, t_avrg=True, overwrite=args.overwrite) 
+
+    if args.var == 't' or args.var == 'all':
+        # Upper limit on t ime difference
+        tmax = int(Nframes * args.tfrac)
+
+        # Compute temporal autocorrelations
+        if args.param == 'hh' or args.param == 'all':
+            autocorr_obj.compute_temporal(h_variation, 'hh', tmax, t_avrg=True, overwrite=args.overwrite)
+        if args.param == 'AA' or args.param == 'all':
+            autocorr_obj.compute_temporal(A_variation, 'AA', tmax, t_avrg=True, overwrite=args.overwrite)
+        if args.param == 'VV' or args.param == 'all':
+            autocorr_obj.compute_temporal(V_variation, 'VV', tmax, t_avrg=True, overwrite=args.overwrite)
+        if args.param == 'vv' or args.param == 'all':
+            autocorr_obj.compute_temporal(velocities,  'vv', tmax, t_avrg=True, overwrite=args.overwrite)
+
+    # Save autocorrelation as .autocorr
+    autocorr_obj.save_pickle()
+
 
 
 def main():
@@ -73,79 +142,24 @@ def main():
     # Subdirectory exists, and create if not
     Path(f"{obj_dir}").mkdir(parents=True, exist_ok=True)
 
-
-
+    commands = []
     for path in glob.glob(f"{args.filepath}*"):
-
-        # Load frames as vm objects
-        list_vm, init_vm = vm_output.load(path)
-
         # run specific config file
         if not ensemble:
             config_path = f"{config_dir}{Path(path).stem}.json"
+            
+        command = [
+            path,
+            config_path,
+            args
+        ]
+        commands.append(command)
+    
+    Npool = len(glob.glob(f"{args.filepath}*"))
+    if Npool > 16: Npool = 16
 
-        # Load config
-        config_file = config.load(config_path)
-
-        # Get values from config
-        rhex    = config.get_value(config_file, 'rhex') 
-        Nframes = config.get_value(config_file, 'Nframes')
-        Lgrid   = config.get_value(config_file, 'Lgrid')
-
-        # Get cell properties
-        positions  = vm_output.get_cell_positions(list_vm)
-        heights    = vm_output.get_cell_heights(list_vm)
-        volumes    = vm_output.get_cell_volumes(list_vm)
-        velocities = vm_output.get_cell_velocities(list_vm)
-
-        areas = np.ma.array(volumes / heights)
-
-        # Define mean variable axis
-        if args.mean_var == 't':
-            mean_var = 1
-        elif args.mean_var == 'cell': 
-            mean_var = 0
-
-        # Subtract mean
-        h_variation = np.ma.array(heights - np.mean(heights, axis=mean_var, keepdims=True), mask=False)
-        A_variation = np.ma.array(areas   - np.mean(areas,   axis=mean_var, keepdims=True), mask=False)
-        V_variation = np.ma.array(volumes - np.mean(volumes, axis=mean_var, keepdims=True), mask=False)
-        velocities  = np.ma.array(velocities, mask=False)
-        velocities  = [velocities[:,:,0], velocities[:,:,1]]
-
-        # Initialize correlation object
-        autocorr_obj = VMAutocorrelationObject(in_path=path)
-        
-        if args.var == 'r' or args.var == 'all':
-            # Upper limit on distance
-            rmax = Lgrid * args.rfrac
-
-            # Compute spatial autocorrelations
-            if args.param == 'hh' or args.param == 'all':
-                autocorr_obj.compute_spatial(positions, h_variation, 'hh', args.dr, rmax, t_avrg=True, overwrite=args.overwrite)
-            if args.param == 'AA' or args.param == 'all':
-                autocorr_obj.compute_spatial(positions, A_variation, 'AA', args.dr, rmax, t_avrg=True, overwrite=args.overwrite)
-            if args.param == 'VV' or args.param == 'all':
-                autocorr_obj.compute_spatial(positions, V_variation, 'VV', args.dr, rmax, t_avrg=True, overwrite=args.overwrite)
-            if args.param == 'vv' or args.param == 'all':
-                autocorr_obj.compute_spatial(positions, velocities,  'vv', args.dr, rmax, t_avrg=True, overwrite=args.overwrite) 
-
-        if args.var == 't' or args.var == 'all':
-            # Upper limit on t ime difference
-            tmax = int(Nframes * args.tfrac)
-
-            # Compute temporal autocorrelations
-            if args.param == 'hh' or args.param == 'all':
-                autocorr_obj.compute_temporal(h_variation, 'hh', tmax, t_avrg=True, overwrite=args.overwrite)
-            if args.param == 'AA' or args.param == 'all':
-                autocorr_obj.compute_temporal(A_variation, 'AA', tmax, t_avrg=True, overwrite=args.overwrite)
-            if args.param == 'VV' or args.param == 'all':
-                autocorr_obj.compute_temporal(V_variation, 'VV', tmax, t_avrg=True, overwrite=args.overwrite)
-            if args.param == 'vv' or args.param == 'all':
-                autocorr_obj.compute_temporal(velocities,  'vv', tmax, t_avrg=True, overwrite=args.overwrite)
-
-        # Save autocorrelation as .autocorr
-        autocorr_obj.save_pickle()
+    with Pool(processes=Npool) as pool:
+        pool.starmap(vm_compute_correlation, commands)
 
 
 if __name__ == "__main__":
