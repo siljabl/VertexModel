@@ -23,21 +23,23 @@ def create_dirname(script, config_file, filename=False):
     Generates standard name and creates directory
     """
     
-    # Number of cells in simulation
+    # Simulation parameters
     Ngrid  = get_value(config_file, 'Nvertices')
     Lgrid  = get_value(config_file, 'Lgrid')
     Lambda = get_value(config_file, 'Lambda')
     v0     = get_value(config_file, 'v0')
     taup   = get_value(config_file, 'taup')
+    eta    = get_value(config_file, 'eta')
 
     # Transform float to int
     Lambda = int(100*Lambda)
     v0     = int(100*v0)
     taup   = int(100*taup)
+    eta    = int(100*eta)
 
     # Name on directory
     timestamp = datetime.now().strftime('%Y%m%d')
-    directory = f"{Path(script).stem}_{timestamp}_N{Ngrid}_L{Lgrid}_Lambda{Lambda}_v0{v0}_taup{taup}"
+    directory = f"{Path(script).stem}_{timestamp}_N{Ngrid}_L{Lgrid}_Lambda{Lambda}_v0{v0}_taup{taup}_eta{eta}"
 
 
     if not filename:
