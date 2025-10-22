@@ -183,9 +183,9 @@ def main():
 
     # log-scale
     if args.xlog or args.log:
-        fig.xscale("log")
+        plt.xscale("log")
     if args.ylog or args.log:
-        fig.yscale("log")
+        plt.yscale("log")
 
     if args.return_plot:
         return fig

@@ -31,7 +31,7 @@ if platform.node() != 'silja-work':
 def main():
     parser = argparse.ArgumentParser(description="Creates video from vm_output")
     parser.add_argument('path',    type=str, help="Defines path to file, typically: data/simulated/raw/dir/file.p.")
-    parser.add_argument('--cbar0', type=str, help='How define 0 level of cbar in vm video',    default='absolute')
+    parser.add_argument('--cbar0', type=str, help='How define 0 level of cbar in vm video',    default='average')
     parser.add_argument('-o', '--overwrite', action="store_true")
     # frame_rate
     args = parser.parse_args()

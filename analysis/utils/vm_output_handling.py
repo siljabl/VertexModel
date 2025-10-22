@@ -83,3 +83,21 @@ def get_cell_velocities(list_vm):
         list_vm)))
 
     return velocities
+
+
+
+def get_neighbour_matrix(list_vm):
+    """ Get cell volumes """
+
+    # indices of cell centres (from first frame)
+    cells = list_vm[0].getVertexIndicesByType("centre")
+
+    neighbours_matrix = np.zeros([len(list_vm), max(cells)+1, max(cells)+1])
+
+    for frame in range(len(list_vm)):
+        for cell in cells:
+            neighbours = list_vm[frame].getNeighbouringCellIndices(cell)
+            neighbours_matrix[frame, cell, neighbours] = 1
+
+
+    return neighbours
