@@ -2,6 +2,7 @@ from cells.bind import VertexModel
 
 import glob
 import argparse
+import platform
 import numpy as np
 from pathlib import Path
 from multiprocessing import Pool
@@ -86,6 +87,15 @@ def main():
     obj_dir    = "data/simulated/processed/"
     data_dir   = "data/simulated/raw/"
     config_dir = "data/simulated/configs/"
+
+    if platform.node() != 'silja-work':
+        print(f"Running simulation from {platform.node()}")
+        obj_dir    = "../../../../hdd_data/silja/VertexModel_data/simulated/processed/"
+        data_dir   = "../../../../hdd_data/silja/VertexModel_data/simulated/raw/"
+        config_dir = "../../../../hdd_data/silja/VertexModel_data/simulated/configs/"
+        print(f"Saving output in {obj_dir}")
+
+
 
     # Command-line argument parsing
     parser = argparse.ArgumentParser(description="Computes correlations on simulation data and save as pickle")
