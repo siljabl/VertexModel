@@ -4,6 +4,7 @@ import argparse
 import platform
 import subprocess
 from pathlib import Path
+from tqdm import tqdm
 
 sys.path.append("analysis/utils")
 sys.path.append("exe/")
@@ -30,19 +31,22 @@ if platform.node() != 'silja-work':
 def main():
     parser = argparse.ArgumentParser(description="Creates video from vm_output")
     parser.add_argument('path',    type=str, help="Defines path to file, typically: data/simulated/raw/dir/file.p.")
-    parser.add_argument('--cbar0', type=str, help='How define 0 level of cbar in vm video',    default='average')
-    parser.add_argument('--replot', action="store_true")
+    parser.add_argument('--cbar0', type=str, help='How define 0 level of cbar in vm video',    default='absolute')
+    parser.add_argument('-o', '--overwrite', action="store_true")
     # frame_rate
     args = parser.parse_args()
 
     # set paths
     fname = Path(args.path).parent.stem
+
     if fname == "raw":
         fname = Path(args.path).stem
     path_to_frames = f"{frames_dir}{fname}"
     path_to_videos = f"{videos_dir}{fname}"
 
-    if args.replot:
+    print(path_to_frames)
+
+    if args.overwrite:
 
         try:
             shutil.rmtree(path_to_frames)
@@ -51,13 +55,13 @@ def main():
         Path(path_to_frames).mkdir(parents=True, exist_ok=True)
 
         # load vm object
-        list_vm, init_vm = vm_output.load(args.path, init_time=50)
+        list_vm, init_vm = vm_output.load(args.path, init_time=100)
 
         # outputs
         fig, ax = plot(list_vm[0], fig=None, ax=None, cbar_zero=args.cbar0)
 
         frame = 0
-        for vm in list_vm:
+        for vm in tqdm(list_vm):
             # plot snapshot
             save_snapshot(vm, fig, ax, path_to_frames, frame, cbar_zero=args.cbar0)
             frame += 1

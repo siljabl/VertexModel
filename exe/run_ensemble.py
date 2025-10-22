@@ -21,7 +21,7 @@ if platform.node() != 'silja-work':
     print(f"Running simulation from {platform.node()}")
     config_path = "../../../../hdd_data/silja/VertexModel_data/simulated/configs/"
     output_path = "../../../../hdd_data/silja/VertexModel_data/simulated/raw/"
-    movies_path = "../../../../hdd_data/silja/VertexModel_data/simulated/videos/"
+    #movies_path = "../../../../hdd_data/silja/VertexModel_data/simulated/videos/"
     print(f"Saving output in {output_path}")
 
 
@@ -53,7 +53,7 @@ def create_dirname(script, config_file, filename=False):
         # Create folders
         Path(f"{config_path}{directory}/").mkdir(parents=True, exist_ok=True)
         Path(f"{output_path}{directory}/").mkdir(parents=True, exist_ok=True)
-        Path(f"{movies_path}{directory}/").mkdir(parents=True, exist_ok=True)
+        #Path(f"{movies_path}{directory}/").mkdir(parents=True, exist_ok=True)
 
     return directory
 
