@@ -3,6 +3,7 @@ import sys
 import shutil
 import pickle
 import argparse
+import platform
 import subprocess
 import numpy as np
 import scipy as sc
@@ -53,6 +54,8 @@ def main():
 
     # DEFINE PATHS
 
+    if platform.node() != 'silja-work' and not --ensemble:
+        print("Error: ouput path does not exists!")
     # Check if subfolders exists, if not create
     if args.dir != '':
         args.dir = f"{args.dir}/"
