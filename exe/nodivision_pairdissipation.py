@@ -3,6 +3,7 @@ import sys
 import shutil
 import pickle
 import argparse
+import platform
 import subprocess
 import numpy as np
 import scipy as sc
@@ -25,6 +26,17 @@ import matplotlib
 matplotlib.use("Agg")
 
 
+# Define paths
+#config_path = "data/simulated/configs/"
+output_path = "data/simulated/raw/"
+
+
+if platform.node() != 'silja-work':
+    #config_path = "../../../../hdd_data/silja/VertexModel_data/simulated/configs/"
+    output_path = "../../../../hdd_data/silja/VertexModel_data/simulated/raw/"
+                       
+
+
 def create_filename(config_file, ensemble=False):
 
     seed = get_value(config_file, 'seed')
@@ -45,7 +57,7 @@ def main():
     parser.add_argument('-c', '--config', type=str,  help='Path to config file',                       default='data/simulated/configs/config_nodivision_pairdissipation.json')
     parser.add_argument('-p', '--params', nargs='*', help='Additional parameters in the form key_value')
     parser.add_argument('--cbar0',        type=str,  help='How define 0 level of cbar in vm video',    default='absolute')
-    parser.add_argument('--frames_dir',   type=str,  help='Where to save frames',    default='data/simulated/frames/')
+    parser.add_argument('--frames_dir',   type=str,  help='Where to save frames',    default='../../../../hdd_data/silja/VertexModel_data/simulated/frames/')
     parser.add_argument('--ensemble',                help='Defines whether run is part of ensemble execution', action='store_true')
     args = parser.parse_args()
 
@@ -124,8 +136,8 @@ def main():
     # Check if subfolders exists, if not create
     if args.dir != '':
         args.dir = f"{args.dir}/"
-    path_to_config = f"data/simulated/configs/{args.dir}"
-    path_to_output = f"data/simulated/raw/{args.dir}"
+    path_to_config = f"{Path(config_path).parent}/{args.dir}"
+    path_to_output = f"{output_path}/{args.dir}"
     path_to_frames = f"{args.frames_dir}/{args.dir}/{fname}"
 
     Path(path_to_config).mkdir(parents=True, exist_ok=True)
