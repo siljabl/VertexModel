@@ -59,7 +59,7 @@ def main():
     parser.add_argument('--cbar0',        type=str,  help='How define 0 level of cbar in vm video',    default='absolute')
     parser.add_argument('--frames_dir',   type=str,  help='Where to save frames',    default='../../../../hdd_data/silja/VertexModel_data/simulated/frames/')
     parser.add_argument('--ensemble',                help='Defines whether run is part of ensemble execution', action='store_true')
-    parser.add_argument('--pair', '--pair_dissipation', action="store_true", help="Adding pair-dissipation.")
+    parser.add_argument('--pair_dissipation', action="store_true", help="Adding pair-dissipation.")
     args = parser.parse_args()
 
 
