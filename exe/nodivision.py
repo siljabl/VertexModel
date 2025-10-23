@@ -26,6 +26,17 @@ import matplotlib
 matplotlib.use("Agg")
 
 
+# Define paths
+#config_path = "data/simulated/configs/"
+output_path = "data/simulated/raw/"
+
+
+if platform.node() != 'silja-work':
+    #config_path = "../../../../hdd_data/silja/VertexModel_data/simulated/configs/"
+    output_path = "../../../../hdd_data/silja/VertexModel_data/simulated/raw/"
+                       
+
+
 def create_filename(config_file, ensemble=False):
 
     seed = get_value(config_file, 'seed')
@@ -43,33 +54,13 @@ def main():
     # Command-line argument parsing
     parser = argparse.ArgumentParser(description="Run simulation constant cell volume and active brownian motion")
     parser.add_argument('-d', '--dir',    type=str,  help='Save in subfolders data/*/dir/. Creates dir if not existing.', default='')
-    parser.add_argument('-c', '--config', type=str,  help='Path to config file',                       default='data/simulated/configs/config_nodivision.json')
+    parser.add_argument('-c', '--config', type=str,  help='Path to config file',                       default='data/simulated/configs/config_nodivision_pairdissipation.json')
     parser.add_argument('-p', '--params', nargs='*', help='Additional parameters in the form key_value')
     parser.add_argument('--cbar0',        type=str,  help='How define 0 level of cbar in vm video',    default='absolute')
     parser.add_argument('--frames_dir',   type=str,  help='Where to save frames',    default='../../../../hdd_data/silja/VertexModel_data/simulated/frames/')
     parser.add_argument('--ensemble',                help='Defines whether run is part of ensemble execution', action='store_true')
+    parser.add_argument('--pair', '--pair_dissipation', action="store_true", help="Adding pair-dissipation.")
     args = parser.parse_args()
-
-
-
-    # DEFINE PATHS
-
-    if platform.node() != 'silja-work' and not --ensemble:
-        print("Error: ouput path does not exists!")
-    # Check if subfolders exists, if not create
-    if args.dir != '':
-        args.dir = f"{args.dir}/"
-    path_to_config = f"data/simulated/configs/{args.dir}"
-    path_to_output = f"data/simulated/raw/{args.dir}"
-    path_to_frames = f"{args.frames_dir}/{args.dir}"
-
-    Path(path_to_config).mkdir(parents=True, exist_ok=True)
-    Path(path_to_output).mkdir(parents=True, exist_ok=True)
-    Path(path_to_frames).mkdir(parents=True, exist_ok=True)
-
-       
-    # Save frames in temporary directory
-    print("Save frames to temp directory \"%s\"." % path_to_frames, file=sys.stderr)
 
 
 
@@ -122,6 +113,7 @@ def main():
     tauV   = config['physics']['tauV']                      # inverse increase rate in V0 unit
     v0     = config['physics']['v0']                        # self-propulsion velocity
     taup   = config['physics']['taup']                      # self-propulsion persistence time
+    eta    = config['physics']['eta']                       # vertex-vertex pair drag coefficient
 
     # Integration
     dt      = config['simulation']['dt']                    # integration time step
@@ -131,12 +123,31 @@ def main():
     Nframes = config['simulation']['Nframes']               # number of frames in simulation
 
 
+
     rho = cell_density(Ngrid, Lgrid)
     update_value(config_file, 'rho', rho)
     
     # Save simulation-specific config file
     fname = create_filename(config_file, args.ensemble)
     print("Simulation name: ", fname)
+
+
+    # DEFINE PATHS
+
+    # Check if subfolders exists, if not create
+    if args.dir != '':
+        args.dir = f"{args.dir}/"
+    path_to_config = f"{Path(config_path).parent}/{args.dir}"
+    path_to_output = f"{output_path}/{args.dir}"
+    path_to_frames = f"{args.frames_dir}/{args.dir}/{fname}"
+
+    Path(path_to_config).mkdir(parents=True, exist_ok=True)
+    Path(path_to_output).mkdir(parents=True, exist_ok=True)
+    Path(path_to_frames).mkdir(parents=True, exist_ok=True)
+
+       
+    # Save frames in temporary directory
+    print("Save frames to temp directory \"%s\"." % path_to_frames, file=sys.stderr)
 
     save_config(f"{path_to_config}{fname}.json", config_file)
 
@@ -151,10 +162,11 @@ def main():
     vm = VertexModel(np.random.randint(1e5))                        # initialise vertex model object
     vm.initRegularTriangularLattice(size=Ngrid, hexagonArea=A0)     # initialise periodic system
 
-
     # Add forces
     vm.addActiveBrownianForce("abp", v0, taup)                      # centre active Brownian force
     vm.addSurfaceForce("surface", Lambda, V0, tauV)                 # surface tension force
+    if args.pair_dissipation:
+        vm.setPairFrictionIntegrator(eta)                           # add pair dissipation
 
     vm.vertexForces["surface"].volume = dict(map(                   # set cell volume
         lambda i: (i, sc.stats.truncnorm((Vmin-V0)/stdV0, (Vmax-V0)/stdV0, loc=V0, scale=stdV0).rvs()),
@@ -168,7 +180,7 @@ def main():
 
     # outputs
     with open(f"{path_to_output}{fname}.p", "wb") as dump: pass     # output file is created
-    fig, ax = plot(vm, fig=None, ax=None, cbar_zero=cbar_zero)                           # initialise plot with first frame
+    fig, ax = plot(vm, fig=None, ax=None, cbar_zero=cbar_zero)      # initialise plot with first frame
 
 
     # simulation
@@ -184,16 +196,8 @@ def main():
         # integrate
         vm.nintegrate(period, dt, delta, epsilon)
 
-
-    # # make movie
-    # subprocess.call([movie_sh_fname,
-    #                 "-d", path_to_frames,
-    #                 "-o", f"{path_to_frames}{fname}.mp4",
-    #                 "-p", sys.executable,
-    #                 "-y"])
-    
+   
     os.system('stty sane')
-    # shutil.rmtree(path_to_frames)
 
 if __name__ == "__main__":
     main()
