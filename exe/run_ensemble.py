@@ -79,7 +79,8 @@ def main():
     parser.add_argument('-P', '--Npool',  type=int,  help="Number of parallel processes", default=16)
     parser.add_argument('-s', '--seed',   type=int,  help="Simulation seed",              default=None)
     parser.add_argument('-c', '--config', type=str,  help='Path to config file',          default='../../../../hdd_data/silja/VertexModel_data/simulated/configs/config.json')
-
+    
+    parser.add_argument('--pair_dissipation', action="store_true", help="Adding pair-dissipation.")
     args = parser.parse_args()
 
     # Load configurations

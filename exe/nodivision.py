@@ -54,12 +54,11 @@ def main():
     # Command-line argument parsing
     parser = argparse.ArgumentParser(description="Run simulation constant cell volume and active brownian motion")
     parser.add_argument('-d', '--dir',    type=str,  help='Save in subfolders data/*/dir/. Creates dir if not existing.', default='')
-    parser.add_argument('-c', '--config', type=str,  help='Path to config file',                       default='data/simulated/configs/config_nodivision_pairdissipation.json')
+    parser.add_argument('-c', '--config', type=str,  help='Path to config file',                       default='data/simulated/configs/config_nodivision.json')
     parser.add_argument('-p', '--params', nargs='*', help='Additional parameters in the form key_value')
     parser.add_argument('--cbar0',        type=str,  help='How define 0 level of cbar in vm video',    default='absolute')
     parser.add_argument('--frames_dir',   type=str,  help='Where to save frames',    default='../../../../hdd_data/silja/VertexModel_data/simulated/frames/')
     parser.add_argument('--ensemble',                help='Defines whether run is part of ensemble execution', action='store_true')
-    parser.add_argument('--pair_dissipation', action="store_true", help="Adding pair-dissipation.")
     args = parser.parse_args()
 
 
@@ -166,8 +165,7 @@ def main():
     # Add forces
     vm.addActiveBrownianForce("abp", v0, taup)                      # centre active Brownian force
     vm.addSurfaceForce("surface", Lambda, V0, tauV)                 # surface tension force
-    if args.pair_dissipation:
-        vm.setPairFrictionIntegrator(eta)                           # add pair dissipation
+    vm.setPairFrictionIntegrator(eta)                           # add pair dissipation
 
     vm.vertexForces["surface"].volume = dict(map(                   # set cell volume
         lambda i: (i, sc.stats.truncnorm((Vmin-V0)/stdV0, (Vmax-V0)/stdV0, loc=V0, scale=stdV0).rvs()),
