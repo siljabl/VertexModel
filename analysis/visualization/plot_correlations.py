@@ -3,6 +3,7 @@ from cells.bind import VertexModel
 import os
 import sys
 import glob
+import platform
 import argparse
 import numpy as np
 from pathlib import Path
@@ -23,6 +24,10 @@ from utils.correlation_object import VMAutocorrelationObject
 
 # Define paths
 config_dir = "data/simulated/configs/"
+
+
+if platform.node() != 'silja-work':
+    config_dir = "../../../../hdd_data/silja/VertexModel_data/simulated/configs/"                                                                                                                                                                     
 
 
 def sort_files(fpattern, legend):

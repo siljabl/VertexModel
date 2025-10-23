@@ -54,11 +54,12 @@ def main():
     # Command-line argument parsing
     parser = argparse.ArgumentParser(description="Run simulation constant cell volume and active brownian motion")
     parser.add_argument('-d', '--dir',    type=str,  help='Save in subfolders data/*/dir/. Creates dir if not existing.', default='')
-    parser.add_argument('-c', '--config', type=str,  help='Path to config file',                       default='data/simulated/configs/config_nodivision.json')
+    parser.add_argument('-c', '--config', type=str,  help='Path to config file',                       default='../../../../hdd_data/silja/VertexModel_data/simulated/configs/config_nodivision.json')
     parser.add_argument('-p', '--params', nargs='*', help='Additional parameters in the form key_value')
-    parser.add_argument('--cbar0',        type=str,  help='How define 0 level of cbar in vm video',    default='absolute')
+    parser.add_argument('--cbar0',        type=str,  help='How define 0 level of cbar in vm video',    default='average')
     parser.add_argument('--frames_dir',   type=str,  help='Where to save frames',    default='../../../../hdd_data/silja/VertexModel_data/simulated/frames/')
     parser.add_argument('--ensemble',                help='Defines whether run is part of ensemble execution', action='store_true')
+    parser.add_argument('--init_time',    type=int,  help='Number of initialisation frames', default=100)
     args = parser.parse_args()
 
 
@@ -189,7 +190,8 @@ def main():
         with open(f"{path_to_output}{fname}.p", "ab") as dump: pickle.dump(vm, dump)
 
         # plot snapshot
-        save_snapshot(vm, fig, ax, path_to_frames, frame, cbar_zero=cbar_zero)
+        if frame > args.init_time:
+            save_snapshot(vm, fig, ax, path_to_frames, frame, cbar_zero=cbar_zero)
         frame += 1
 
         # integrate

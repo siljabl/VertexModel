@@ -56,7 +56,8 @@ def main():
 
         # load vm object
         list_vm, init_vm = vm_output.load(args.path, init_time=100)
-
+        print(len(list_vm), len(init_vm))
+        
         # outputs
         fig, ax = plot(list_vm[0], fig=None, ax=None, cbar_zero=args.cbar0)
 
