@@ -42,8 +42,8 @@ def vm_compute_correlation(path, config_path, args):
     h_variation = np.ma.array(heights - np.mean(heights, axis=mean_var, keepdims=True), mask=False)
     A_variation = np.ma.array(areas   - np.mean(areas,   axis=mean_var, keepdims=True), mask=False)
     V_variation = np.ma.array(volumes - np.mean(volumes, axis=mean_var, keepdims=True), mask=False)
-    velocities  = [np.ma.array(velocities[:,:,0] - np.mean(velocities[:,:,0], axis=mean_var, keepdims=True), mask=False),
-                   np.ma.array(velocities[:,:,1] - np.mean(velocities[:,:,1], axis=mean_var, keepdims=True), mask=False)]
+    velocities  = [np.ma.array(velocities[:,:,0] - np.ma.mean(velocities[:,:,0], axis=mean_var, keepdims=True), mask=False),
+                   np.ma.array(velocities[:,:,1] - np.ma.mean(velocities[:,:,1], axis=mean_var, keepdims=True), mask=False)]
 
     # Initialize correlation object
     autocorr_obj = VMAutocorrelationObject(in_path=path)
