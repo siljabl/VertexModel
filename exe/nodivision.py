@@ -101,13 +101,11 @@ def main():
     rgrid = Lgrid / Ngrid                                   # length scale of triangular lattice
 
     # Cell
-#    rhex  = config['physics']['rhex']                       # reference side lenght of regular cell (hexagon)
     A0    = hexagon_area(rgrid)                             # initial cell area
     V0    = config['experimental']['V0']                    # cell volume
     stdV0 = config['experimental']['stdV0'] * V0            # standard deviation of cell volume distribution
     Vmin  = config['experimental']['Vmin']  * V0            # lower limit on volume
     Vmax  = config['experimental']['Vmax']  * V0            # upper limit on volume
-    rexp  = config['experimental']['rhex']                  # physical side lenght of regular cell
 
     # Forces
     gamma  = config['physics']['gamma']                    # surface tension
@@ -125,7 +123,7 @@ def main():
 
 
 
-    rho = cell_density(Ngrid, Lgrid, rexp)
+    rho = cell_density(Ngrid, Lgrid)
     update_value(config_file, 'rho', rho)
     
     # Save simulation-specific config file

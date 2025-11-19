@@ -38,12 +38,11 @@ def hexagon_side(V0):
     return ((2 / 3**2) * V0) ** (1/3)
 
 
-def cell_density(Ngrid, Lgrid, rscale):
+def cell_density(Ngrid, Lgrid):
     """ 
     Computes the global cell density in units of r_6^2
     Ngrid:  Number of vertices in one direction
     Lgrid:  System size in one direction
-    rscale: Scaling variable to physical units
     
     """
     Ncell = Ngrid**2 / 3
@@ -51,4 +50,4 @@ def cell_density(Ngrid, Lgrid, rscale):
 
     rho = Ncell / Agrid
 
-    return int(rho * 10**6 / rscale**2)
+    return int(rho * 10**6)
