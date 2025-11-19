@@ -101,7 +101,6 @@ def main():
     rgrid = Lgrid / Ngrid                                   # length scale of triangular lattice
 
     # Cell
-#    rhex  = config['physics']['rhex']                       # reference side lenght of regular cell (hexagon)
     A0    = hexagon_area(rgrid)                             # initial cell area
     V0    = config['experimental']['V0']                    # cell volume
     stdV0 = config['experimental']['stdV0'] * V0            # standard deviation of cell volume distribution
