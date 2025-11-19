@@ -58,6 +58,7 @@ cellprop = SegmentationData()
 cellprop.load(f"data/experimental/processed/{dataset}/cell_props.p")
 cellcorr  = AutocorrelationData(f"data/experimental/processed/{dataset}/cell_autocorr.p")
 fieldcorr = AutocorrelationData(f"data/experimental/processed/{dataset}/field_autocorr.p")
+cellprop.add_density()
 
 mask = (cellprop.density > density - args.binsize / 2) * (cellprop.density < density + args.binsize / 2)
 

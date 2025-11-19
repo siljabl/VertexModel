@@ -84,6 +84,11 @@ class SegmentationData:
         if param == "density":
             self.density = value
 
+    def add_density(self):
+        Ncells = np.ma.sum(~self.A.mask, axis=1)
+        Acells = np.ma.sum(self.A, axis=1)
+        self.density = 10**6 * Ncells / Acells
+
 
 class VariationData:
     def __init__(self, path):

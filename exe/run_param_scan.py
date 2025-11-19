@@ -44,7 +44,7 @@ def main():
 
     if args.list == None:
         assert len(args.range) == 3, f"Wrong format on input '--range'. Should be '-r <min> <max> <Nparam>'"
-        param_range = np.linspace(float(args.range[0]), float(args.range[1]), int(args.range[2])).tostring()
+        param_range = np.linspace(float(args.range[0]), float(args.range[1]), int(args.range[2])).astype('str')
     else:
         param_range = [param for param in args.list]
 
