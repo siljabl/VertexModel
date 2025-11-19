@@ -111,7 +111,7 @@ def main():
     parser.add_argument('-p', '--param',     type=str, help="Parameter to plot correlation of (varvar)", default="all")
     parser.add_argument('-v', '--var',       type=str, help="Correlation variable (t or r)",             default="all")
     parser.add_argument('-o','--overwrite',            help="Overwrite previous computations",           action='store_true')
-    parser.add_argument('--dr',            type=float, help="Spatial step size (float)",                                            default='5')
+    parser.add_argument('--dr',            type=float, help="Spatial step size (float)",                                            default='20')
     parser.add_argument('--rfrac',         type=float, help="Max distance to compute correlation for (float)",                      default='0.5')
     parser.add_argument('--tfrac',         type=float, help="Fraction of total duration to compute correlation for (float)",        default='0.5')
     parser.add_argument('--mean_var',      type=str,   help="Variable to take mean over in <x - <x>_var> (t or cell). Default: t",  default='t')
