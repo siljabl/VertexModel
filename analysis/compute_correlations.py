@@ -14,11 +14,19 @@ from utils.correlation_object import VMAutocorrelationObject
 
 
 def vm_compute_correlation(path, config_path, args):
-    # Load frames as vm objects
-    list_vm, init_vm = vm_output.load(path)
 
     # Load config
     config_file = config.load(config_path)
+
+    # Compute time period between frames
+    dt = config_file["simulation"]["dt"]
+    T  = config_file["simulation"]["period"]
+    df = T * dt
+
+    # Load frames as vm objects
+    list_vm, init_vm = vm_output.load(path, df=df)
+    print("Lenght of data: ", len(list_vm))
+
 
     # Get values from config
     Nframes = config.get_value(config_file, 'Nframes')
@@ -115,6 +123,7 @@ def main():
 
     # file is in subdir
     if len(relative_path.split("/")) > 1:
+        print("Data is part of ensemble")
 
         # input is directory
         if relative_path.split("/")[-1] == "":
@@ -134,6 +143,7 @@ def main():
         ensemble = True
 
     else:
+        print("Data is not part of ensemble")
         ensemble = False
         
     print(f"Computing correlations of files in {data_dir} with config files in {config_dir}.\n")

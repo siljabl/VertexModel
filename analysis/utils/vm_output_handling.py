@@ -5,7 +5,7 @@ from operator import itemgetter
 from cells.bind import VertexModel
 
 
-def load(file, init_time=100):
+def load(file, init_time=100, df=1):
     """ Loads vm object and returns as list """
     
     list_vm = []
@@ -17,7 +17,7 @@ def load(file, init_time=100):
                 assert type(vm) is VertexModel  # check pickled object is a vertex model
                 
                 vm.nintegrate(1,0)              # integrate so output corresponds to correct frame/timestep 
-                if vm.time < init_time: 
+                if vm.time < init_time * df: 
                     init_vm += [vm]             # save first frames as init_vm
                 else:
                     list_vm += [vm]             # append frame to list_vm
