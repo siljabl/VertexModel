@@ -76,13 +76,13 @@ def vm_compute_correlation(path, config_path, args):
 
         # Compute temporal autocorrelations
         if args.param == 'hh' or args.param == 'all':
-            autocorr_obj.compute_temporal(h_variation, 'hh', tmax, t_avrg=True, overwrite=args.overwrite)
+            autocorr_obj.compute_temporal(h_variation, 'hh', tmax, df=df, t_avrg=True, overwrite=args.overwrite)
         if args.param == 'AA' or args.param == 'all':
-            autocorr_obj.compute_temporal(A_variation, 'AA', tmax, t_avrg=True, overwrite=args.overwrite)
+            autocorr_obj.compute_temporal(A_variation, 'AA', tmax, df=df, t_avrg=True, overwrite=args.overwrite)
         if args.param == 'VV' or args.param == 'all':
-            autocorr_obj.compute_temporal(V_variation, 'VV', tmax, t_avrg=True, overwrite=args.overwrite)
+            autocorr_obj.compute_temporal(V_variation, 'VV', tmax, df=df, t_avrg=True, overwrite=args.overwrite)
         if args.param == 'vv' or args.param == 'all':
-            autocorr_obj.compute_temporal(velocities,  'vv', tmax, t_avrg=True, overwrite=args.overwrite)
+            autocorr_obj.compute_temporal(velocities,  'vv', tmax, df=df, t_avrg=True, overwrite=args.overwrite)
 
     # Save autocorrelation as .autocorr
     autocorr_obj.save_pickle()

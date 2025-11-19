@@ -1,11 +1,13 @@
 import os
+import sys
 import pickle
 import platform
 import numpy as np
 from pathlib import Path
 from datetime import datetime
 
-import utils.correlation_computations as compute
+sys.path.append("analysis/utils/")
+import correlation_computations as compute
 
 data_dir = "data/simulated/raw/"
 obj_dir  = "data/simulated/processed/"
@@ -132,7 +134,7 @@ class VMAutocorrelationObject:
 
 
 
-    def compute_temporal(self, variable, variable_name, t_max, t_avrg=False, overwrite=False):
+    def compute_temporal(self, variable, variable_name, t_max, df=1, t_avrg=False, overwrite=False):
         """ Computes temporal autocorrelation """
 
         # Check if correlation exists
@@ -146,5 +148,5 @@ class VMAutocorrelationObject:
 
         # Update object
         self.temporal[variable_name] = Ct['C_norm']
-        self.t_array[variable_name]  = np.arange(t_max)
+        self.t_array[variable_name]  = np.arange(t_max) * df
         self.log['t'][variable_name] = datetime.today().strftime('%Y/%m/%d_%H:%M')

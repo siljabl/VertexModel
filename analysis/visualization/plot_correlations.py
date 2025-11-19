@@ -150,7 +150,7 @@ def plot_correlation(path, label, color, args):
         if args.units == "sim":
             x = corr_obj.r_array[args.param]
         elif args.units == "exp":
-            x = corr_obj.r_array[args.param] * config_file["experimental"]["rhex"]
+            x = corr_obj.r_array[args.param]
 
         y = corr_obj.spatial[args.param]
         plt.plot(x[(x <= args.xlim) * (y <= args.ylim)], y[(x <= args.xlim) * (y <= args.ylim)],
