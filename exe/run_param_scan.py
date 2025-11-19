@@ -88,7 +88,7 @@ def main():
         commands = []
         for run, param in zip(range(Nparam), param_range):
             if args.identical:
-                seed = args.seed
+                seed = str(args.seed)
             else:
                 seed = str(np.random.randint(1e3))
 
