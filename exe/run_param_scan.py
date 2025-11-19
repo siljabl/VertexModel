@@ -38,6 +38,7 @@ def main():
     parser.add_argument('-P', '--Npool',  type=int,   help="Number of parallel processes",              default=16)
     parser.add_argument('-c', '--config', type=str,   help='Path to config file', default='../../../../hdd_data/silja/VertexModel_data/simulated/configs/config_nodivision.json')
     parser.add_argument('--ensemble',                 help='Defines whether run is part of ensemble execution', action='store_true')
+    parser.add_argument('--identical',                help='Run all simulations with identical seed', action='store_true')
     args = parser.parse_args()
 
     assert args.range != None or args.list != None, f"Must provide either range or list of values for {args.param}"
@@ -86,11 +87,16 @@ def main():
         # Prepare the commands for each run
         commands = []
         for run, param in zip(range(Nparam), param_range):
+            if args.idential:
+                seed = args.seed
+            else:
+                seed = str(np.random.randint(1e3))
+                
             command = [
                 'python',
                 args.script,
                 '--config', args.config,
-                '--params', 'seed',     str(np.random.randint(1e3)),
+                '--params', 'seed',     seed,
                             args.param, param
             ]
             commands.append(command)
