@@ -45,6 +45,7 @@ density = 1900
 
 # Add experimental data
 dataset = "holomonitor_20240301_B1-4"
+#dataset = "holomonitor_20240319_A1-9"
 
 cellprop = SegmentationData()
 cellprop.load(f"data/experimental/processed/{dataset}/cell_props.p")
@@ -98,6 +99,8 @@ else:
     #                  alpha=0.5, color="b")
     out_path = f"{fig_dir}temporal_autocorrelation_{args.param}.png"
 
-fig.legend()
+
+if args.legend != '':
+    fig.legend(title=rf'${args.legend}$')
 fig.tight_layout()
 fig.savefig(out_path)
