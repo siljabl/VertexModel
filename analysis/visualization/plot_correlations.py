@@ -166,15 +166,13 @@ def plot_correlation(path, label, color, args):
             x = corr_obj.t_array[args.param] #/ vmean
         elif args.units == "exp":
             #print(vmean, config_file["experimental"]["rhex"], config_file["experimental"]["vmean"])
-            x = corr_obj.t_array[args.param][:-1]# * (vmean * config_file["experimental"]["rhex"]) / config_file["experimental"]["vmean"]
+            x = corr_obj.t_array[args.param] # * (vmean * config_file["experimental"]["rhex"]) / config_file["experimental"]["vmean"]
             y = corr_obj.temporal[args.param]
-            print(len(x), print(len(y)))
-        plt.plot(x[(x <= args.xlim) * (y <=
-                                        args.ylim)], y[(x <= args.xlim) * (y <= args.ylim)],
+
+        plt.plot(x[(x <= args.xlim) * (y <= args.ylim)], y[(x <= args.xlim) * (y <= args.ylim)],
                     args.fmt,
                     color=color, 
                     label=label)
-        plt.xlim(0,30)
 
 
 
