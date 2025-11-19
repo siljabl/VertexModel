@@ -36,7 +36,7 @@ def main():
     parser.add_argument('-s', '--seed',   type=int,   help="Simulation seed",                           default=None)
     parser.add_argument('-N', '--Nruns',  type=int,   help="Number of runs to do in ensemble",          default=10)
     parser.add_argument('-P', '--Npool',  type=int,   help="Number of parallel processes",              default=16)
-    parser.add_argument('-c', '--config', type=str,   help='Path to config file', default='data/simulated/configs/config_nodivision.json')
+    parser.add_argument('-c', '--config', type=str,   help='Path to config file', default='../../../../hdd_data/silja/VertexModel_data/simulated/configs/config_nodivision.json')
     parser.add_argument('--ensemble',                 help='Defines whether run is part of ensemble execution', action='store_true')
     args = parser.parse_args()
 
