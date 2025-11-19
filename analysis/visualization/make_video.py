@@ -38,8 +38,8 @@ def main():
 
     # set paths
     fname = Path(args.path).parent.stem
-
-    if fname == "raw":
+    
+    if fname == "raw" or fname == "frames":
         fname = Path(args.path).stem
     path_to_frames = f"{frames_dir}{fname}"
     path_to_videos = f"{videos_dir}{fname}"
@@ -56,7 +56,6 @@ def main():
 
         # load vm object
         list_vm, init_vm = vm_output.load(args.path, init_time=100)
-        print(len(list_vm), len(init_vm))
         
         # outputs
         fig, ax = plot(list_vm[0], fig=None, ax=None, cbar_zero=args.cbar0)

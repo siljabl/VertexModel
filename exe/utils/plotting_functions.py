@@ -27,7 +27,7 @@ def _update_canvas(fig):
         raise WindowClosedException
 
 def plot(vm, fig=None, ax=None, update=True, only_set=False,
-    vertex_indices=False, cbar_zero='hexagon'):
+         vertex_indices=False, cbar_zero='hexagon'):
     """
     Plot vertex model.
 
@@ -180,7 +180,7 @@ def plot(vm, fig=None, ax=None, update=True, only_set=False,
                     rotation=270, labelpad=_cbar_labelpad)
             elif cbar_zero == 'absolute':
                 cbar_area.set_label(
-                    r"$h_i / r_6^*$",
+                    r"$h ~(µm)$",
                     rotation=270, labelpad=_cbar_labelpad)
             if surface_force.parameters["tauV"] == 0 or True:
                 pass
@@ -353,8 +353,10 @@ def plot(vm, fig=None, ax=None, update=True, only_set=False,
     if "taur" in locals():
         title += r"$, \tau_r=%.1e$" % taur
     ax.set_title(title)
-    ax.set_xlabel(r"$x~/~r_6^*$")
-    ax.set_ylabel(r"$y~/~r_6^*$")     
+
+    # physical axes
+    ax.set_xlabel(r"$x ~(µm)$")
+    ax.set_ylabel(r"$y ~(µm)$")     
 
     # update canvas
     if update: _update_canvas(fig)
@@ -398,5 +400,5 @@ cmap_yketa = (                                                               # c
         (3/4, (0.925, 0.804, 0.000)),
         (4/4, (0.886, 0.549, 0.000))))
     or plt.cm.bwr)
-norm_area = Normalize(-1, 1)                                                # interval of value represented by colourmap
+norm_area = Normalize(0, 8)                                                # interval of value represented by colourmap
 scalarMap_yketa = ScalarMappable(norm_area, cmap_yketa)                       # conversion from scalar value to colour

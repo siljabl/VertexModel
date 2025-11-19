@@ -56,7 +56,7 @@ def main():
     parser.add_argument('-d', '--dir',    type=str,  help='Save in subfolders data/*/dir/. Creates dir if not existing.', default='')
     parser.add_argument('-c', '--config', type=str,  help='Path to config file',                       default='../../../../hdd_data/silja/VertexModel_data/simulated/configs/config_nodivision.json')
     parser.add_argument('-p', '--params', nargs='*', help='Additional parameters in the form key_value')
-    parser.add_argument('--cbar0',        type=str,  help='How define 0 level of cbar in vm video',    default='average')
+    parser.add_argument('--cbar0',        type=str,  help='How define 0 level of cbar in vm video',    default='absolute')
     parser.add_argument('--frames_dir',   type=str,  help='Where to save frames',    default='../../../../hdd_data/silja/VertexModel_data/simulated/frames/')
     parser.add_argument('--ensemble',                help='Defines whether run is part of ensemble execution', action='store_true')
     parser.add_argument('--init_time',    type=int,  help='Number of initialisation frames', default=100)
@@ -101,16 +101,16 @@ def main():
     rgrid = Lgrid / Ngrid                                   # length scale of triangular lattice
 
     # Cell
-    rhex  = config['physics']['rhex']                       # reference side lenght of regular cell (hexagon)
+#    rhex  = config['physics']['rhex']                       # reference side lenght of regular cell (hexagon)
     A0    = hexagon_area(rgrid)                             # initial cell area
-    V0    = hexagon_volume(rhex)                            # cell volume
+    V0    = config['experimental']['V0']                    # cell volume
     stdV0 = config['experimental']['stdV0'] * V0            # standard deviation of cell volume distribution
     Vmin  = config['experimental']['Vmin']  * V0            # lower limit on volume
     Vmax  = config['experimental']['Vmax']  * V0            # upper limit on volume
     rexp  = config['experimental']['rhex']                  # physical side lenght of regular cell
 
     # Forces
-    Lambda = config['physics']['Lambda']                    # surface tension
+    gamma  = config['physics']['gamma']                    # surface tension
     tauV   = config['physics']['tauV']                      # inverse increase rate in V0 unit
     v0     = config['physics']['v0']                        # self-propulsion velocity
     taup   = config['physics']['taup']                      # self-propulsion persistence time
@@ -165,7 +165,7 @@ def main():
 
     # Add forces
     vm.addActiveBrownianForce("abp", v0, taup)                      # centre active Brownian force
-    vm.addSurfaceForce("surface", Lambda, V0, tauV)                 # surface tension force
+    vm.addSurfaceForce("surface", gamma, V0, tauV)                 # surface tension force
     vm.setPairFrictionIntegrator(eta)                           # add pair dissipation
 
     vm.vertexForces["surface"].volume = dict(map(                   # set cell volume
