@@ -41,8 +41,8 @@ def create_dirname(script, config_file, filename=False):
     # Transform float to int
     gamma = int(gamma)
     v0    = int(v0)
-    taup  = int(taup)
-    eta   = int(eta)
+    taup  = int(100*taup)
+    eta   = int(100*eta)
 
     # Name on directory
     timestamp = datetime.now().strftime('%Y%m%d')
