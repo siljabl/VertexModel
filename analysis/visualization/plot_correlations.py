@@ -11,6 +11,7 @@ from pathlib import Path
 # Append the path of relative_parent directories
 sys.path.append("analysis/")
 sys.path.append("VertexModel/analysis/")
+import utils.vm_output_handling as vm_output
 
 # Avoid localhost error on my machine
 import matplotlib as mpl
@@ -65,8 +66,8 @@ def sort_files(fpattern, legend):
         
         # Sort according to label value
         sorted_inds = np.argsort(label_list)
-        sorted_file_list  = np.array(file_list)[sorted_inds]
-        sorted_label_list = np.array(label_list)[sorted_inds]
+        sorted_file_list   = np.array(file_list)[sorted_inds]
+        sorted_label_list  = np.array(label_list)[sorted_inds]
 
         return sorted_file_list, sorted_label_list
     
@@ -75,23 +76,51 @@ def sort_files(fpattern, legend):
 
 
 
-def initialize_figure(varname, type):
+def initialize_figure(varname, args):
     """ Create figure """
 
     fig = plt.figure(figsize=(6, 4), dpi=300)
 
-    if type == 'r':
+    if args.var == 'r':
         plt.title(rf'$C_{{{varname}}}(r)$')
-        plt.xlabel(r'$r~/~r_6^*$')
+        if args.units == "sim":
+            plt.xlabel(r'$r~/~r_6^*$')
+        elif args.units == "exp":
+            plt.xlabel(r'$r ~(µm)$')
+        
         plt.axhline(0, 0, 1, linestyle="dashed", color="gray")
 
     else:
         plt.title(rf'$C_{{{varname}}}(t)$')
-        plt.xlabel(r'$t$')
-        #plt.xlabel(r'$t~/~\tau_p$')
+
+        if args.units == "sim":
+            plt.xlabel(r'$t$')# ~(r_6^*/~\bar{v})$')
+        elif args.units == "exp":
+            plt.xlabel(r'$t ~(h)$')
         plt.axhline(0, 0, 1, linestyle="dashed", color="gray")
 
     return fig
+
+
+def compute_average_displacement(file):
+    """
+    Compute time scale as average displacement
+    """
+    fname = Path(file).stem
+    path = glob.glob(f"data/simulated/raw/{fname}/*")[0]
+
+    # load raw data
+    list_vm,_ = vm_output.load(path)
+
+    # extract cell positions
+    cell_positions = vm_output.get_cell_positions(list_vm)
+
+    # compute average displacement between two frames
+    dr_arr = np.sqrt(np.diff(cell_positions[:,:,0], axis=0)**2 + np.diff(cell_positions[:,:,1], axis=0)**2)
+    dr = np.mean(dr_arr)
+    print(dr)
+    
+    return dr
 
 
 
@@ -117,7 +146,11 @@ def plot_correlation(path, label, color, args):
 
     # Plot
     if args.var == "r":
-        x = corr_obj.r_array[args.param]
+        if args.units == "sim":
+            x = corr_obj.r_array[args.param]
+        elif args.units == "exp":
+            x = corr_obj.r_array[args.param] * config_file["experimental"]["rhex"]
+
         y = corr_obj.spatial[args.param]
         plt.plot(x[(x <= args.xlim) * (y <= args.ylim)], y[(x <= args.xlim) * (y <= args.ylim)],
                     args.fmt,
@@ -125,14 +158,20 @@ def plot_correlation(path, label, color, args):
                     label=label)
     
     else:
+        vmean = compute_average_displacement(path)
         # Get persistence time
-        taup = config.get_value(config_file, 'taup')
-        x = corr_obj.t_array[args.param]# / taup
+
+        if args.units == "sim":
+            x = corr_obj.t_array[args.param] #/ vmean
+        elif args.units == "exp":
+            #print(vmean, config_file["experimental"]["rhex"], config_file["experimental"]["vmean"])
+            x = corr_obj.t_array[args.param]# * (vmean * config_file["experimental"]["rhex"]) / config_file["experimental"]["vmean"]
         y = corr_obj.temporal[args.param]
         plt.plot(x[(x <= args.xlim) * (y <= args.ylim)], y[(x <= args.xlim) * (y <= args.ylim)],
                     args.fmt,
                     color=color, 
                     label=label)
+        plt.xlim(0,30)
 
 
 
@@ -149,6 +188,7 @@ def main():
     parser.add_argument('-o','--outdir', type=str, help="Output directory",                         default="results/")
     parser.add_argument('-x', '--xlim',  type=float, help="Upper limit on x-axis", default=9999)
     parser.add_argument('-y', '--ylim',  type=float, help="Upper limit on x-axis", default=1.1)
+    parser.add_argument('-u', '--units', type=str, help="Unit to plot in (sim or exp)", default='exp')
     parser.add_argument('--xlog', action="store_true")
     parser.add_argument('--ylog', action="store_true")
     parser.add_argument('--log',  action="store_true")
@@ -157,7 +197,9 @@ def main():
     args = parser.parse_args()
 
     # Assert temporal or spatial correlation
-    assert args.var in ['r', 't'], "Wrong correlation variable. Must be r or t"
+    assert args.var in ['r', 't'], "Wrong correlation variable. Must be r or t."
+    
+    assert args.units in ['sim', 'exp'], "Does not recognize units. Must be sim or exp."
 
 
     # Sort data sets by legend value
@@ -172,7 +214,7 @@ def main():
 
 
     # Plot each data set
-    fig = initialize_figure(args.param, args.var)
+    fig = initialize_figure(args.param, args)
     for file, label, color in zip(files_list, labels_list, colors):
 
         plot_correlation(file, label, color, args)
