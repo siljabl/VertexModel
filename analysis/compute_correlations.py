@@ -29,7 +29,7 @@ def vm_compute_correlation(path, config_path, args):
 
 
     # Get values from config
-    Nframes = config.get_value(config_file, 'Nframes')
+    Nframes = len(list_vm)
     Lgrid   = config.get_value(config_file, 'Lgrid')
 
     # Get cell properties
