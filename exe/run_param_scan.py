@@ -87,11 +87,11 @@ def main():
         # Prepare the commands for each run
         commands = []
         for run, param in zip(range(Nparam), param_range):
-            if args.idential:
+            if args.identical:
                 seed = args.seed
             else:
                 seed = str(np.random.randint(1e3))
-                
+
             command = [
                 'python',
                 args.script,
