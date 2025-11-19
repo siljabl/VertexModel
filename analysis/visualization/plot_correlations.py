@@ -7,6 +7,7 @@ import platform
 import argparse
 import numpy as np
 from pathlib import Path
+from datetime import datetime
 
 # Append the path of relative_parent directories
 sys.path.append("analysis/")
@@ -158,16 +159,18 @@ def plot_correlation(path, label, color, args):
                     label=label)
     
     else:
-        vmean = compute_average_displacement(path)
+        # vmean = compute_average_displacement(path)
         # Get persistence time
 
         if args.units == "sim":
             x = corr_obj.t_array[args.param] #/ vmean
         elif args.units == "exp":
             #print(vmean, config_file["experimental"]["rhex"], config_file["experimental"]["vmean"])
-            x = corr_obj.t_array[args.param]# * (vmean * config_file["experimental"]["rhex"]) / config_file["experimental"]["vmean"]
-        y = corr_obj.temporal[args.param]
-        plt.plot(x[(x <= args.xlim) * (y <= args.ylim)], y[(x <= args.xlim) * (y <= args.ylim)],
+            x = corr_obj.t_array[args.param][:-1]# * (vmean * config_file["experimental"]["rhex"]) / config_file["experimental"]["vmean"]
+            y = corr_obj.temporal[args.param]
+            print(len(x), print(len(y)))
+        plt.plot(x[(x <= args.xlim) * (y <=
+                                        args.ylim)], y[(x <= args.xlim) * (y <= args.ylim)],
                     args.fmt,
                     color=color, 
                     label=label)
@@ -177,7 +180,9 @@ def plot_correlation(path, label, color, args):
 
 
 def main():
-    fig_dir = "results/"
+    date    = datetime.now().strftime('%Y%m%d')
+    fig_dir = f"results/{date}/"
+    Path(fig_dir).mkdir(parents=True, exist_ok=True)
 
     parser = argparse.ArgumentParser(description="Plot all defined autocorrelations")
     parser.add_argument('filepattern',   type=str, help="Path to files to plot. Typically 'data/simulated/obj/file'. Filename is on form <'path/to/file'>*.autocorr")
