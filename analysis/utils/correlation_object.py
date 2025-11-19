@@ -127,6 +127,7 @@ class VMAutocorrelationObject:
         # Update object
         self.spatial[variable_name]  = Cr['C_norm'].compressed()
         self.r_array[variable_name]  = Cr['r_bin_centers'].compressed()
+        print(self.r_array)
         self.log['r'][variable_name] = datetime.today().strftime('%Y/%m/%d_%H:%M')
 
 

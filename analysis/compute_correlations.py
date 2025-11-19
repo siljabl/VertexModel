@@ -38,7 +38,6 @@ def vm_compute_correlation(path, config_path, args):
     volumes    = vm_output.get_cell_volumes(list_vm)
     velocities = vm_output.get_cell_velocities(list_vm)
 
-    print(positions)
     areas = np.ma.array(volumes / heights)
 
     # Define mean variable axis
