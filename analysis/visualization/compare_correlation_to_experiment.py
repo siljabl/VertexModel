@@ -10,6 +10,9 @@ from datetime import datetime
 sys.path.append("analysis/visualization")
 from plot_correlations import plot_correlation, sort_files, initialize_figure
 
+sys.path.append("analysis/utils")
+import config_functions as config
+
 sys.path.append("exe/utils")
 from vm_functions import hexagon_side
 
@@ -19,6 +22,10 @@ from data_class import AutocorrelationData, SegmentationData
 date    = datetime.now().strftime('%Y%m%d')
 fig_dir = f"results/{date}/"
 Path(fig_dir).mkdir(parents=True, exist_ok=True)
+
+
+# Define paths
+config_dir = "data/simulated/configs/"
 
 parser = argparse.ArgumentParser(description="Plot all defined autocorrelations")
 parser.add_argument('filepattern',   type=str, help="Path to files to plot. Typically 'data/simulated/obj/file'. Filename is on form <'path/to/file'>*.autocorr")
@@ -57,7 +64,7 @@ mask = (cellprop.density > density - args.binsize / 2) * (cellprop.density < den
 if args.param == "vv":
     mask = mask[:-1]
 
-print(len(mask), len(cellcorr.spatial[args.param]))
+
 # take mean of correlations at this density
 if args.var == "r":
     mean_correlation = np.ma.mean(cellcorr.spatial[args.param][mask], axis=0)
@@ -77,11 +84,19 @@ cmap   = mpl.colormaps[args.cmap]
 colors = cmap(np.linspace(0.1, 0.9, len(files_list)))
 
 # Plot each data set
+labels = ['exp']
+i = 0
 fig = initialize_figure(args.param, args)
 for file, label, color in zip(files_list, labels_list, colors):
 
-    plot_correlation(file, label, color, args)
+    # # config
+    # fname = Path(file).stem
+    # config_path = f"{config_dir}/{fname}.json"
+    # config_file = config.load(config_path)
 
+    plot_correlation(file, label, color, args)
+    labels.append(i)
+    i += 1
 
 if args.var == "r":
     plt.plot(cellcorr.r_array[args.param], mean_correlation, "b--", label="Exp")
@@ -100,7 +115,11 @@ else:
     out_path = f"{fig_dir}temporal_autocorrelation_{args.param}.png"
 
 
+
+
 if args.legend != '':
     fig.legend(title=rf'${args.legend}$')
+else:
+    fig.legend(labels)
 fig.tight_layout()
 fig.savefig(out_path)
