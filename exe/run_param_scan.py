@@ -47,6 +47,8 @@ def main():
         param_range = np.linspace(float(args.range[0]), float(args.range[1]), int(args.range[2]))
     else:
         param_range = [param for param in args.list]
+
+    print(param_range)
     
     Nparam = len(param_range)
 
