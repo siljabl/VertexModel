@@ -101,3 +101,38 @@ def get_neighbour_matrix(list_vm):
 
 
     return neighbours
+
+
+def get_cell_aspect_ratios(list_vm):
+
+    cells = list_vm[0].getVertexIndicesByType("centre")
+
+
+    for vm in list_vm:  
+        polygons = getPolygonsCell(vm)
+        centers  = itemgetter(*cells)(list_vm[0].getPositions(wrapped=True))
+
+        centered_polygons = [np.array(polygon) - np.array(center) for polygon, center in zip(polygons, centers)]
+
+
+        cov = [np.cov(polygon, rowvar=False, bias=False) for polygon in polygons]
+
+        # eigen-decomposition
+        eigvals, eigvecs = np.linalg.eigh(cov)  # returns sorted (ascending) eigenvalues for symmetric matrices
+
+        # eigenvalues are in ascending order (smallest first), so:
+        minor_idx = 0
+        major_idx = 1
+
+        # directions (unit vectors)
+        minor_dir = eigvecs[:, minor_idx]
+        major_dir = eigvecs[:, major_idx]
+
+        proj_major = [np.array(polygon).dot(major) for polygon, major in zip(polygons, major_dir)]
+        proj_minor = [np.array(polygon).dot(minor) for polygon, minor in zip(polygons, minor_dir)]
+
+        major_length = np.array([major.max() - major.min() for major in proj_major])
+        minor_length = np.array([minor.max() - minor.min() for minor in proj_minor])
+
+    return major_length / minor_length
+
