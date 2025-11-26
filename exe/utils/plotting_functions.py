@@ -400,5 +400,5 @@ cmap_yketa = (                                                               # c
         (3/4, (0.925, 0.804, 0.000)),
         (4/4, (0.886, 0.549, 0.000))))
     or plt.cm.bwr)
-norm_area = Normalize(0, 8)                                                # interval of value represented by colourmap
+norm_area = Normalize(0, 10)                                                # interval of value represented by colourmap
 scalarMap_yketa = ScalarMappable(norm_area, cmap_yketa)                       # conversion from scalar value to colour
