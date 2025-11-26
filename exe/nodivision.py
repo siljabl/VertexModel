@@ -104,11 +104,12 @@ def main():
     A0    = hexagon_area(rgrid)                             # initial cell area
     V0    = config['experimental']['V0']                    # cell volume
     stdV0 = config['experimental']['stdV0'] * V0            # standard deviation of cell volume distribution
-    Vmin  = config['experimental']['Vmin']  * V0            # lower limit on volume
-    Vmax  = config['experimental']['Vmax']  * V0            # upper limit on volume
+    #Vmin  = config['experimental']['Vmin']  * V0            # lower limit on volume
+    #Vmax  = config['experimental']['Vmax']  * V0            # upper limit on volume
+    skew  = config['experimental']['skew']                  # upper limit on volume
 
     # Forces
-    gamma  = config['physics']['gamma']                    # surface tension
+    gamma  = config['physics']['gamma']                     # surface tension
     tauV   = config['physics']['tauV']                      # inverse increase rate in V0 unit
     v0     = config['physics']['v0']                        # self-propulsion velocity
     taup   = config['physics']['taup']                      # self-propulsion persistence time
@@ -166,9 +167,14 @@ def main():
     vm.addSurfaceForce("surface", gamma, V0, tauV)                 # surface tension force
     vm.setPairFrictionIntegrator(eta)                           # add pair dissipation
 
+    # vm.vertexForces["surface"].volume = dict(map(                   # set cell volume
+    #     lambda i: (i, sc.stats.truncnorm((Vmin-V0)/stdV0, (Vmax-V0)/stdV0, loc=V0, scale=stdV0).rvs()),
+    #     vm.vertexForces["surface"].volume))
+    
     vm.vertexForces["surface"].volume = dict(map(                   # set cell volume
-        lambda i: (i, sc.stats.truncnorm((Vmin-V0)/stdV0, (Vmax-V0)/stdV0, loc=V0, scale=stdV0).rvs()),
+        lambda i: (i, sc.stats.skewnorm(a=skew, loc=V0, scale=stdV0).rvs()),
         vm.vertexForces["surface"].volume))
+
 
 
 
