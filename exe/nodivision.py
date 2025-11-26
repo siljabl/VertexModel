@@ -103,7 +103,7 @@ def main():
     # Cell
     A0    = hexagon_area(rgrid)                             # initial cell area
     V0    = config['experimental']['V0']                    # cell volume
-    stdV0 = config['experimental']['stdV0'] * V0            # standard deviation of cell volume distribution
+    stdV0 = config['experimental']['stdV0']                 # standard deviation of cell volume distribution
     #Vmin  = config['experimental']['Vmin']  * V0            # lower limit on volume
     #Vmax  = config['experimental']['Vmax']  * V0            # upper limit on volume
     skew  = config['experimental']['skew']                  # upper limit on volume
