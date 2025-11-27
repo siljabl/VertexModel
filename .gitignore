@@ -5,7 +5,7 @@ data/
 venv/
 docs/
 mnt/
-analysis/notebooks
+#analysis/notebooks
 .emacs
 __pycache__/
 
