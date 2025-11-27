@@ -2,7 +2,7 @@ import pickle
 import numpy as np
 
 from operator import itemgetter
-from cells.bind import VertexModel
+from cells.bind import VertexModel, getPolygonsCell
 
 
 def load(file, init_time=100, df=1):
@@ -107,6 +107,7 @@ def get_cell_aspect_ratios(list_vm):
 
     cells = list_vm[0].getVertexIndicesByType("centre")
 
+    aspect_ratio = []
 
     for vm in list_vm:  
         polygons = getPolygonsCell(vm)
@@ -134,5 +135,8 @@ def get_cell_aspect_ratios(list_vm):
         major_length = np.array([major.max() - major.min() for major in proj_major])
         minor_length = np.array([minor.max() - minor.min() for minor in proj_minor])
 
-    return major_length / minor_length
+        aspect_ratio.append(major_length / minor_length)
+
+
+    return np.array(aspect_ratio)
 
