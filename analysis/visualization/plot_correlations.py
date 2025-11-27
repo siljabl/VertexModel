@@ -28,7 +28,7 @@ from utils.correlation_object import VMAutocorrelationObject
 config_dir = "data/simulated/configs/"
 
 
-if platform.node() != 'silja-work':
+if platform.node() != 'silja-work' and platform.node() != 'silja-pc':
     config_dir = "../../../../hdd_data/silja/VertexModel_data/simulated/configs/"                                                                                                                                                                     
 
 

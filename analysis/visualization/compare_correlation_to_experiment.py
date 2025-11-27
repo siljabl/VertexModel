@@ -53,7 +53,7 @@ density = 1900
 
 # Add experimental data
 dataset = "holomonitor_20240301_B1-4"
-#dataset = "holomonitor_20240319_A1-9"
+#dataset = "holomonitor_20240319_A1-13"
 
 cellprop = SegmentationData()
 cellprop.load(f"data/experimental/processed/{dataset}/cell_props.p")

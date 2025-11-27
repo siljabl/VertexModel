@@ -55,6 +55,7 @@ def vm_compute_correlation(path, config_path, args):
 
     # Initialize correlation object
     autocorr_obj = VMAutocorrelationObject(in_path=path)
+    print(autocorr_obj.log)
 
     if args.var == 'r' or args.var == 'all':
         # Upper limit on distance
@@ -96,7 +97,7 @@ def main():
     data_dir   = "data/simulated/raw/"
     config_dir = "data/simulated/configs/"
 
-    if platform.node() != 'silja-work':
+    if platform.node() != 'silja-work' and platform.node() != 'silja-pc':
         print(f"Running simulation from {platform.node()}")
         obj_dir    = "../../../../hdd_data/silja/VertexModel_data/simulated/processed/"
         data_dir   = "../../../../hdd_data/silja/VertexModel_data/simulated/raw/"

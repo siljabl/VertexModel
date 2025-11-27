@@ -12,7 +12,7 @@ import correlation_computations as compute
 data_dir = "data/simulated/raw/"
 obj_dir  = "data/simulated/processed/"
 
-if platform.node() != 'silja-work':
+if platform.node() != 'silja-work' and platform.node() != 'silja-pc':
     data_dir = "../../../../hdd_data/silja/VertexModel_data/simulated/raw/"
     obj_dir  = "../../../../hdd_data/silja/VertexModel_data/simulated/processed/"
 
