@@ -31,11 +31,9 @@ matplotlib.use("Agg")
 output_path = "data/simulated/raw/"
 
 
-if platform.node() != 'silja-work':
-    #config_path = "../../../../hdd_data/silja/VertexModel_data/simulated/configs/"
+if platform.node() != 'silja-work' and platform.node() != 'silja-pc':
     output_path = "../../../../hdd_data/silja/VertexModel_data/simulated/raw/"
                        
-
 
 def create_filename(config_file, ensemble=False):
 
@@ -161,6 +159,7 @@ def main():
     # Vertex model object
     vm = VertexModel(np.random.randint(1e5))                        # initialise vertex model object
     vm.initRegularTriangularLattice(size=Ngrid, hexagonArea=A0)     # initialise periodic system
+    print(vm.systemSize)
 
     # Add forces
     vm.addActiveBrownianForce("abp", v0, taup)                      # centre active Brownian force
