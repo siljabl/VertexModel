@@ -28,22 +28,23 @@ Path(fig_dir).mkdir(parents=True, exist_ok=True)
 config_dir = "data/simulated/configs/"
 
 parser = argparse.ArgumentParser(description="Plot all defined autocorrelations")
-parser.add_argument('filepattern',   type=str, help="Path to files to plot. Typically 'data/simulated/obj/file'. Filename is on form <'path/to/file'>*.autocorr")
-parser.add_argument('param',         type=str, help="Parameter to plot correlation of (varvar)")
-parser.add_argument('var',           type=str, help="Correlation variable (t or r)")
-parser.add_argument('-l','--legend', type=str, help="Add legend (str)",                         default='')
-parser.add_argument('-c','--cmap',   type=str, help="Specify matplotlib colormap (str)",        default='plasma')
-parser.add_argument('-o','--outdir', type=str, help="Output directory",                         default="results/")
-parser.add_argument('-x', '--xlim',  type=float, help="Upper limit on x-axis", default=9999)
-parser.add_argument('-y', '--ylim',  type=float, help="Upper limit on x-axis", default=1.1)
-parser.add_argument('-u', '--units', type=str, help="Unit to plot in (sim or exp)", default='exp')
+parser.add_argument('param',                 type=str, help="Parameter to plot correlation of (varvar)")
+parser.add_argument('var',                   type=str, help="Correlation variable (t or r)")
+parser.add_argument('-f', '--filepattern',   type=str, help="Path to files to plot. Typically 'data/simulated/obj/file'. Filename is on form <'path/to/file'>*.autocorr", default=None)
+parser.add_argument('-l','--legend',         type=str, help="Add legend (str)",                         default='')
+parser.add_argument('-c','--cmap',           type=str, help="Specify matplotlib colormap (str)",        default='plasma')
+parser.add_argument('-o','--outdir',         type=str, help="Output directory",                         default="results/")
+parser.add_argument('-x', '--xlim',          type=float, help="Upper limit on x-axis", default=9999)
+parser.add_argument('-y', '--ylim',          type=float, help="Upper limit on x-axis", default=1.1)
+parser.add_argument('-u', '--units',         type=str, help="Unit to plot in (sim or exp)", default='exp')
+parser.add_argument('--fmt',    default="-")
+parser.add_argument('--binsize',    type=int,   help="size of density bin",    default=200)
+parser.add_argument('--figscale',   type=float, help="scaling of figure size", default=1)
+parser.add_argument('--frame_to_h', type=float, help="convert frame to h",     default=1/12)
+parser.add_argument('-r', '--return_plot', action="store_true")
 parser.add_argument('--xlog', action="store_true")
 parser.add_argument('--ylog', action="store_true")
 parser.add_argument('--log',  action="store_true")
-parser.add_argument('--fmt',    default="-")
-parser.add_argument('--binsize',    type=int,   help="size of density bin", default=200)
-parser.add_argument('--frame_to_h', type=float, help="convert frame to h",  default=1/12)
-parser.add_argument('-r', '--return_plot', action="store_true")
 args = parser.parse_args()
 
 
@@ -76,28 +77,30 @@ else:
     std_correlation  = np.ma.std(cellcorr.temporal[args.param][mask], axis=0)
 
 # plot simulation
-
-# Sort data sets by legend value
-files_list, labels_list = sort_files(args.filepattern, args.legend)
-
-# Define line colors
-cmap   = mpl.colormaps[args.cmap]
-colors = cmap(np.linspace(0.1, 0.9, len(files_list)))
-
-# Plot each data set
+fig = initialize_figure(args.param, args, args.figscale)
 labels = ['exp']
-i = 0
-fig = initialize_figure(args.param, args)
-for file, label, color in zip(files_list, labels_list, colors):
 
-    # # config
-    # fname = Path(file).stem
-    # config_path = f"{config_dir}/{fname}.json"
-    # config_file = config.load(config_path)
+if args.filepattern != None:
+    # Sort data sets by legend value
+    files_list, labels_list = sort_files(args.filepattern, args.legend)
 
-    plot_correlation(file, label, color, args)
-    labels.append(i)
-    i += 1
+    # Define line colors
+    cmap   = mpl.colormaps[args.cmap]
+    colors = cmap(np.linspace(0.1, 0.9, len(files_list)))
+
+    # Plot each data set
+    i = 0
+    
+    for file, label, color in zip(files_list, labels_list, colors):
+
+        # # config
+        # fname = Path(file).stem
+        # config_path = f"{config_dir}/{fname}.json"
+        # config_file = config.load(config_path)
+
+        plot_correlation(file, label, color, args)
+        labels.append(i)
+        i += 1
 
 if args.var == "r":
     plt.plot(cellcorr.r_array[args.param], mean_correlation, "b--", label="Exp")

@@ -77,10 +77,10 @@ def sort_files(fpattern, legend):
 
 
 
-def initialize_figure(varname, args):
+def initialize_figure(varname, args, fig_scale=1):
     """ Create figure """
 
-    fig = plt.figure(figsize=(6, 4), dpi=300)
+    fig = plt.figure(figsize=(6*fig_scale, 4*fig_scale), dpi=300)
 
     if args.var == 'r':
         plt.title(rf'$C_{{{varname}}}(r)$')
