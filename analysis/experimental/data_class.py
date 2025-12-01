@@ -253,11 +253,14 @@ class AutocorrelationData:
             self.load()
 
         else:
+            self.temporal_cell = {}
             self.temporal = {}
             self.spatial  = {}
             self.t_array  = {}
             self.r_array  = {}
-            self.log = {'t': {},
+            self.density  = {}
+            self.log = {'t_cell': {},
+                        't': {},
                         'r': {}}
 
 
@@ -275,10 +278,12 @@ class AutocorrelationData:
             state = pickle.load(f)
         
         # Update object
+        self.temporal_cell = state.get('temporal_cell', {})
         self.temporal = state.get('temporal', {})
         self.spatial  = state.get('spatial', {})
         self.t_array  = state.get('t_array', {})
         self.r_array  = state.get('r_array', {})
+        self.density  = state.get('density', {})
         self.log      = state.get('log', {})
 
         print(f"State loaded from {self.path}.")
@@ -308,10 +313,12 @@ class AutocorrelationData:
 
         # Prepare state dictionary to save
         state = {
+            'temporal_cell': self.temporal_cell,
             'temporal': self.temporal,
             'spatial':  self.spatial,
             't_array':  self.t_array,
             'r_array':  self.r_array,
+            'density':  self.density,
             'log':      self.log
         }
         
