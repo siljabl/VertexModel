@@ -100,10 +100,7 @@ def main():
     # Cell
     A0    = hexagon_area(rgrid)                             # initial cell area
     V0    = config['experimental']['V0']                    # cell volume
-    stdV0 = config['experimental']['stdV0']                 # standard deviation of cell volume distribution
-    #Vmin  = config['experimental']['Vmin']  * V0           # lower limit on volume
-    #Vmax  = config['experimental']['Vmax']  * V0           # upper limit on volume
-    skew  = config['experimental']['skew']                  # upper limit on volume
+    scale = config['experimental']['scale']                 # Scale parameter of cell volume lognormal distribution
 
     # Forces
     gamma  = config['physics']['gamma']                     # surface tension
@@ -170,7 +167,7 @@ def main():
     #     vm.vertexForces["surface"].volume))
     
     vm.vertexForces["surface"].volume = dict(map(                   # set cell volume
-        lambda i: (i, sc.stats.skewnorm(a=skew, loc=V0, scale=stdV0).rvs()),
+        lambda i: (i, sc.stats.lognorm(0.3, scale=2200).rvs()),
         vm.vertexForces["surface"].volume))
 
 
