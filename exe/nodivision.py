@@ -27,7 +27,6 @@ matplotlib.use("Agg")
 
 
 # Define paths
-#config_path = "data/simulated/configs/"
 output_path = "data/simulated/raw/"
 
 
@@ -52,7 +51,7 @@ def main():
     # Command-line argument parsing
     parser = argparse.ArgumentParser(description="Run simulation constant cell volume and active brownian motion")
     parser.add_argument('-d', '--dir',    type=str,  help='Save in subfolders data/*/dir/. Creates dir if not existing.', default='')
-    parser.add_argument('-c', '--config', type=str,  help='Path to config file',                       default='../../../../hdd_data/silja/VertexModel_data/simulated/configs/config_nodivision.json')
+    parser.add_argument('-c', '--config', type=str,  help='Path to config file',                       default='configs/config_nodivision.json')
     parser.add_argument('-p', '--params', nargs='*', help='Additional parameters in the form key_value')
     parser.add_argument('--cbar0',        type=str,  help='How define 0 level of cbar in vm video',    default='absolute')
     parser.add_argument('--frames_dir',   type=str,  help='Where to save frames',    default='../../../../hdd_data/silja/VertexModel_data/simulated/frames/')
@@ -102,12 +101,13 @@ def main():
     A0    = hexagon_area(rgrid)                             # initial cell area
     V0    = config['experimental']['V0']                    # cell volume
     stdV0 = config['experimental']['stdV0']                 # standard deviation of cell volume distribution
-    #Vmin  = config['experimental']['Vmin']  * V0            # lower limit on volume
-    #Vmax  = config['experimental']['Vmax']  * V0            # upper limit on volume
+    #Vmin  = config['experimental']['Vmin']  * V0           # lower limit on volume
+    #Vmax  = config['experimental']['Vmax']  * V0           # upper limit on volume
     skew  = config['experimental']['skew']                  # upper limit on volume
 
     # Forces
     gamma  = config['physics']['gamma']                     # surface tension
+    Lambda = config['physics']['lambda']                    # ratio of lateral to apical-basal surface tension
     tauV   = config['physics']['tauV']                      # inverse increase rate in V0 unit
     v0     = config['physics']['v0']                        # self-propulsion velocity
     taup   = config['physics']['taup']                      # self-propulsion persistence time
@@ -159,12 +159,11 @@ def main():
     # Vertex model object
     vm = VertexModel(np.random.randint(1e5))                        # initialise vertex model object
     vm.initRegularTriangularLattice(size=Ngrid, hexagonArea=A0)     # initialise periodic system
-    print(vm.systemSize)
 
     # Add forces
-    vm.addActiveBrownianForce("abp", v0, taup)                      # centre active Brownian force
-    vm.addSurfaceForce("surface", gamma, V0, tauV)                 # surface tension force
-    vm.setPairFrictionIntegrator(eta)                           # add pair dissipation
+    vm.addActiveBrownianForce("abp", v0, taup)                     # centre active Brownian force
+    vm.addSurfaceForce("surface", gamma, Lambda, V0, tauV)         # surface tension force
+    vm.setPairFrictionIntegrator(eta)                              # add pair dissipation
 
     # vm.vertexForces["surface"].volume = dict(map(                   # set cell volume
     #     lambda i: (i, sc.stats.truncnorm((Vmin-V0)/stdV0, (Vmax-V0)/stdV0, loc=V0, scale=stdV0).rvs()),
