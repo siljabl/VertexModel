@@ -1,11 +1,9 @@
-# Ignore
-simulation/
+# Ignore folders
 cells/
-data/
-venv/
-docs/
-mnt/
+configs/
 movies/
-#analysis/notebooks
+results/
+venv/
+
+# Ignore files
 .emacs
-__pycache__/
