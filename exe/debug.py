@@ -33,6 +33,7 @@ def main():
 
     # Forces
     Lambda = 1                                              # surface tension
+    gamma  = 1
     tauV   = 0                                              # inverse increase rate in V0 unit
     v0     = 1                                              # self-propulsion velocity
     taup   = 3                                              # self-propulsion persistence time
@@ -56,7 +57,7 @@ def main():
 
     # Add forces
     vm.addActiveBrownianForce("abp", v0, taup)                      # centre active Brownian force
-    vm.addSurfaceForce("surface", Lambda, V0, tauV)                 # surface tension force
+    vm.addSurfaceForce("surface", gamma, Lambda, V0, tauV)                 # surface tension force
     vm.setPairFrictionIntegrator(eta)                               # add pair dissipation
 
     vm.vertexForces["surface"].volume = dict(map(                   # set cell volume
@@ -100,9 +101,6 @@ def main():
         vm.nintegrate(period, dt, delta, epsilon)
 
 
-    # make movie
-    subprocess.call([movie_sh_fname,
-    "-d", _frames_dir, "-p", sys.executable, "-y"])
 
 if __name__ == "__main__":
     main()
