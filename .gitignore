@@ -4,6 +4,8 @@ configs/
 movies/
 results/
 venv/
+*/__pycache__
+
 
 # Ignore files
 .emacs
