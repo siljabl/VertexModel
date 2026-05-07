@@ -23,12 +23,7 @@ from utils.exception_handlers import save_snapshot
 from run_ensemble import create_dirname
 
 # Define paths
-output_path = "data/simulated/raw/"
-
-
-if platform.node() != 'silja-work' and platform.node() != 'silja-pc':
-    output_path = "../../../../hdd_data/silja/VertexModel_data/simulated/raw/"
-                       
+output_path = "../../../../hdd_data/silja/VertexModel/sim/raw/"
 
 def create_filename(config_file, ensemble=False):
 
