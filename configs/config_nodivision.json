@@ -11,15 +11,16 @@
 	"rho": 0
     },
     "physics": {
-	"gamma": 13,
+	"gamma": 27,
 	"lambda": 1,
 	"tauV": 0,
-	"v0": 100,
-	"taup": 1,
-	"eta": 1
+	"v0": 120,
+	"taup": 1.2,
+	"eta": 2
     },
     "experimental": {
-	"V0": 2200,
-	"scale": 0.3
+	"V0": 3000,
+	"s": 0.4,
+	"scale": 0.9
     }
 }
