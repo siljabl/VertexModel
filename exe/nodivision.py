@@ -22,10 +22,6 @@ from utils.exception_handlers import save_snapshot
 
 from run_ensemble import create_dirname
 
-import matplotlib
-matplotlib.use("Agg")
-
-
 # Define paths
 output_path = "data/simulated/raw/"
 
@@ -100,7 +96,8 @@ def main():
     # Cell
     A0    = hexagon_area(rgrid)                             # initial cell area
     V0    = config['experimental']['V0']                    # cell volume
-    scale = config['experimental']['scale']                 # Scale parameter of cell volume lognormal distribution
+    s     = config['experimental']['s']                     # parameter of scipy.stats.lognorm
+    scale = config['experimental']['scale']                 # parameter of scipy.stats.lognorm
 
     # Forces
     gamma  = config['physics']['gamma']                     # surface tension
@@ -167,9 +164,8 @@ def main():
     #     vm.vertexForces["surface"].volume))
     
     vm.vertexForces["surface"].volume = dict(map(                   # set cell volume
-        lambda i: (i, sc.stats.lognorm(0.3, scale=2200).rvs()),
+        lambda i: (i, V0 * sc.stats.lognorm(s, scale=scale).rvs()),
         vm.vertexForces["surface"].volume))
-
 
 
 
