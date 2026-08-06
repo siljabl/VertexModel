@@ -51,3 +51,14 @@ def cell_density(Ngrid, Lgrid):
     rho = Ncell / Agrid
 
     return int(rho * 10**6)
+
+
+def cell_volume(Ngrid, Lgrid):
+    """
+    Computes average cell volume as function of cell density from the fit to the pixelwise average volume.
+    """
+
+    rho = cell_density(Ngrid, Lgrid)
+    V0  = 5400 - 1.2*rho + 1e-4*rho**2
+
+    return V0
