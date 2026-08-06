@@ -90,7 +90,7 @@ def main():
 
     # Cell
     A0    = hexagon_area(rgrid)                             # initial cell area
-    V0    = config['experimental']['V0']                    # cell volume
+    V0    = cell_volume(Ngrid, Lgrid)                       # cell volume
     s     = config['experimental']['s']                     # parameter of scipy.stats.lognorm
     scale = config['experimental']['scale']                 # parameter of scipy.stats.lognorm
 
@@ -154,10 +154,7 @@ def main():
     vm.addSurfaceForce("surface", gamma, Lambda, V0, tauV)         # surface tension force
     vm.setPairFrictionIntegrator(eta)                              # add pair dissipation
 
-    # vm.vertexForces["surface"].volume = dict(map(                   # set cell volume
-    #     lambda i: (i, sc.stats.truncnorm((Vmin-V0)/stdV0, (Vmax-V0)/stdV0, loc=V0, scale=stdV0).rvs()),
-    #     vm.vertexForces["surface"].volume))
-    
+    # Initialise volume
     vm.vertexForces["surface"].volume = dict(map(                   # set cell volume
         lambda i: (i, V0 * sc.stats.lognorm(s, scale=scale).rvs()),
         vm.vertexForces["surface"].volume))
