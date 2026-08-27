@@ -10,6 +10,7 @@ import pickle
 import argparse
 import numpy as np
 import utils.config_functions as cfg
+import utils.vm_integration as integrate
 
 from datetime import datetime
 from cells.bind import VertexModel
@@ -18,6 +19,7 @@ from utils.path_handling import create_run_fname
 from utils.exception_handlers import save_frame
 from utils.vm_plotting import plot_frame
 from utils.vm_setup import initalise_vm_lattice, set_cell_volumes, initialise_vm_forces
+
 
 
 
@@ -89,11 +91,8 @@ def main():
         frame += 1
 
         # integrate
-        vm.nintegrate(config['simulation']['period'], 
-                      config['simulation']['dt'], 
-                      config['simulation']['delta'], 
-                      config['simulation']['epsilon'])
-
+        for i in range(config['simulation']['period']):
+            integrate.one_timestep(vm, config)
    
     os.system('stty sane')
 
