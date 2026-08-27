@@ -14,9 +14,9 @@ import utils.config_functions as cfg
 from datetime import datetime
 from cells.bind import VertexModel
 from paths_config import SIM_RAW_DIR, SIM_FRAMES_DIR
-from utils.path_handling  import create_run_fname
-from utils.plotting_functions import plot
-from utils.exception_handlers import save_snapshot
+from utils.vm_plotting import plot_frame
+from utils.path_handling import create_run_fname
+from utils.exception_handlers import save_frame
 from utils.vm_setup import initalise_vm_lattice, set_cell_volumes, initialise_vm_forces
 
 
@@ -41,8 +41,8 @@ def main():
         config['simulation']['seed'] = args.seed
     seed  = config['simulation']['seed']
 
-    dirname, runname = create_run_fname(config, __file__)
-    fname = f"{dirname}/{runname}"
+    dirname, runname = create_run_fname(config)
+    fname = f"{Path(__file__).stem}/{dirname}/{runname}"
 
     # configs
     cfg_dir = Path("configs") / Path(__file__).stem / dirname
@@ -50,11 +50,11 @@ def main():
     cfg.save(cfg_dir / f"{runname}.json", config, script_file=__file__)
 
     # raw data
-    raw_dir = Path(SIM_RAW_DIR) / dirname
+    raw_dir = Path(SIM_RAW_DIR) / Path(__file__).stem / dirname
     raw_dir.mkdir(parents=True, exist_ok=True)
 
     # frames
-    frames_dir = Path(SIM_FRAMES_DIR) / dirname / runname
+    frames_dir = Path(SIM_FRAMES_DIR) / fname
     frames_dir.mkdir(parents=True, exist_ok=True)
 
 
@@ -75,7 +75,7 @@ def main():
 
     # outputs
     with open(raw_dir / f"{runname}.p", "wb") as dump: pass      # output file is created
-    fig, ax = plot(vm, fig=None, ax=None, cbar_zero=args.cbar0)      # initialise plot with first frame
+    fig, ax = plot_frame(vm, fig=None, ax=None, cbar_zero=args.cbar0)      # initialise plot with first frame
 
     # simulation
     frame = 0
@@ -85,7 +85,7 @@ def main():
 
         # plot snapshot
         if frame > args.init_time:
-            save_snapshot(vm, fig, ax, f"{SIM_FRAMES_DIR}/{fname}", frame, cbar_zero=args.cbar0)
+            save_frame(vm, fig, ax, f"{SIM_FRAMES_DIR}/{fname}", frame, cbar_zero=args.cbar0)
         frame += 1
 
         # integrate
