@@ -10,11 +10,10 @@ from tqdm import tqdm
 repo_root = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(repo_root))
 
-import utils.vm_output_handling as vm_output
-
-from paths_config             import SIM_RAW_DIR, SIM_FRAMES_DIR
-from cells.init               import movie_sh_fname
-from utils.vm_plotting        import plot_frame
+from utils.vm_io import load
+from paths_config import SIM_RAW_DIR, SIM_FRAMES_DIR
+from cells.init import movie_sh_fname
+from utils.vm_plotting import plot_frame
 from utils.exception_handlers import save_frame
 
 VIDEOS_DIR = Path("movies")
@@ -57,7 +56,7 @@ def main():
             raise FileNotFoundError(f"Data file not found: {data_path}")
 
         # Load vm objects (list of frames) — adjust init_time if needed
-        list_vm, init_vm = vm_output.load(data_path, init_time=100)
+        list_vm, init_vm = load(data_path, init_time=100)
         print(f"Loaded {len(list_vm)} frames from {data_path}")
 
         # Initialise plot with first frame
