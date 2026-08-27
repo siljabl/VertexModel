@@ -1,4 +1,6 @@
 import pickle
+
+from pathlib import Path
 from cells.bind import VertexModel
 
 
@@ -28,3 +30,14 @@ def load(file, init_time=100):
     return list_vm, init_vm
 
 
+
+def load_ensemble(dirpath, init_time=100):
+
+    dirpath = Path(dirpath)
+    runs = []
+
+    for path in sorted(dirpath.glob("N*seed*.p")):
+        list_vm, init_vm = load(path, init_time=init_time)
+        runs.append(list_vm)
+
+    return runs
