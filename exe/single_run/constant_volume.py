@@ -36,7 +36,6 @@ def main():
     config = cfg.load(args.config_path)
     config["date"] = datetime.now().strftime('%Y%m%d_%H%M%S')
 
-
     # Create simulation run filename
     if args.seed:
         config['simulation']['seed'] = args.seed
