@@ -26,7 +26,7 @@ from utils.vm_setup import initalise_vm_lattice, set_cell_volumes, initialise_vm
 def main():
     # Command-line argument parsing
     parser = argparse.ArgumentParser(description="Run simulation constant cell volume and active brownian motion")
-    parser.add_argument('-c', '--config_path', type=str,  help='Path to config file',                       default='configs/base/config_cell_division.json')
+    parser.add_argument('-c', '--config_path', type=str,  help='Path to config file',                       default='configs/base/config_relaxing_volume.json')
     parser.add_argument('-s', '--seed',        type=int,  help='Simulation seed',                           default=None)
     parser.add_argument('--cbar0',             type=str,  help='How define 0 level of cbar in vm video',    default='absolute')
     parser.add_argument('--init_time',         type=int,  help='Number of initialisation frames',           default=100)
