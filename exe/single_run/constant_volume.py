@@ -14,9 +14,9 @@ import utils.config_functions as cfg
 from datetime import datetime
 from cells.bind import VertexModel
 from paths_config import SIM_RAW_DIR, SIM_FRAMES_DIR
-from utils.vm_plotting import plot_frame
 from utils.path_handling import create_run_fname
 from utils.exception_handlers import save_frame
+from utils.vm_plotting import plot_frame
 from utils.vm_setup import initalise_vm_lattice, set_cell_volumes, initialise_vm_forces
 
 
@@ -35,6 +35,7 @@ def main():
     # Load config file
     config = cfg.load(args.config_path)
     config["date"] = datetime.now().strftime('%Y%m%d_%H%M%S')
+
 
     # Create simulation run filename
     if args.seed:
