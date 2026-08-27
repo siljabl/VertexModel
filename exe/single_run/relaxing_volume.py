@@ -93,7 +93,6 @@ def main():
         for i in range(config['simulation']['period']):
             integrate.one_timestep(vm, config)
             integrate.volume_relaxation(vm, config)
-            integrate.cell_division(vm, config)
 
    
     os.system('stty sane')
