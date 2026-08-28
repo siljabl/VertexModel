@@ -66,7 +66,7 @@ def plot_observable_density(ax_arr, vms_density, Ngrids, func, cmap="viridis", b
         ax_arr[1].errorbar(rho, mean, std, fmt='.', c=c)
         ax_arr[2].plot(mean, std / mean, '.', c=c)
 
-    plt.colorbar(sm, ax=ax_arr[0], label=r"$\rho$")
+    plt.colorbar(sm, ax=ax_arr[0], label=r"$\rho_{\text{cell}}$")
 
 
 
@@ -118,7 +118,7 @@ def main():
 
     ax[0].set(xlabel=rf"${args.label}~/~\langle {args.label} \rangle$",
               ylabel=rf"$P({args.label})$")
-    ax[1].set(xlabel=r"$\rho$ (1/mm$^2$)",
+    ax[1].set(xlabel=r"$\rho_{{\text{cell}}}$ (1/mm$^2$)",
               ylabel=rf"$\langle {args.label} \rangle$ ({args.unit})")
     ax[2].set(xlabel=rf"$\langle {args.label} \rangle$ ({args.unit})",
               ylabel=rf"$\sigma_{{{args.label}}}~/~\langle {args.label} \rangle$")
