@@ -40,7 +40,7 @@ def main():
     # Create simulation run filename
     if args.seed:
         config['simulation']['seed'] = args.seed
-    seed  = config['simulation']['seed']
+    seed = config['simulation']['seed']
 
     dirname, runname = create_run_fname(config)
     fname = f"{Path(__file__).stem}/{dirname}/{runname}"
@@ -93,7 +93,7 @@ def main():
         for i in range(config['simulation']['period']):
             integrate.one_timestep(vm, config)
             integrate.cell_growth(vm, config)
-            # integrate.cell_division(vm, config)
+            integrate.cell_division(vm, config)
 
    
     os.system('stty sane')
