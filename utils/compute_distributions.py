@@ -46,10 +46,10 @@ def hist_to_curve(arr, bins=None, hist_range=None):
     return 0.5*(x[1:] + x[:-1]), y, bins
 
 
-def rescaled_distribution(arr, bins=None):
+def rescaled_distribution(arr, bins=None, hist_range=None):
 
     arr_rescaled = arr / timepoint_mean(arr)
-    arr_rescaled = arr_rescaled.flatten()
-    obs_rescaled, freq, _ = hist_to_curve(arr_rescaled, bins=bins)
+    arr_rescaled = arr_rescaled.compressed().flatten()
+    obs_rescaled, freq, _ = hist_to_curve(arr_rescaled, bins=bins, hist_range=hist_range)
 
     return obs_rescaled, freq
