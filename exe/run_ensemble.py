@@ -31,7 +31,7 @@ def main():
     parser.add_argument('-N', '--Nruns',  type=int,  help="Number of runs to so",         default=10)
     parser.add_argument('-P', '--Npool',  type=int,  help="Number of parallel processes", default=16)
     parser.add_argument('-s', '--seed',   type=int,  help="Simulation seed",              default=None)
-    parser.add_argument('-c', '--config', type=str,  help='Path to config file',          default='configs/base/config_constant_volume.json')
+    #parser.add_argument('-c', '--config', type=str,  help='Path to config file',          default=None)
     args = parser.parse_args()
 
 
@@ -47,7 +47,6 @@ def main():
         command = [
             'python', 
             args.script,
-            '--config', args.config,
             '--seed', str(np.random.randint(1e3)),
         ]
         commands.append(command)
