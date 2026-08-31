@@ -1,7 +1,7 @@
 {
     "simulation": {
 	"seed": 0,
-	"Nvertices": 42,
+	"Nvertices": 36,
 	"Lgrid": 600,
 	"Nframes": 200,
 	"dt": 0.0104,
@@ -12,7 +12,7 @@
     "physics": {
 	"gamma": 18,
 	"lambda": 1,
-	"tauV": 0,
+	"tauV": 0.01,
 	"v0": 100,
 	"taup": 1.75,
 	"eta": 0.5

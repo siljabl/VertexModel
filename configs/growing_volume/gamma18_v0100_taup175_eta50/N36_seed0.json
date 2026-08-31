@@ -1,0 +1,27 @@
+{
+    "simulation": {
+        "seed": 0,
+        "Nvertices": 36,
+        "Lgrid": 600,
+        "Nframes": 200,
+        "dt": 0.0104,
+        "delta": 0.8,
+        "epsilon": 0.1,
+        "period": 8
+    },
+    "physics": {
+        "gamma": 18,
+        "lambda": 1,
+        "tauV": 0.01,
+        "v0": 100,
+        "taup": 1.75,
+        "eta": 0.5
+    },
+    "calibration": {
+        "s": 0.3,
+        "scale": 0.9,
+        "Vth_ratio": 2
+    },
+    "date": "20260827_164906",
+    "script": "/home/silja/Documents/VertexModel/exe/single_run/growing_volume.py"
+}
