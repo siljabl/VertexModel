@@ -41,7 +41,7 @@ def main():
     # Create simulation run filename
     if args.seed:
         config['simulation']['seed'] = args.seed
-    seed  = config['simulation']['seed']
+    seed = config['simulation']['seed']
 
     dirname, runname = create_run_fname(config)
     fname = f"{Path(__file__).stem}/{dirname}/{runname}"
