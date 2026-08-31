@@ -1,9 +1,7 @@
-# utils/vm_setup.py
-
 import numpy as np
 import scipy as sc
-from cells.bind import VertexModel
-from utils.vm_functions import hexagon_area, cell_volume
+from utils.vm_geometry import hexagon_area
+from utils.vm_calibration import cell_volume
 
 
 
@@ -25,15 +23,14 @@ def initalise_vm_lattice(vm, config):
 
 def set_cell_volumes(vm, config):
 
-    Ngrid = config['simulation']['Nvertices']
-    Lgrid = config['simulation']['Lgrid']
-    s     = config['experimental']['s']                     # parameter of scipy.stats.lognorm
-    scale = config['experimental']['scale']                 # parameter of scipy.stats.lognorm
+    s     = config['calibration']['s']                     # parameter of scipy.stats.lognorm
+    scale = config['calibration']['scale']                 # parameter of scipy.stats.lognorm
 
-    V0    = cell_volume(Ngrid, Lgrid)                       # cell volume
+    V0     = cell_volume(config)                       # cell volume
+    Vscale = V0 / np.exp(np.log(scale) + s**2/2)
 
-    vm.vertexForces["surface"].volume = dict(map(                   # set cell volume
-        lambda i: (i, V0 / np.exp(np.log(scale) + s**2/2) * sc.stats.lognorm(s, scale=scale).rvs()),
+    vm.vertexForces["surface"].volume = dict(map(           # set cell volume
+        lambda i: (i, Vscale * sc.stats.lognorm(s, scale=scale).rvs()),
         vm.vertexForces["surface"].volume))
 
     return vm
@@ -49,10 +46,7 @@ def initialise_vm_forces(vm, config):
     taup   = config['physics']['taup']
     eta    = config['physics']['eta']
 
-    Ngrid = config['simulation']['Nvertices']
-    Lgrid = config['simulation']['Lgrid']
-
-    V0    = cell_volume(Ngrid, Lgrid)
+    V0 = cell_volume(config)
 
     vm.addActiveBrownianForce("abp", v0, taup)                     # centre active Brownian force
     vm.addSurfaceForce("surface", gamma, Lambda, V0, tauV)         # surface tension force
