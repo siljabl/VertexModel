@@ -69,6 +69,21 @@ def cell_perimeters(list_vm):
     return np.ma.array(perimeter)
 
 
+
+def cell_displacements(list_vm):
+
+    # dt = list_vm[1].time - list_vm[0].time
+
+    positions     = cell_positions(list_vm)
+    vector_displacements = np.ma.diff(positions, axis=0)
+    displacements = np.ma.sqrt(vector_displacements[:,:,0]**2 + vector_displacements[:,:,1]**2)
+
+    return displacements
+
+
+
+
+
 def cell_velocities(list_vm):
     """ Get cell volumes """
 
