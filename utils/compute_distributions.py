@@ -23,6 +23,7 @@ def dataset_std(arr):
 
 
 def timepoint_mean(arr):
+    arr  = np.ma.masked_invalid(arr)
     dims = np.shape(arr)
 
     if len(dims) == 3:
@@ -35,21 +36,39 @@ def timepoint_mean(arr):
 
 def hist_to_curve(arr, bins=None, hist_range=None):
     ''' Returns histogram as a normalized curve '''
+    arr  = np.ma.masked_invalid(arr)
+    if arr.count() == 0:
+        return np.array([]), np.array([]), bins
+
+    data = arr.compressed()
+
     if hist_range == None:
-        hist_range = (np.ma.min(arr), np.ma.max(arr))
+        hist_range = (data.min(), data.max())
 
     if bins == None:
-        bins  = int(np.max(arr))
+        bins  = max(10, int(np.ceil(data.max())))
 
-    y, x = np.histogram(arr, bins=bins, range=hist_range, density=True)
+    y, x = np.histogram(data, bins=bins, range=hist_range, density=True)
 
     return 0.5*(x[1:] + x[:-1]), y, bins
 
 
 def rescaled_distribution(arr, bins=None, hist_range=None):
+    arr = np.ma.masked_invalid(arr)
+    if arr.count() == 0:
+        return np.array([]), np.array([])
 
-    arr_rescaled = arr / timepoint_mean(arr)
-    arr_rescaled = arr_rescaled.compressed().flatten()
-    obs_rescaled, freq, _ = hist_to_curve(arr_rescaled, bins=bins, hist_range=hist_range)
+    tmean = timepoint_mean(arr)
+    tmean = np.ma.masked_invalid(tmean)
+    tmean = np.ma.masked_where(tmean == 0, tmean)
+
+    arr_rescaled = arr / tmean
+    arr_rescaled = np.ma.masked_invalid(arr_rescaled)
+
+    arr_flat = arr_rescaled.compressed()
+    if arr_flat.size == 0:
+        return np.array([]), np.array([])
+    
+    obs_rescaled, freq, _ = hist_to_curve(arr_flat, bins=bins, hist_range=hist_range)
 
     return obs_rescaled, freq
