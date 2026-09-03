@@ -17,7 +17,6 @@ import exp_ensemble_observables as get_exp
 import compute_distributions as compute
 
 from cmcrameri import cm
-from vm_calibration import cell_density_from_Ngrid
 
 from paths_config import SIM_RAW_DIR
 
@@ -71,25 +70,32 @@ def plot_observable_by_density(ax_arr, ds_by_density, densities, func=None, attr
 
     # Loop over each ensemble at a given density (ρ) and its color
     for ds_at_density, rho, c in zip(ds_by_density, 
-                              densities,
-                              colors):
+                                     densities,
+                                     colors):
         
         if func:
             arr = get_vm.ensemble_observable(ds_at_density, func)
         else:
-            # arr = compute_attribute(ds_at_density, attr)
             arr = get_exp.ensemble_observable(ds_at_density, attr)
+
+        # Ensure masking of any NaN/inf
+        arr = np.ma.masked_invalid(arr)
+
+        # Ensure masking of missing cells
+        arr = np.ma.masked_where(arr <= 0, arr)
+
+        # Skip if no cells
+        if arr.count() == 0:
+            continue
             
         obs, freq = compute.rescaled_distribution(arr, bins=bins, hist_range=hist_range)
 
-
         ax_arr[0].plot(obs, freq, c=c)
-
         plot_mean(ax_arr[1], rho, arr, c=c)
         plot_std(ax_arr[2],  rho, arr, c=c)
         # ax_arr[2].plot(mean, std / mean, '.', c=c)
 
-    plt.colorbar(sm, ax=ax_arr[0], label=r"$\rho_{\text{cell}}$")
+    plt.colorbar(sm, ax=ax_arr[0], label=r"$\rho_{\text{cell}}$ (mm$^{-2}$)")
 
 
 
@@ -109,12 +115,12 @@ def main():
     args = parser.parse_args()
 
     # Assert that observable is a function in vm_observables
-    if not hasattr(get, args.vm_observable):
+    if not hasattr(get_vm, args.vm_observable):
         raise ValueError(
             f"Observable '{args.vm_observable}' is not defined in vm_observables.\n"
-            f"Available: {', '.join(sorted(name for name in dir(get) if not name.startswith('_')))}"
+            f"Available: {', '.join(sorted(name for name in dir(get_vm) if not name.startswith('_')))}"
         )
-    func = getattr(get, args.vm_observable)
+    func = getattr(get_vm, args.vm_observable)
     if not callable(func):
         raise TypeError(
             f"vm_observables.{args.vm_observable} exists but is not callable."
