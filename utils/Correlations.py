@@ -1,11 +1,12 @@
 import os
 import pickle
 import numpy as np
-import masked_correlations as compute
+import correlation_core as compute
 
 from pathlib import Path
 from datetime import datetime
 from paths_config import SIM_RAW_DIR, SIM_PROC_DIR
+from matrix_preprocessing import detrend_entire_matrix
 
 
 class AutocorrBase:
@@ -257,3 +258,47 @@ class SimulationAutocorrelations(AutocorrBase):
             t_avrg=t_avrg, overwrite=overwrite,
             df=df, mean_var=mean_var
         )
+
+
+
+def compute_cell_correlation(autocorr_obj, parameter_map, args):
+
+    # -------- Spatial correlations --------
+    if args.var == "r" or args.var == "all":
+        rmax = int(550 * args.rfrac)
+
+        for name, (pos, var) in parameter_map.items():
+
+            # Compute spatial correlation
+            if args.param in (name, 'all'):
+                autocorr_obj.compute_spatial(positions=pos, 
+                                             variable=var, 
+                                             variable_name=name, 
+                                             dr=args.dr, 
+                                             r_max=rmax, 
+                                             t_avrg=args.t_avrg, 
+                                             overwrite=args.overwrite)
+
+
+    # -------- Temporal correlations --------
+    if args.var == 't' or args.var == 'all':
+        tmax = int(len(parameter_map['hh'][1]) * args.tfrac)
+
+        for name, (pos, var) in parameter_map.items():
+            if args.param in (name, 'all'):
+
+                # Detrend if taking correlation w.r.t. cell mean
+                if args.mean_var == "cell":
+                    var = detrend_entire_matrix(var)
+
+                # Compute temporal correlation
+                autocorr_obj.compute_temporal(variable=var,
+                                              variable_name=name,
+                                              t_max=tmax,
+                                              df=args.dt,
+                                              mean_var=args.mean_var,
+                                              t_avrg=args.t_avrg,
+                                              overwrite=args.overwrite)
+
+    # Save autocorrelations
+    autocorr_obj.save()
