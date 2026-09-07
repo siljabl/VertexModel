@@ -5,15 +5,15 @@ from utils.vm_calibration import cell_volume
 
 
 
-def initalise_vm_lattice(vm, config):
+def initialise_vm_lattice(vm, config):
     """
-    Initializes VertexModel lattice and returns (vm, config_with_rho_A0_V0).
+    Initialise VertexModel lattice as a regular triangular lattice.
     """
-    Ngrid = config['simulation']['Nvertices']
-    Lgrid = config['simulation']['Lgrid']
+    Ngrid = config['simulation']['Nvertices']           # Number of vertices in each dimension. Ncell = Ngrid**2 / 3
+    Lgrid = config['simulation']['Lgrid']               # Length of lattice in µm
 
-    rgrid = Lgrid / Ngrid
-    A0    = hexagon_area(rgrid)
+    rgrid = Lgrid / Ngrid                               # Lattice spacing of triangular grid
+    A0    = hexagon_area(rgrid)                         # Target average cell area
 
     vm.initRegularTriangularLattice(size=Ngrid, hexagonArea=A0)
 
@@ -22,14 +22,25 @@ def initalise_vm_lattice(vm, config):
 
 
 def set_cell_volumes(vm, config):
+    """
+    Initialise cell volumes drawn from a lognormal distribution 
+    """
 
-    s     = config['calibration']['s']                     # parameter of scipy.stats.lognorm
-    scale = config['calibration']['scale']                 # parameter of scipy.stats.lognorm
+    # Lognormal parameters from calibration
+    s     = config['calibration']['s']            # shape parameter (std. dev of log)
+    scale = config['calibration']['scale']        # scale parameter (exp(mean of log))
 
-    V0     = cell_volume(config)                       # cell volume
-    Vscale = V0 / np.exp(np.log(scale) + s**2/2)
+    # Experimental mean cell volume (from calibration / density)
+    V0     = cell_volume(config)
 
-    vm.vertexForces["surface"].volume = dict(map(           # set cell volume
+    # Mean of lognormal with parameters (s, scale) is: E[X] = scale * exp(s**2 / 2)
+    Vmean  = scale * np.exp(s**2 / 2)
+
+    # Choose Vscale so that mean(Vscale * X) = V0
+    Vscale = V0 / Vmean
+    
+    # Set volume of each cell by drawing from the rescaled lognormal
+    vm.vertexForces["surface"].volume = dict(map(
         lambda i: (i, Vscale * sc.stats.lognorm(s, scale=scale).rvs()),
         vm.vertexForces["surface"].volume))
 
@@ -38,7 +49,9 @@ def set_cell_volumes(vm, config):
 
 
 def initialise_vm_forces(vm, config):
-
+    """
+    Initialise forces in the VertexModel
+    """
     gamma  = config['physics']['gamma']
     Lambda = config['physics']['lambda']
     tauV   = config['physics']['tauV']
@@ -46,11 +59,17 @@ def initialise_vm_forces(vm, config):
     taup   = config['physics']['taup']
     eta    = config['physics']['eta']
 
+    # Reference volume (experimental mean) from calibration
     V0 = cell_volume(config)
 
-    vm.addActiveBrownianForce("abp", v0, taup)                     # centre active Brownian force
-    vm.addSurfaceForce("surface", gamma, Lambda, V0, tauV)         # surface tension force
-    vm.setPairFrictionIntegrator(eta)                              # add pair dissipation
+    # Centre active Brownian force
+    vm.addActiveBrownianForce("abp", v0, taup)
+
+    # Surface tension force
+    vm.addSurfaceForce("surface", gamma, Lambda, V0, tauV)
+
+    # Pair dissipation
+    vm.setPairFrictionIntegrator(eta)
 
     return vm
 
