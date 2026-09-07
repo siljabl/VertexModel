@@ -55,6 +55,7 @@ def cell_volume(config):
     return cell_volume_from_density(rho)
 
 
+
 def cell_division_volume(config):
     """
     Threshold volume for cell division, as a ratio of the average cell volume.

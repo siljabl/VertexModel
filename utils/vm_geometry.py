@@ -11,6 +11,7 @@ def hexagon_area(rgrid):
 
     return (3**(3/2) / 2) * (rgrid)**2
 
+
 def hexagon_side(V0):
     """ Computes side length of regular hexagon fm volume """
 
