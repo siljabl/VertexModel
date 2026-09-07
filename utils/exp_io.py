@@ -6,9 +6,9 @@ repo_root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(repo_root))
 
 
-from SegmentedCells import SegmentedCells
-from Correlations   import ExperimentalAutocorrelations
-from paths_config   import EXP_RAW_DIR, EXP_PROC_DIR, EXP_DATASETS_IDS
+from ExperimentData import SegmentedCells
+from Correlations import ExperimentalAutocorrelations
+from paths_config import EXP_RAW_DIR, EXP_PROC_DIR, EXP_DATASETS_IDS
 
 
 
