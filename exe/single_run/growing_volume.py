@@ -9,15 +9,13 @@ sys.path.insert(0, str(repo_root))
 import pickle
 import argparse
 import numpy as np
-import utils.config_functions as cfg
+import utils.config_io as cfg
 import utils.vm_integration as integrate
 
 from datetime import datetime
 from cells.bind import VertexModel
 from paths_config import SIM_RAW_DIR, SIM_FRAMES_DIR
-from utils.path_handling import create_run_fname
-from utils.exception_handlers import save_frame
-from utils.vm_plotting import plot_frame
+from utils.vm_plotting import plot_frame, save_frame
 from utils.vm_setup import initalise_vm_lattice, set_cell_volumes, initialise_vm_forces
 
 
@@ -42,7 +40,7 @@ def main():
         config['simulation']['seed'] = args.seed
     seed = config['simulation']['seed']
 
-    dirname, runname = create_run_fname(config)
+    dirname, runname = cfg.create_run_fname(config)
     fname = f"{Path(__file__).stem}/{dirname}/{runname}"
 
     # configs
