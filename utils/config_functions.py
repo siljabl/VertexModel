@@ -1,6 +1,5 @@
 import os
 import json
-from datetime import datetime
 
 
 def load(config_path):
@@ -19,6 +18,7 @@ def save(config_path, config_dict, script_file):
     with open(config_path, 'w') as f:
         json.dump(config_dict, f, indent=4)
 
+    # Make config read-only (owner/group/world) after saving
     os.chmod(config_path, 0o444)
 
 
@@ -32,12 +32,15 @@ def update_value(config_dict, key, val):
         key (str): The key to search for.
         val: The value associated with the key, or None if the key does not exist.
     """
+
+    # Cast to float
     val = float(val)
 
-    # Transform to int
+    # Cast to int
     if int(val) == val:
         val = int(val)
 
+    # Update all sub-dicts that contain this key
     for sub_dict in config_dict.values():
         if isinstance(sub_dict, dict) and key in sub_dict:
             sub_dict[key] = val
