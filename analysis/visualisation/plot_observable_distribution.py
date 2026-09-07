@@ -1,22 +1,22 @@
-import os, sys
-from pathlib import Path
-sys.path.append("utils")
-
-# Add repo root to sys.path
-repo_root = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(repo_root))
-
-import pickle
+import os
+import sys
 import argparse
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import io_functions as io
-import vm_observables as get_vm
-import exp_ensemble_observables as get_exp
-import compute_distributions as compute
 
+from pathlib import Path
 from cmcrameri import cm
+
+# Add repo root to sys.path
+repo_root = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(repo_root))
+sys.path.append("utils")
+import vm_io as vm_io
+import exp_io as exp_io
+import vm_observables as get_vm
+import exp_observables as get_exp
+import compute_distributions as compute
 
 from paths_config import SIM_RAW_DIR
 
@@ -138,7 +138,7 @@ def main():
     # Load all ensemble frames 
     vms_density = []
     for Ngrid in Ngrids:
-        vms = io.load_simulation_ensemble(dirpath, Ngrid=Ngrid)
+        vms = vm_io.load_simulation_ensemble(dirpath, Ngrid=Ngrid)
 
         vms_density.append(vms)
 

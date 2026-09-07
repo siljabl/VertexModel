@@ -10,14 +10,11 @@ from tqdm import tqdm
 repo_root = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(repo_root))
 
-from utils.io_functions import load_simulation
-from paths_config import SIM_RAW_DIR, SIM_FRAMES_DIR
 from cells.init import movie_sh_fname
-from utils.vm_plotting import plot_frame
-from utils.exception_handlers import save_frame
+from utils.vm_io import load_simulation
+from paths_config import SIM_RAW_DIR, SIM_FRAMES_DIR, VIDEOS_DIR
+from utils.vm_plotting import plot_frame, save_frame
 
-VIDEOS_DIR = Path("movies")
-data_dir   = "../../../../hdd_data/silja/VertexModel/sim/"
 
 
 def main():
