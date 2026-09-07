@@ -209,3 +209,40 @@ def detrend_entire_matrix(arr):
     detrended_arr = np.ma.array(detrended_arr).T
 
     return detrended_arr
+
+
+
+
+def cell_variations(arr, mean_axis):
+    """
+    arr       : masked array (T, Ncells)
+    mean_axis : int (0 or 1) axis to average over
+
+    Returns
+    -------
+    arr_var
+    """
+
+    dims = np.shape(arr)
+
+    # If array is a vector
+    if len(dims) == 3:
+
+        # Identify axis along which vector is stacked
+        dims_arr = np.asarray(dims)
+        idx = int(np.where(dims_arr == 2)[0][0])
+
+        if idx == 1:
+            arr = np.swapaxes(arr, 0, 1)
+        elif idx == 2:
+            arr = np.swapaxes(arr, 0, 2)
+            arr = np.swapaxes(arr, 1, 2)
+
+        arr_variation = np.ma.array([arr[0] - np.mean(arr[0], axis=mean_axis, keepdims=True),
+                                     arr[1] - np.mean(arr[1], axis=mean_axis, keepdims=True)], mask=False)
+
+    # If array is a scalar
+    else:
+        arr_variation = np.ma.array(arr - np.mean(arr, axis=mean_axis, keepdims=True), mask=False)
+
+    return arr_variation
