@@ -98,7 +98,7 @@ def pad_and_stack_2d(arrays):
 
 
 
-def _interp_corr2d_to_t_common(C_t2d, dt, t_common):
+def interp_corr2d_to_t_common(C_t2d, dt, t_common):
     """
     Interpolate a 2D correlation array (N_density, N_t) onto t_common along the time axis,
     respecting masks: for each row, only unmasked points are used for interpolation, and
