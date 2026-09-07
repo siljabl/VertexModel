@@ -1,12 +1,18 @@
 import numpy as np
-
 from matrix_preprocessing import pad_2d
 
 
 def get_attribute(exp, attr, f2h):
     attrs = dict(vars(exp))
 
-    if attr == "V":
+    if attr == "pos":
+        x = np.ma.clip(attrs["h"], 0, 1e4) 
+        y = np.ma.clip(attrs["A"], 0, 1e4)
+        pos = np.ma.masked_invalid([x, y])
+        
+        return pos
+
+    elif attr == "V":
         h = np.ma.clip(attrs["h"], 0, 1e4) 
         A = np.ma.clip(attrs["A"], 0, 1e4)
         V = np.ma.masked_invalid(h*A)
@@ -33,6 +39,13 @@ def get_attribute(exp, attr, f2h):
         v  = np.ma.masked_invalid(np.ma.sqrt(dx**2 + dy**2) / f2h)
         
         return v
+
+    elif attr == "v_vec":
+        dx = np.ma.masked_invalid(attrs["dx"])
+        dy = np.ma.masked_invalid(attrs["dy"])
+        v_vec  = np.ma.masked_invalid([dx / f2h, dy / f2h])
+        
+        return v_vec
     
     else: 
         assert hasattr(exp, attr), f"Datasets do not have attribute '{attr}'."
