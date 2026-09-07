@@ -204,26 +204,3 @@ def cell_vertical_aspect_ratios(list_vm):
     areas   = cell_areas(list_vm)
 
     return np.array(heights / np.ma.sqrt(areas))
-
-
-
-def ensemble_observable(vms, func):
-    """
-    vms  : list of runs, each run is list_vm (frames)
-    func : function(list_vm) -> array (T, N)
-
-    Returns
-    -------
-    obs : np.ma.array
-        Shape (T, R, N): frame, run, cell.
-    """
-
-    obs = []
-
-    for vm in vms:
-        observable = func(vm)
-        obs.append(observable)
-
-    obs = np.ma.array(obs)
-
-    return np.swapaxes(obs, 0, 1)
