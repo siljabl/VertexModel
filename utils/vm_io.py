@@ -5,9 +5,8 @@ from pathlib import Path
 repo_root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(repo_root))
 
-
-from cells.bind     import VertexModel
-from Correlations   import SimulationAutocorrelations
+from cells.bind import VertexModel
+from Correlations import SimulationAutocorrelations
 
 
 def load_simulation(file, init_time=100):
