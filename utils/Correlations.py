@@ -100,8 +100,12 @@ class AutocorrBase:
         if mean_var == 'r':
             self.log['t'][variable_name]      = datetime.today().strftime('%Y/%m/%d_%H:%M')
         else:
-            self.log['t_cell'] = {}
-            self.log['t_cell'][variable_name] = datetime.today().strftime('%Y/%m/%d_%H:%M')
+            try:
+                self.log['t_cell'][variable_name] = datetime.today().strftime('%Y/%m/%d_%H:%M')
+            except:
+                self.log['t_cell'] = {}
+                self.log['t_cell'][variable_name] = datetime.today().strftime('%Y/%m/%d_%H:%M')
+
 
         return Ct
 
@@ -292,7 +296,7 @@ def compute_cell_correlation(autocorr_obj, parameter_map, args):
 
                 # Detrend if taking correlation w.r.t. cell mean
                 # Not detrending velocities (need to detrend each component separatly)
-                if args.mean_var == "cell" and args.param in ("hh", "AA", "VV"):
+                if args.mean_var == "cell" and len(np.shape(var)) <= 2:
                     var = detrend_entire_matrix(var)
 
                 # Compute temporal correlation
