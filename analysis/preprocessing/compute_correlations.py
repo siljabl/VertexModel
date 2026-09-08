@@ -74,21 +74,29 @@ def prepare_parameter_map(data, args):
 
     if is_vm:
         positions = get_vm.cell_positions(data)
+        positions = np.ma.array([positions[:,:,0], 
+                                 positions[:,:,1]])
+        vpositions = (positions[:, :-1] + positions[:, 1:] ) / 2
         parameter_map = {
-            'hh': (positions,        cell_variations(get_vm.cell_heights(data), mean_axis)),
-            'AA': (positions,        cell_variations(get_vm.cell_areas(data),  mean_axis)),
-            'VV': (positions,        cell_variations(get_vm.cell_volumes(data), mean_axis)),
-            'vv': (positions[:, :-1], cell_variations(get_vm.cell_displacement_vectors(data), mean_axis)),
-        }
-    else:
-        positions = np.ma.array([data.x, data.y])
-        parameter_map = {
-            'hh': (positions,        cell_variations(get_exp.get_attribute(data, 'h', args.dt), mean_axis)),
-            'AA': (positions,        cell_variations(get_exp.get_attribute(data, 'A', args.dt), mean_axis)),
-            'VV': (positions,        cell_variations(get_exp.get_attribute(data, 'V', args.dt), mean_axis)),
-            'vv': (positions[:, :-1], cell_variations(get_exp.get_attribute(data, 'v_vec', args.dt), mean_axis)),
+            'hh': (positions,  cell_variations(get_vm.cell_heights(data), mean_axis)),
+            'AA': (positions,  cell_variations(get_vm.cell_areas(data),   mean_axis)),
+            'VV': (positions,  cell_variations(get_vm.cell_volumes(data), mean_axis)),
+            'vv': (vpositions, cell_variations(get_vm.cell_displacement_vectors(data), mean_axis)),
         }
 
+    else:
+        positions = np.ma.array([data.x, data.y])
+        vpositions = (positions[:, :-1] + positions[:, 1:] ) / 2
+
+        parameter_map = {
+            'hh': (positions,  cell_variations(get_exp.get_attribute(data, 'h', args.dt), mean_axis)),
+            'AA': (positions,  cell_variations(get_exp.get_attribute(data, 'A', args.dt), mean_axis)),
+            'VV': (positions,  cell_variations(get_exp.get_attribute(data, 'V', args.dt), mean_axis)),
+            'vv': (vpositions, cell_variations(get_exp.get_attribute(data, 'v_vec', args.dt), mean_axis)),
+            # 'vv': (vpositions, get_exp.get_attribute(data, 'v_vec', args.dt)),
+
+        }
+    
     return parameter_map
 
 

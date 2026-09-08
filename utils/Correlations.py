@@ -100,6 +100,7 @@ class AutocorrBase:
         if mean_var == 'r':
             self.log['t'][variable_name]      = datetime.today().strftime('%Y/%m/%d_%H:%M')
         else:
+            self.log['t_cell'] = {}
             self.log['t_cell'][variable_name] = datetime.today().strftime('%Y/%m/%d_%H:%M')
 
         return Ct
@@ -239,11 +240,11 @@ class SimulationAutocorrelations(AutocorrBase):
         self.save_state(f"{self.path_addition}{self.out_path}")
 
 
-    # Spatial: positions shape (Nframes, Ncells, 2), include lag-0 point
+    # Spatial: positions shape (2, Nframes, Ncells), include lag-0 point
     def compute_spatial(self, positions, variable, variable_name,
                         dr, r_max, t_avrg=False, overwrite=False):
-        x = positions[:, :, 0]
-        y = positions[:, :, 1]
+        x = positions[0]
+        y = positions[1]
         return super().compute_spatial(
             x, y, variable, variable_name,
             dr, r_max, t_avrg=t_avrg, overwrite=overwrite,
@@ -268,7 +269,7 @@ def compute_cell_correlation(autocorr_obj, parameter_map, args):
         rmax = int(550 * args.rfrac)
 
         for name, (pos, var) in parameter_map.items():
-
+   
             # Compute spatial correlation
             if args.param in (name, 'all'):
                 autocorr_obj.compute_spatial(positions=pos, 
@@ -285,10 +286,13 @@ def compute_cell_correlation(autocorr_obj, parameter_map, args):
         tmax = int(len(parameter_map['hh'][1]) * args.tfrac)
 
         for name, (pos, var) in parameter_map.items():
+
+
             if args.param in (name, 'all'):
 
                 # Detrend if taking correlation w.r.t. cell mean
-                if args.mean_var == "cell":
+                # Not detrending velocities (need to detrend each component separatly)
+                if args.mean_var == "cell" and args.param in ("hh", "AA", "VV"):
                     var = detrend_entire_matrix(var)
 
                 # Compute temporal correlation

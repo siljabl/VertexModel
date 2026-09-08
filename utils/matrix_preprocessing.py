@@ -165,25 +165,25 @@ def detrend_array(t_arr, arr, keepdims=False):
     # Fit only on unmasked entries
     fit = linregress(t_arr[~arr.mask], arr.data[~arr.mask])
 
-    if not keepdims:
-        # Detrend only on unmasked points, return 1D array
-        lin_fit   = t_arr[~arr.mask] * fit.slope
-        detrended = arr.data[~arr.mask] - lin_fit
+    # if not keepdims:
+    #     # Detrend only on unmasked points, return 1D array
+    #     lin_fit   = t_arr[~arr.mask] * fit.slope
+    #     detrended = arr.data[~arr.mask] - lin_fit
 
-        # Compute relative standard deviation
-        rel_std   = np.ma.std(detrended) / np.ma.mean(arr.data[~arr.mask])
+    #     # Compute relative standard deviation
+    #     rel_std   = np.ma.std(detrended) / np.ma.mean(arr.data[~arr.mask])
 
-        return detrended, rel_std
+    #     return detrended, rel_std
     
-    else:
-        # Detrend full array, keeping shape and mask
-        lin_fit   = t_arr * fit.slope + fit.intercept
-        detrended = arr - lin_fit + np.ma.mean(arr)
+    # else:
+    # Detrend full array, keeping shape and mask
+    lin_fit   = t_arr * fit.slope + fit.intercept
+    detrended = arr - lin_fit + np.ma.mean(arr)
 
-        # Compute relative standard deviation
-        rel_std = np.ma.std(detrended) / np.ma.mean(arr)
+    # Compute relative standard deviation
+    rel_std = np.ma.std(detrended) / np.ma.mean(arr)
 
-        return detrended, rel_std
+    return detrended, rel_std
     
 
 
@@ -201,12 +201,13 @@ def detrend_entire_matrix(arr):
         try:
             detrended, _  = detrend_array(time, cell, keepdims=True)
             detrended_arr.append(detrended)
+
         
         except:
             # If regression fails (e.g. all masked), return fully masked column
             detrended_arr.append(np.ma.array(cell, mask=True))
 
-    detrended_arr = np.ma.array(detrended_arr).T
+    detrended_arr = np.ma.vstack(detrended_arr).T
 
     return detrended_arr
 
@@ -238,11 +239,12 @@ def cell_variations(arr, mean_axis):
             arr = np.swapaxes(arr, 0, 2)
             arr = np.swapaxes(arr, 1, 2)
 
-        arr_variation = np.ma.array([arr[0] - np.mean(arr[0], axis=mean_axis, keepdims=True),
-                                     arr[1] - np.mean(arr[1], axis=mean_axis, keepdims=True)], mask=False)
+
+        arr_variation = np.ma.array([arr[0] - np.ma.mean(arr[0], axis=mean_axis, keepdims=True),
+                                     arr[1] - np.ma.mean(arr[1], axis=mean_axis, keepdims=True)])
 
     # If array is a scalar
     else:
-        arr_variation = np.ma.array(arr - np.mean(arr, axis=mean_axis, keepdims=True), mask=False)
+        arr_variation = np.ma.array(arr - np.ma.mean(arr, axis=mean_axis, keepdims=True))
 
-    return arr_variation
+    return np.ma.masked_invalid(arr_variation)

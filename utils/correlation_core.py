@@ -33,6 +33,7 @@ def scalar_temporal_correlation(var1, var2, Nframes, t_max=None):
     delta_f : masked array, shape (Nframes, t_max)
         Frame lag j - i.
     """
+
     if t_max is None:
         t_max = Nframes
 
@@ -123,6 +124,7 @@ def vector_temporal_correlation(vec1, vec2, Nframes, t_max=None):
     """
     Temporal correlation between two vector fields.
     """
+
     if t_max is None:
         t_max = Nframes
 
@@ -190,6 +192,7 @@ def general_temporal_correlation(var1, var2=None, t_max=None, t_avrg=False):
         Nframes = dim_var1[0]
 
         if len(dim_var2) == 2:
+            print("Input is scalar")
             C_norm, N, delta_f = scalar_temporal_correlation(
                 var1, var2, Nframes, t_max
             )
@@ -208,6 +211,7 @@ def general_temporal_correlation(var1, var2=None, t_max=None, t_avrg=False):
                 var2, [var1x, var1y], Nframes, t_max
             )
         else:
+            print("Input is vector")
             var2x, var2y = var2
             C_norm, N, delta_f = vector_temporal_correlation(
                 [var1x, var1y], [var2x, var2y], Nframes, t_max
@@ -498,6 +502,7 @@ def general_spatial_correlation(x, y, var1, var2=None, dr=40, r_max=500,
 
     if len(dim_var1) == 2:
         if len(dim_var2) == 2:
+            print("Input is scalar")
             C_norm, N_in_rbin, r_bin_centers, frame_axis_masked = \
                 scalar_spatial_correlation(x, y, var1, var2, dr, r_max)
         else:
@@ -513,6 +518,7 @@ def general_spatial_correlation(x, y, var1, var2=None, dr=40, r_max=500,
                 scalar_vector_spatial_correlation(x, y, var2, [var1x, var1y],
                                                   dr, r_max)
         else:
+            print("Input is vector")
             var2x, var2y = var2
             C_norm, N_in_rbin, r_bin_centers, frame_axis_masked = \
                 vector_spatial_correlation(x, y, [var1x, var1y],
