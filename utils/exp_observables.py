@@ -43,7 +43,7 @@ def get_attribute(exp, attr, f2h):
     elif attr == "v_vec":
         dx = np.ma.masked_invalid(attrs["dx"])
         dy = np.ma.masked_invalid(attrs["dy"])
-        v_vec  = np.ma.masked_invalid([dx / f2h, dy / f2h])
+        v_vec  = np.ma.array([dx / f2h, dy / f2h])
         
         return v_vec
     
