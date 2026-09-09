@@ -21,10 +21,12 @@ def initialise_vm_lattice(vm, config):
 
 
 
-def set_cell_volumes(vm, config):
+def set_cell_volumes(vm, config, distribution="experimental"):
     """
     Initialise cell volumes drawn from a lognormal distribution 
     """
+
+    assert distribution in ("uniform", "experimental")
 
     # Lognormal parameters from calibration
     s     = config['calibration']['s']            # shape parameter (std. dev of log)
@@ -33,16 +35,23 @@ def set_cell_volumes(vm, config):
     # Experimental mean cell volume (from calibration / density)
     V0     = cell_volume(config)
 
-    # Mean of lognormal with parameters (s, scale) is: E[X] = scale * exp(s**2 / 2)
-    Vmean  = scale * np.exp(s**2 / 2)
+    if distribution == "experimental":
+        # Mean of lognormal with parameters (s, scale) is: E[X] = scale * exp(s**2 / 2)
+        Vmean  = scale * np.exp(s**2 / 2)
 
-    # Choose Vscale so that mean(Vscale * X) = V0
-    Vscale = V0 / Vmean
-    
-    # Set volume of each cell by drawing from the rescaled lognormal
-    vm.vertexForces["surface"].volume = dict(map(
-        lambda i: (i, Vscale * sc.stats.lognorm(s, scale=scale).rvs()),
-        vm.vertexForces["surface"].volume))
+        # Choose Vscale so that mean(Vscale * X) = V0
+        Vscale = V0 / Vmean
+        
+        # Set volume of each cell by drawing from the rescaled lognormal
+        vm.vertexForces["surface"].volume = dict(map(
+            lambda i: (i, Vscale * sc.stats.lognorm(s, scale=scale).rvs()),
+            vm.vertexForces["surface"].volume))
+
+    else:
+        # Set volume of each cell to V0
+        vm.vertexForces["surface"].volume = dict(map(
+            lambda i: (i, V0),
+            vm.vertexForces["surface"].volume))
 
     return vm
 
