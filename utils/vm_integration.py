@@ -1,6 +1,6 @@
 import numpy as np
 from cells.bind import BaseIntegrator
-from utils.vm_calibration import cell_division_volume, cell_volume
+from utils.vm_calibration import cell_division_volume, cell_volume, cell_death_area
 
 
 def one_timestep(vm, config):
@@ -62,18 +62,17 @@ def volume_relaxation(vm, config):
 
 def cell_division(vm, config):
     """ 
-    Performs cell division on vm object 
-    
+    Performs cell division on vm object by splitting the dividing cell along its longest axis.
+    After division the daughter cells will round up, thus mimicing the delayed behaviour in cells during mitosis
+
     Division probability for cell i:
         p_div = 
-
     """
 
     # Get cell volumes and cell heights
     volumes = vm.vertexForces["surface"].volume.copy()
     heights = vm.vertexForces["surface"].height.copy()
 
-    # 
     Vth = cell_division_volume(config)
 
     for i in vm.getVertexIndicesByType("centre"):
@@ -81,6 +80,11 @@ def cell_division(vm, config):
         # Division probability
         p_div = (volumes[i] - Vth)/Vth
         if np.random.rand() < p_div:
+
+            # # Skip if to few neighbours
+            # N_neighbours = len(vm.getNeighbourVertices(i)[1])
+            # if N_neighbours < 5:
+            #     continue
 
             # Split cell i, get new vertice index j
             j = vm.splitCellAtMax(i)
@@ -92,7 +96,34 @@ def cell_division(vm, config):
     # Update cell volumes
     vm.vertexForces["surface"].volume = volumes
 
-    # return vm
+
+
+def cell_death(vm, config):
+    """ 
+    Performs apoptosis on vm object by merging the dying cell with the neighbour it shares the longest junction with. 
+
+    Probability of dying for cell i:
+        p_death = 
+    """
+
+    Ath = cell_death_area(config)
+
+    for i in vm.getVertexIndicesByType("centre"):
+        # Get area of cell i
+        area = vm.getVertexToNeighboursArea(i)
+
+        # Death probability
+        p_death = (area - Ath)/Ath
+
+        if np.random.rand() > p_death:
+
+            # # Skip if to few neighbours
+            # N_neighbours = len(vm.getNeighbourVertices(i)[1])
+            # if N_neighbours < 6:
+            #     continue
+
+            j,  n_indices  = vm.mergeCellAtMax(i)
+
 
 
 def pulsating_cells(vm, config):
