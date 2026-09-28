@@ -3,11 +3,11 @@
 	"seed": 0,
 	"Nvertices": 36,
 	"Lgrid": 600,
-	"Nframes": 200,
-	"dt": 0.0104,
+	"Nframes": 220,
+	"dt": 0.0026,
 	"delta": 0.8,
 	"epsilon": 0.1,
-	"period": 8
+	"period": 32
     },
     "physics": {
 	"gamma": 18,
@@ -18,7 +18,13 @@
 	"eta": 0.5
     },
     "calibration": {
-	"s": 0.3,
-	"scale": 0.9
+        "s": 0.3,
+        "Vstd": 0.5,
+        "scale": 0.9,
+        "g": 80,
+        "V_div": 2500,
+        "k_div": 0.001,
+        "A_death": 140,
+        "k_death": 0.002
     }
 }
