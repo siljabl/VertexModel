@@ -6,21 +6,55 @@ from cells.bind import getPolygonsCell
 
 
 # NB: Update when adding cell division!
-def centre_indices(list_vm):
-    """Return indices of cell centres (from first frame)."""
-    return list_vm[0].getVertexIndicesByType("centre")
+def centre_indices(vm):
+    """Return indices of cell centres)."""
+    return vm.getVertexIndicesByType("centre")
+
+
+
+def unique_indices(list_vm):
+    """ Get number og unique cells in full simulation run """
+
+    idx = []
+    for vm in list_vm:
+        idx.append(vm.getVertexIndicesByType("centre"))
+
+    return np.unique(np.concatenate(idx))
+
+
+
+def number_of_cells(list_vm):
+    N = []
+    for vm in list_vm:
+        N.append(len(centre_indices(vm)))
+    return np.array(N)
 
 
 
 def cell_positions(list_vm):
-    """Get cell positions at centres for each frame."""
+    """ Get cell heights """
 
-    cells = centre_indices(list_vm)
+    idx = unique_indices(list_vm)
+    Nc  = len(idx)
+    Nt  = len(list_vm)
 
-    # unwrap positions of centres
-    positions = np.ma.array(list(map(
-        lambda vm: itemgetter(*cells)(vm.getPositions(wrapped=False)), 
-        list_vm)))
+    # Maps an actual cell ID, e.g. 17 or 1042, to a column number 0, 1, ...
+    id_to_column = {cell_id: col for col, cell_id in enumerate(idx)}
+
+    positions = np.ma.array(np.zeros([Nt, Nc, 2]), mask=True)
+
+    for vm, t in zip(list_vm, np.arange(Nt)):
+        idx_in_frame = centre_indices(vm)
+        pos_in_frame = np.ma.array(itemgetter(*idx_in_frame)(vm.getPositions(wrapped=False)))
+
+        # Convert the non-consecutive cell IDs to output-column indices
+        columns = np.array([id_to_column[cell_id] for cell_id in idx_in_frame])
+
+        # Assign each height to the column for its cell ID
+        positions[t, columns] = pos_in_frame
+
+    # positions[:,:,0] = positions[:,:,0] % vm.systemSize[0]
+    # positions[:,:,1] = positions[:,:,1] % vm.systemSize[1]
 
     return positions
 
@@ -29,12 +63,24 @@ def cell_positions(list_vm):
 def cell_heights(list_vm):
     """ Get cell heights """
 
-    cells = centre_indices(list_vm)
+    idx = unique_indices(list_vm)
+    Nc  = len(idx)
+    Nt  = len(list_vm)
 
-    # unwrap cell heights
-    heights = np.ma.array(list(map(
-        lambda vm: itemgetter(*cells)(vm.vertexForces["surface"].height.copy()),
-        list_vm)))
+    # Maps an actual cell ID, e.g. 17 or 1042, to a column number 0, 1, ...
+    id_to_column = {cell_id: col for col, cell_id in enumerate(idx)}
+
+    heights = np.ma.array(np.zeros([Nt, Nc]), mask=True)
+
+    for vm, t in zip(list_vm, np.arange(Nt)):
+        idx_in_frame     = centre_indices(vm)
+        heights_in_frame = np.ma.array(itemgetter(*idx_in_frame)(vm.vertexForces["surface"].height.copy()))
+
+        # Convert the non-consecutive cell IDs to output-column indices
+        columns = np.array([id_to_column[cell_id] for cell_id in idx_in_frame])
+
+        # Assign each height to the column for its cell ID
+        heights[t, columns] = heights_in_frame
 
     return heights
 
@@ -43,12 +89,24 @@ def cell_heights(list_vm):
 def cell_volumes(list_vm):
     """ Get cell volumes """
 
-    cells = centre_indices(list_vm)
+    idx = unique_indices(list_vm)
+    Nc  = len(idx)
+    Nt  = len(list_vm)
 
-    # unwrap cell volumes
-    volumes = np.ma.array(list(map(
-        lambda vm: itemgetter(*cells)(vm.vertexForces["surface"].volume.copy()), 
-        list_vm)))
+    # Maps an actual cell ID, e.g. 17 or 1042, to a column number 0, 1, ...
+    id_to_column = {cell_id: col for col, cell_id in enumerate(idx)}
+
+    volumes = np.ma.array(np.zeros([Nt, Nc]), mask=True)
+
+    for vm, t in zip(list_vm, np.arange(Nt)):
+        idx_in_frame     = centre_indices(vm)
+        volumes_in_frame = np.ma.array(itemgetter(*idx_in_frame)(vm.vertexForces["surface"].volume.copy()))
+
+        # Convert the non-consecutive cell IDs to output-column indices
+        columns = np.array([id_to_column[cell_id] for cell_id in idx_in_frame])
+
+        # Assign each volume to the column for its cell ID
+        volumes[t, columns] = volumes_in_frame
 
     return volumes
 
@@ -92,7 +150,7 @@ def cell_velocities(list_vm):
     """ Get instantaneous cell velocities """
 
     # indices of cell centres (from first frame)
-    cells = centre_indices(list_vm)
+    cells = centre_indices(list_vm[0])
 
     # unwrap cell velocities at cell centers
     velocities = np.ma.array(list(map(
@@ -105,7 +163,7 @@ def cell_velocities(list_vm):
 
 def cell_vector_norm(vector):
     """ Take norm of vector in cell observable """
-    return np.ma.sqrt(vector[:,:,0]**2 + cell_vector_norm[:,:,1]**2) 
+    return np.ma.sqrt(vector[:,:,0]**2 + vector[:,:,1]**2) 
 
 
 
@@ -114,6 +172,7 @@ def cell_displacements(list_vm):
 
     displacement_vectors = cell_displacement_vectors(list_vm)
     scalar_displacements = cell_vector_norm(displacement_vectors)
+    scalar_displacements.mask[scalar_displacements > 50] = True     # Quickfixs, should be improved!
 
     return scalar_displacements
 
@@ -141,7 +200,7 @@ def neighbour_matrix(list_vm):
         are neighbours, 0 otherwise, for each frame.
     """
 
-    cells = centre_indices(list_vm)
+    cells = centre_indices(list_vm[0])
 
     neighbours_matrix = np.zeros([len(list_vm), max(cells) + 1, max(cells) + 1])
 
