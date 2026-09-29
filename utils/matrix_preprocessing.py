@@ -165,23 +165,12 @@ def detrend_array(t_arr, arr, keepdims=False):
     # Fit only on unmasked entries
     fit = linregress(t_arr[~arr.mask], arr.data[~arr.mask])
 
-    # if not keepdims:
-    #     # Detrend only on unmasked points, return 1D array
-    #     lin_fit   = t_arr[~arr.mask] * fit.slope
-    #     detrended = arr.data[~arr.mask] - lin_fit
-
-    #     # Compute relative standard deviation
-    #     rel_std   = np.ma.std(detrended) / np.ma.mean(arr.data[~arr.mask])
-
-    #     return detrended, rel_std
-    
-    # else:
     # Detrend full array, keeping shape and mask
     lin_fit   = t_arr * fit.slope + fit.intercept
     detrended = arr - lin_fit + np.ma.mean(arr)
 
     # Compute relative standard deviation
-    rel_std = np.ma.std(detrended) / np.ma.mean(arr)
+    rel_std = np.ma.masked_invalid(np.ma.std(detrended) / (np.ma.mean(arr)+1e-8))
 
     return detrended, rel_std
     
