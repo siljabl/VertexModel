@@ -68,7 +68,7 @@ def get_value(config_dict, key):
 
 
 
-def create_run_fname(config):
+def create_run_fname(config, script):
     """
     Create filepath for simulation output
     """
@@ -76,12 +76,27 @@ def create_run_fname(config):
     N     = config['simulation']['Nvertices']
     seed  = config['simulation']['seed']
 
-    gamma = int(config['physics']['gamma'])
-    v0    = int(config['physics']['v0'])
-    taup  = int(config['physics']['taup'] * 100)
-    eta   = int(config['physics']['eta'] * 100)
+    fname = f"N{N}_seed{seed}"
 
-    dirname = f"gamma{gamma}_v0{v0}_taup{taup}_eta{eta}"
-    fname   = f"N{N}_seed{seed}"
+    if script == "constant_volume":
+        gamma = int(config['physics']['gamma'])
+        v0    = int(config['physics']['v0'])
+        taup  = int(config['physics']['taup'] * 100)
+        eta   = int(config['physics']['eta'] * 100)
+
+        dirname = f"gamma{gamma}_v0{v0}_taup{taup}_eta{eta}"
+
+    
+    else:
+        gamma = int(config['physics']['gamma'])
+        v0    = int(config['physics']['v0'])
+        g     = int(config['calibration']['g'])
+        kdiv  = int(config['calibration']['k_div'] * 100)
+        Vdiv  = int(config['calibration']['V_div'])
+        kdeath = int(config['calibration']['k_death'] * 100)
+        Adeath = int(config['calibration']['A_death'])
+
+        dirname = f"g{g}_kdiv{kdiv}_Vdiv{Vdiv}_kdeath{kdeath}_Adeath{Adeath}"
+
 
     return dirname, fname
