@@ -26,16 +26,16 @@ def set_cell_volumes(vm, config, distribution="experimental"):
     Initialise cell volumes drawn from a lognormal distribution 
     """
 
-    assert distribution in ("uniform", "experimental")
+    assert distribution in ("delta", "uniform", "experimental")
 
     # Lognormal parameters from calibration
     s     = config['calibration']['s']            # shape parameter (std. dev of log)
     scale = config['calibration']['scale']        # scale parameter (exp(mean of log))
 
-    # Experimental mean cell volume (from calibration / density)
-    V0     = cell_volume(config)
-
     if distribution == "experimental":
+        # Experimental mean cell volume (from calibration / density)
+        V0     = cell_volume(config)
+
         # Mean of lognormal with parameters (s, scale) is: E[X] = scale * exp(s**2 / 2)
         Vmean  = scale * np.exp(s**2 / 2)
 
@@ -47,7 +47,24 @@ def set_cell_volumes(vm, config, distribution="experimental"):
             lambda i: (i, Vscale * sc.stats.lognorm(s, scale=scale).rvs()),
             vm.vertexForces["surface"].volume))
 
+
+    elif distribution == "uniform":
+        V0   = cell_volume(config)
+        Vstd = config["calibration"]["Vstd"]
+
+        Vlow = (1-Vstd)*V0
+        Vhigh = (1+Vstd)*V0
+
+        assert Vlow > 0 
+        
+        vm.vertexForces["surface"].volume = dict(map(
+            lambda i: (i, np.random.uniform(low=Vlow, high=Vhigh)),
+            vm.vertexForces["surface"].volume))
+
+
     else:
+        V0 = cell_volume(config)
+
         # Set volume of each cell to V0
         vm.vertexForces["surface"].volume = dict(map(
             lambda i: (i, V0),
