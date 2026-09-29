@@ -40,7 +40,7 @@ def main():
         config['simulation']['seed'] = args.seed
     seed = config['simulation']['seed']
 
-    dirname, runname = cfg.create_run_fname(config)
+    dirname, runname = cfg.create_run_fname(config, Path(__file__).stem)
     fname = f"{Path(__file__).stem}/{dirname}/{runname}"
 
     # configs

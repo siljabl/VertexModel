@@ -16,7 +16,7 @@ from datetime import datetime
 from cells.bind import VertexModel
 from paths_config import SIM_RAW_DIR, SIM_FRAMES_DIR
 from utils.vm_plotting import plot_frame, save_frame
-from utils.vm_setup import initalise_vm_lattice, set_cell_volumes, initialise_vm_forces
+from utils.vm_setup import initialise_vm_lattice, set_cell_volumes, initialise_vm_forces
 
 
 
@@ -40,7 +40,7 @@ def main():
         config['simulation']['seed'] = args.seed
     seed  = config['simulation']['seed']
 
-    dirname, runname = cfg.create_run_fname(config)
+    dirname, runname = cfg.create_run_fname(config, Path(__file__).stem)
     fname = f"{Path(__file__).stem}/{dirname}/{runname}"
 
     # configs
@@ -64,9 +64,9 @@ def main():
     np.random.seed(seed)
 
     vm = VertexModel(np.random.randint(1e5))
-    vm = initalise_vm_lattice(vm, config)
+    vm = initialise_vm_lattice(vm, config)
     vm = initialise_vm_forces(vm, config)
-    vm = set_cell_volumes(vm, config)
+    vm = set_cell_volumes(vm, config, distribution="uniform")
 
 
 
@@ -91,7 +91,7 @@ def main():
         for i in range(config['simulation']['period']):
             integrate.one_timestep(vm, config)
             integrate.volume_relaxation(vm, config)
-
+            # integrate.cell_division(vm, config)
    
     os.system('stty sane')
 

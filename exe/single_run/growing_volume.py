@@ -17,7 +17,7 @@ from cells.bind import VertexModel
 from paths_config import SIM_RAW_DIR, SIM_FRAMES_DIR
 from utils.vm_plotting import plot_frame, save_frame
 from utils.vm_setup import initialise_vm_lattice, set_cell_volumes, initialise_vm_forces
-
+from utils.vm_observables import centre_indices
 
 
 
@@ -73,7 +73,7 @@ def main():
     # SIMULATION
 
     # outputs
-    with open(raw_dir / f"{runname}.p", "wb") as dump: pass      # output file is created
+    with open(raw_dir / f"{runname}.p", "wb") as dump: pass                # output file is created
     fig, ax = plot_frame(vm, fig=None, ax=None, cbar_zero=args.cbar0)      # initialise plot with first frame
 
     # simulation
@@ -87,14 +87,15 @@ def main():
             save_frame(vm, fig, ax, f"{SIM_FRAMES_DIR}/{fname}", frame, cbar_zero=args.cbar0)
         frame += 1
 
-        # perform cell division and apoptosis
-        # performed only once per period to avoid aptosis involving cells that appeared within present period
-        integrate.cell_death(vm, config)        # do cell_death first to avoid killing newly divided cells
-        integrate.cell_division(vm, config)
-
+        # integration
         for i in range(config['simulation']['period']):
             integrate.one_timestep(vm, config)
             integrate.cell_growth(vm, config)
+
+        # division
+        integrate.cell_division(vm, config)
+
+        print("frame: ", frame, ", t: ", np.round(frame/12, 2), " h, N: ",  len(centre_indices(vm)), "rho: ", int(10**6*len(centre_indices(vm)) / (600*520)))
 
    
     os.system('stty sane')
