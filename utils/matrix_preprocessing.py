@@ -170,6 +170,7 @@ def detrend_array(t_arr, arr, keepdims=False):
     detrended = arr - lin_fit + np.ma.mean(arr)
 
     # Compute relative standard deviation
+
     rel_std = np.ma.masked_invalid(np.ma.std(detrended) / (np.ma.mean(arr)+1e-8))
 
     return detrended, rel_std
