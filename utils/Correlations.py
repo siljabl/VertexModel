@@ -1,12 +1,12 @@
 import os
 import pickle
 import numpy as np
-import correlation_core as compute
+import utils.correlation_core as compute
 
 from pathlib import Path
 from datetime import datetime
 from paths_config import SIM_RAW_DIR, SIM_PROC_DIR
-from matrix_preprocessing import detrend_entire_matrix
+from utils.matrix_preprocessing import detrend_entire_matrix
 
 
 class AutocorrBase:

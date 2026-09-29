@@ -9,7 +9,6 @@ class SegmentedCells:
     """ Container for segmented cell observables from experimental data. """
 
 
-
     def __init__(self, path):
         # Timestamp for this object
         self.date = datetime.today().strftime('%Y/%m/%d_%H:%M')

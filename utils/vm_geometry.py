@@ -16,3 +16,4 @@ def hexagon_side(V0):
     """ Computes side length of regular hexagon fm volume """
 
     return ((2 / 3**2) * V0) ** (1/3)
+

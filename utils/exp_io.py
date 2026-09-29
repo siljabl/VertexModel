@@ -1,5 +1,6 @@
 import sys
 import copy
+import numpy as np
 from pathlib import Path
 # Add repo root to sys.path
 repo_root = Path(__file__).resolve().parents[1]
