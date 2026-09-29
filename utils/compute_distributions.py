@@ -53,9 +53,12 @@ def timepoint_mean(arr):
     if len(dims) == 3:
         # mean over runs and cells, keep time axis
         mean = np.ma.mean(arr, axis=(1,2), keepdims=True)
-    else:
+    elif len(dims) == 2:
         # mean over "cells" (axis 1), keep time axis
         mean = np.ma.mean(arr, axis=1, keepdims=True)
+
+    else:
+        mean = np.ma.mean(arr)
 
     return  mean
 
