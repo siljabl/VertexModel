@@ -5,10 +5,19 @@ from matrix_preprocessing import pad_2d
 def get_attribute(exp, attr, f2h):
     attrs = dict(vars(exp))
 
-    if attr == "pos":
-        x = np.ma.clip(attrs["h"], 0, 1e4) 
-        y = np.ma.clip(attrs["A"], 0, 1e4)
-        pos = np.ma.masked_invalid([x, y])
+    if attr == "t":
+        dummy = np.ma.masked_invalid(attrs["x"]) 
+        dims  = np.shape(dummy)
+        t_arr = np.arange(dims[0])
+        I     = np.ones(dims[1])
+        t = np.ma.array(np.outer(t_arr, I), mask=dummy.mask)
+
+        return t * f2h
+
+    elif attr == "pos":
+        x = np.ma.masked_invalid(attrs["x"]) 
+        y = np.ma.masked_invalid(attrs["y"])
+        pos = np.ma.array([x, y])
         
         return pos
 
@@ -19,14 +28,14 @@ def get_attribute(exp, attr, f2h):
         
         return V
 
-    elif attr == "pxy":
+    elif attr == "\chi_{\parallel}":
         amin = np.ma.clip(attrs["aminor"], 1e-8, 1e4)
         amaj = np.ma.clip(attrs["amajor"], 0,    1e4)
         pxy  = np.ma.masked_invalid(amaj / amin)
         
         return pxy
     
-    elif attr == "ph":
+    elif attr == "\chi_{\perp}":
         h  = np.ma.clip(attrs["h"], 0, 1e4)
         A  = np.ma.clip(attrs["A"], 1, 1e4)
         ph = np.ma.masked_invalid(h / np.ma.sqrt(A))
