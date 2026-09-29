@@ -1,6 +1,8 @@
 import numpy as np
+from operator import itemgetter
 from cells.bind import BaseIntegrator
-from utils.vm_calibration import cell_division_volume, cell_volume, cell_death_area
+from utils.vm_calibration import cell_volume, division_probability, death_probability, cell_density
+from utils.vm_observables import centre_indices
 
 
 def one_timestep(vm, config):
@@ -21,15 +23,15 @@ def cell_growth(vm, config):
     Linear growth of cell volumes: dV/dt = 1 / tauV.
     """
 
-    dt   = config["simulation"]["dt"]        # integration time step
-    tauV = config["physics"]["tauV"]         # timescale of cell growth
+    dt = config["simulation"]["dt"]        # integration time step
+    g  = config["calibration"]["g"]         # timescale of cell growth
 
     # Get cell volumes
     volumes = vm.vertexForces["surface"].volume.copy()
 
     for i in vm.getVertexIndicesByType("centre"):
         # linear growth
-        volumes[i] += dt / tauV
+        volumes[i] += g*dt
 
     # Update cell volumes
     vm.vertexForces["surface"].volume = volumes
@@ -73,25 +75,28 @@ def cell_division(vm, config):
     volumes = vm.vertexForces["surface"].volume.copy()
     heights = vm.vertexForces["surface"].height.copy()
 
-    Vth = cell_division_volume(config)
+    # cells = centre_indices(vm)
+    # Vmean = np.ma.mean(itemgetter(*cells)(vm.vertexForces["surface"].volume.copy()))
+    V0    = cell_volume(config)
 
     for i in vm.getVertexIndicesByType("centre"):
 
         # Division probability
-        p_div = (volumes[i] - Vth)/Vth
+        p_div = division_probability(config, volumes[i])
         if np.random.rand() < p_div:
 
-            # # Skip if to few neighbours
-            # N_neighbours = len(vm.getNeighbourVertices(i)[1])
-            # if N_neighbours < 5:
-            #     continue
+            # Skip if to few neighbours
+            N_neighbours = len(vm.getNeighbourVertices(i)[1])
+            if N_neighbours <= 4:
+                continue
 
             # Split cell i, get new vertice index j
-            j = vm.splitCellAtMax(i)
+            j = vm.splitCellAtMax(i, avoidThreeEdgeCells=True)
 
             # Update volumes of daughter cells 
             volumes[i] = heights[i]*vm.getVertexToNeighboursArea(i)
             volumes[j] = heights[i]*vm.getVertexToNeighboursArea(j)
+
 
     # Update cell volumes
     vm.vertexForces["surface"].volume = volumes
@@ -106,24 +111,25 @@ def cell_death(vm, config):
         p_death = 
     """
 
-    Ath = cell_death_area(config)
+    Ncells  = len(vm.getVertexIndicesByType("centre"))
+    Ntarget = config["simulation"]["Nvertices"]**2 / 3
+    p_dead = Ncells / Ntarget - 1
 
     for i in vm.getVertexIndicesByType("centre"):
         # Get area of cell i
         area = vm.getVertexToNeighboursArea(i)
 
         # Death probability
-        p_death = (area - Ath)/Ath
+        # p_dead = death_probability(config, area)
 
-        if np.random.rand() > p_death:
+        if np.random.rand() < p_dead:
 
             # # Skip if to few neighbours
             # N_neighbours = len(vm.getNeighbourVertices(i)[1])
-            # if N_neighbours < 6:
+            # if N_neighbours <= 4:
             #     continue
 
-            j,  n_indices  = vm.mergeCellAtMax(i)
-
+            j,  n_indices  = vm.mergeCellAtMin(i)
 
 
 def pulsating_cells(vm, config):
