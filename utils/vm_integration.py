@@ -24,7 +24,7 @@ def cell_growth(vm, config):
     """
 
     dt = config["simulation"]["dt"]        # integration time step
-    g  = config["calibration"]["g"]         # timescale of cell growth
+    g  = config["calibration"]["g"]        # timescale of cell growth
 
     # Get cell volumes
     volumes = vm.vertexForces["surface"].volume.copy()
@@ -65,7 +65,7 @@ def volume_relaxation(vm, config):
 def cell_division(vm, config):
     """ 
     Performs cell division on vm object by splitting the dividing cell along its longest axis.
-    After division the daughter cells will round up, thus mimicing the delayed behaviour in cells during mitosis
+    After division the daughter cells will round up, thus mimicking the delayed behaviour in cells during mitosis
 
     Division probability for cell i:
         p_div = 
@@ -75,32 +75,32 @@ def cell_division(vm, config):
     volumes = vm.vertexForces["surface"].volume.copy()
     heights = vm.vertexForces["surface"].height.copy()
 
-    # cells = centre_indices(vm)
-    # Vmean = np.ma.mean(itemgetter(*cells)(vm.vertexForces["surface"].volume.copy()))
-    V0    = cell_volume(config)
-
+    counter = 0
     for i in vm.getVertexIndicesByType("centre"):
 
         # Division probability
         p_div = division_probability(config, volumes[i])
         if np.random.rand() < p_div:
 
-            # Skip if to few neighbours
-            N_neighbours = len(vm.getNeighbourVertices(i)[1])
-            if N_neighbours <= 4:
-                continue
-
             # Split cell i, get new vertice index j
-            j = vm.splitCellAtMax(i, avoidThreeEdgeCells=True)
+            j = vm.splitCellAtMiddle(i, avoidThreeEdgeCells=True,
+                                        avoidThinCells=True,
+                                        edgeLim=config["simulation"]["edgeLim"])
 
-            # Update volumes of daughter cells 
-            volumes[i] = heights[i]*vm.getVertexToNeighboursArea(i)
-            volumes[j] = heights[i]*vm.getVertexToNeighboursArea(j)
+            # Update volumes of daughter cells
+            # Equal height
+            # volumes[i] = heights[i]*vm.getVertexToNeighboursArea(i)
+            # volumes[j] = heights[i]*vm.getVertexToNeighboursArea(j)
+
+            # Equal volume
+            volumes[i] = 0.5 * volumes[i]
+            volumes[j] = volumes[i]
+
+            counter += 1
 
 
     # Update cell volumes
     vm.vertexForces["surface"].volume = volumes
-
 
 
 def cell_death(vm, config):
@@ -129,7 +129,8 @@ def cell_death(vm, config):
             # if N_neighbours <= 4:
             #     continue
 
-            j,  n_indices  = vm.mergeCellAtMin(i)
+            j,  n_indices  = vm.mergeCellAtMax(i)
+            # j,  n_indices  = vm.mergeCellAtMin(i)
 
 
 def pulsating_cells(vm, config):
