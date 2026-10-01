@@ -95,7 +95,7 @@ def division_probability(config, V):
     if rate < 0:
         rate = 0
 
-    p_div = 1 - np.exp(-rate * dt)
+    p_div = 1 - np.exp(-rate * T * dt)
 
     return p_div
 
@@ -112,7 +112,7 @@ def death_probability(config, A):
     if rate < 0:
         rate = 0
 
-    p_death = 1 - np.exp(-rate * dt)
+    p_death = 1 - np.exp(-rate * T * dt)
 
     return p_death
 
