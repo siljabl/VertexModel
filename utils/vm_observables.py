@@ -3,6 +3,7 @@ import numpy as np
 
 from operator import itemgetter
 from cells.bind import getPolygonsCell
+from utils.matrix_preprocessing import pad_and_stack_axis
 
 
 # NB: Update when adding cell division!
@@ -251,6 +252,8 @@ def cell_planar_aspect_ratios(list_vm):
 
         # Collect aspect ratio of all cells in frame
         aspect_ratios.append(np.array(amajor) / np.array(aminor))
+
+    aspect_ratios = pad_and_stack_axis(aspect_ratios)
 
     return np.array(aspect_ratios)
 
