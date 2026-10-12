@@ -39,6 +39,7 @@ def load_simulation(file, init_time=100):
     return list_vm, init_vm
 
 
+
 def sort_simulation_by_density(vms, density, bin_size=200, Lgrid=600):
     """ Load all experiments in given density range """
 
@@ -63,6 +64,7 @@ def sort_simulation_by_density(vms, density, bin_size=200, Lgrid=600):
         runs_at_density.append(run)
 
     return runs_at_density
+
 
 
 def load_simulation_at_density(dirpath, density, Lgrid=600, bin_size=200, init_time=100):
