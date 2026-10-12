@@ -1,0 +1,3 @@
+[submodule "cells"]
+	path = cells
+	url = git@github.com:siljabl/cells.git
