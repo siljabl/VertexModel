@@ -91,7 +91,7 @@ def initialise_vm_forces(vm, config):
     vm.addActiveBrownianForce("abp", v0, taup)
 
     # Surface tension force
-    vm.addSurfaceForce("surface", gamma, Lambda, V0, tauV)
+    vm.addSurfaceForce("surface", gamma, Lambda, V0, 0)
 
     # Pair dissipation
     vm.setPairFrictionIntegrator(eta)
