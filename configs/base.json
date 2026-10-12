@@ -10,8 +10,8 @@
     "integration": {
         "dt": 0.0052,
         "period": 16,
-        "n_transient": 400,
-        "n_production": 300
+        "n_transient": 100,
+        "n_production": 100
     },
     "forces": {
         "gamma": 18,
