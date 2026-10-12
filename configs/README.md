@@ -3,6 +3,7 @@
 ## Simulation
 
 - `seed`: Seed for the random-number generator.
+- `n_vertices`: Number of vertices in each dimension of the initial lattice.
 - `size`: Linear size of the lattice domain.
 - `t1_threshold`: Edge-length threshold below which a T1 transition is
   triggered.

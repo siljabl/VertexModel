@@ -1,6 +1,7 @@
 {
     "simulation": {
         "seed": 0,
+        "n_vertices": 42,
         "size": 600,
         "t1_threshold": 0.8,
         "t1_offset": 0.1,
