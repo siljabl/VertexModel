@@ -1,13 +1,15 @@
 {
     "simulation": {
 	"seed": 0,
-	"Nvertices": 36,
+	"Nvertices": 42,
 	"Lgrid": 600,
-	"Nframes": 220,
-	"dt": 0.0026,
+	"Nframes": 100,
+    "Ninit": 100,
+	"dt": 0.0104,
 	"delta": 0.8,
 	"epsilon": 0.1,
-	"period": 32
+	"period": 8,
+    "edgeLim": 1
     },
     "physics": {
 	"gamma": 18,
@@ -21,10 +23,10 @@
         "s": 0.3,
         "Vstd": 0.5,
         "scale": 0.9,
-        "g": 80,
-        "V_div": 2500,
-        "k_div": 0.001,
-        "A_death": 140,
-        "k_death": 0.002
+        "g": 100,
+        "V_div": 2200,
+        "k_div": 0.000027,
+        "A_death": 0,
+        "k_death": 0
     }
 }

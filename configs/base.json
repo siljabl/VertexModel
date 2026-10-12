@@ -1,0 +1,33 @@
+{
+    "simulation": {
+        "seed": 0,
+        "size": 600,
+        "t1_threshold": 0.8,
+        "t1_offset": 0.1,
+        "edge_limit": 1
+    },
+    "integration": {
+        "dt": 0.0052,
+        "period": 16,
+        "n_transient": 400,
+        "n_production": 300
+    },
+    "forces": {
+        "gamma": 18,
+        "lambda": 1,
+        "v0": 100,
+        "taup": 1.75,
+        "eta": 0.5
+    },
+    "cells": {
+        "distribution": "uniform",
+        "scale": 0.9,
+        "Vstd": 0.5,
+        "s": 0.3
+    },
+    "growth": {
+        "g": 100,
+        "k_div": 0.000027,
+        "V_div": 2200
+    }
+}
