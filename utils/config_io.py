@@ -91,12 +91,11 @@ def create_run_fname(config, script):
         gamma = int(config['physics']['gamma'])
         v0    = int(config['physics']['v0'])
         g     = int(config['calibration']['g'])
-        kdiv  = int(config['calibration']['k_div'] * 1000)
+        kdiv  = int(config['calibration']['k_div'] * 1e6)
         Vdiv  = int(config['calibration']['V_div'])
-        kdeath = int(config['calibration']['k_death'] * 1000)
-        Adeath = int(config['calibration']['A_death'])
 
-        dirname = f"g{g}_kdiv{kdiv}_Vdiv{Vdiv}_kdeath{kdeath}_Adeath{Adeath}"
+
+        dirname = f"g{g}_kdiv{kdiv}_Vdiv{Vdiv}"
 
 
     return dirname, fname
