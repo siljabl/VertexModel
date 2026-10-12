@@ -73,9 +73,7 @@ def cell_division(vm, config):
 
     # Get cell volumes and cell heights
     volumes = vm.vertexForces["surface"].volume.copy()
-    heights = vm.vertexForces["surface"].height.copy()
 
-    counter = 0
     for i in vm.getVertexIndicesByType("centre"):
 
         # Division probability
@@ -87,20 +85,13 @@ def cell_division(vm, config):
                                         avoidThinCells=True,
                                         edgeLim=config["simulation"]["edgeLim"])
 
-            # Update volumes of daughter cells
-            # Equal height
-            # volumes[i] = heights[i]*vm.getVertexToNeighboursArea(i)
-            # volumes[j] = heights[i]*vm.getVertexToNeighboursArea(j)
-
-            # Equal volume
+            # Update volumes of daughter cells to have half of mother volume
             volumes[i] = 0.5 * volumes[i]
             volumes[j] = volumes[i]
 
-            counter += 1
-
-
     # Update cell volumes
     vm.vertexForces["surface"].volume = volumes
+
 
 
 def cell_death(vm, config):
@@ -124,13 +115,8 @@ def cell_death(vm, config):
 
         if np.random.rand() < p_dead:
 
-            # # Skip if to few neighbours
-            # N_neighbours = len(vm.getNeighbourVertices(i)[1])
-            # if N_neighbours <= 4:
-            #     continue
-
+            # Merge cells
             j,  n_indices  = vm.mergeCellAtMax(i)
-            # j,  n_indices  = vm.mergeCellAtMin(i)
 
 
 def pulsating_cells(vm, config):
