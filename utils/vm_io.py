@@ -39,6 +39,31 @@ def load_simulation(file, init_time=100):
     return list_vm, init_vm
 
 
+def sort_simulation_by_density(vms, density, bin_size=200, Lgrid=600):
+    """ Load all experiments in given density range """
+
+    runs_at_density = []
+
+    min_density = density - bin_size / 2
+    max_density = density + bin_size / 2
+
+    # Loop through experiments and mask data
+    for list_vm in vms:
+
+        # Compute cell density during simulation
+        N_cells   = number_of_cells(list_vm)
+        densities = cell_density_from_Ncell(N_cells, Lgrid=Lgrid)
+
+        mask = (densities > min_density) * (densities < max_density)
+        run = []
+        for vm, m in zip(list_vm, mask):
+            if m:
+                run.append(vm)
+
+        runs_at_density.append(run)
+
+    return runs_at_density
+
 
 def load_simulation_at_density(dirpath, density, Lgrid=600, bin_size=200, init_time=100):
     """ Load all experiments in given density range """
