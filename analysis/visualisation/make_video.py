@@ -23,6 +23,7 @@ def main():
     parser.add_argument('--cbar0',           type=str,   default='absolute',  help='How define 0 level of cbar in vm video')
     parser.add_argument('--fps',             type=int,   default="10",        help="Frame rate (frames per second) for the output video")
     parser.add_argument('--hmax',            type=float, default=14)
+    parser.add_argument('--init_time',       type=int,   default=100)
     parser.add_argument('-o', '--overwrite', action="store_true")
     args = parser.parse_args()
 
@@ -53,7 +54,7 @@ def main():
             raise FileNotFoundError(f"Data file not found: {data_path}")
 
         # Load vm objects (list of frames) — adjust init_time if needed
-        list_vm, init_vm = load_simulation(data_path, init_time=100)
+        list_vm, init_vm = load_simulation(data_path, init_time=args.init_time)
         print(f"Loaded {len(list_vm)} frames from {data_path}")
 
         # Initialise plot with first frame

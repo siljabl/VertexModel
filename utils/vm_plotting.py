@@ -26,7 +26,7 @@ from matplotlib.collections import PatchCollection, LineCollection
 class WindowClosedException(Exception): pass
 
 
-def save_frame(vm, fig, ax, _frames_dir, index, cbar_zero='hexagon', hmax=14):
+def save_frame(vm, fig, ax, _frames_dir, index, cbar_zero='hexagon', hmax=20):
     """ Saves simulation snapshot while taking care of syntax errors """
     
     # update plot
