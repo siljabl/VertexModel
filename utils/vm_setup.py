@@ -9,8 +9,8 @@ def initialise_vm_lattice(vm, config):
     """
     Initialise VertexModel lattice as a regular triangular lattice.
     """
-    Ngrid = config['simulation']['Nvertices']           # Number of vertices in each dimension. Ncell = Ngrid**2 / 3
-    Lgrid = config['simulation']['Lgrid']               # Length of lattice in µm
+    Ngrid = config['simulation']['n_vertices']           # Number of vertices in each dimension. Ncell = Ngrid**2 / 3
+    Lgrid = config['simulation']['size']                 # Length of lattice in µm
 
     rgrid = Lgrid / Ngrid                               # Lattice spacing of triangular grid
     A0    = hexagon_area(rgrid)                         # Target average cell area
@@ -29,8 +29,8 @@ def set_cell_volumes(vm, config, distribution="experimental"):
     assert distribution in ("delta", "uniform", "experimental")
 
     # Lognormal parameters from calibration
-    s     = config['calibration']['s']            # shape parameter (std. dev of log)
-    scale = config['calibration']['scale']        # scale parameter (exp(mean of log))
+    s     = config['cells']['s']            # shape parameter (std. dev of log)
+    scale = config['cells']['scale']        # scale parameter (exp(mean of log))
 
     if distribution == "experimental":
         # Experimental mean cell volume (from calibration / density)
@@ -50,7 +50,7 @@ def set_cell_volumes(vm, config, distribution="experimental"):
 
     elif distribution == "uniform":
         V0   = cell_volume(config)
-        Vstd = config["calibration"]["Vstd"]
+        Vstd = config["cells"]["Vstd"]
 
         Vlow = (1-Vstd)*V0
         Vhigh = (1+Vstd)*V0
@@ -77,12 +77,11 @@ def initialise_vm_forces(vm, config):
     """
     Initialise forces in the VertexModel
     """
-    gamma  = config['physics']['gamma']
-    Lambda = config['physics']['lambda']
-    tauV   = config['physics']['tauV']
-    v0     = config['physics']['v0']
-    taup   = config['physics']['taup']
-    eta    = config['physics']['eta']
+    gamma  = config['forces']['gamma']
+    Lambda = config['forces']['lambda']
+    v0     = config['forces']['v0']
+    taup   = config['forces']['taup']
+    eta    = config['forces']['eta']
 
     # Reference volume (experimental mean) from calibration
     V0 = cell_volume(config)

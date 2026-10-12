@@ -10,10 +10,10 @@ def load(config_path):
 
 
     
-def save(config_path, config_dict, script_file):
+def save(config_path, config_dict, mode):
     """Save configuration to a JSON file."""
 
-    config_dict["script"] = script_file
+    config_dict["mode"] = mode
     
     with open(config_path, 'w') as f:
         json.dump(config_dict, f, indent=4)
@@ -73,26 +73,26 @@ def create_run_fname(config, script):
     Create filepath for simulation output
     """
 
-    N     = config['simulation']['Nvertices']
+    N     = config['simulation']['n_vertices']
     seed  = config['simulation']['seed']
 
     fname = f"N{N}_seed{seed}"
 
     if script == "constant_volume":
-        gamma = int(config['physics']['gamma'])
-        v0    = int(config['physics']['v0'])
-        taup  = int(config['physics']['taup'] * 100)
-        eta   = int(config['physics']['eta'] * 100)
+        gamma = int(config['forces']['gamma'])
+        v0    = int(config['forces']['v0'])
+        taup  = int(config['forces']['taup'] * 100)
+        eta   = int(config['forces']['eta'] * 100)
 
         dirname = f"gamma{gamma}_v0{v0}_taup{taup}_eta{eta}"
 
     
     else:
-        gamma = int(config['physics']['gamma'])
-        v0    = int(config['physics']['v0'])
-        g     = int(config['calibration']['g'])
-        kdiv  = int(config['calibration']['k_div'] * 1e6)
-        Vdiv  = int(config['calibration']['V_div'])
+        gamma = int(config['forces']['gamma'])
+        v0    = int(config['forces']['v0'])
+        g     = int(config['growth']['g'])
+        kdiv  = int(config['growth']['k_div'] * 1e6)
+        Vdiv  = int(config['growth']['V_div'])
 
 
         dirname = f"g{g}_kdiv{kdiv}_Vdiv{Vdiv}"

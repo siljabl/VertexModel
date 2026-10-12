@@ -1,7 +1,7 @@
 import numpy as np
 from operator import itemgetter
 from cells.bind import BaseIntegrator
-from utils.vm_calibration import cell_volume, division_probability, death_probability, cell_density
+from utils.vm_calibration import cell_volume, division_probability
 from utils.vm_observables import centre_indices
 
 
@@ -10,9 +10,9 @@ def one_timestep(vm, config):
     Perform one integration step of the VertexModel.
     """
 
-    dt      = config['simulation']['dt']        # integration time step
-    delta   = config['simulation']['delta']     # length below which T1s are triggered
-    epsilon = config['simulation']['epsilon']   # edges have length delta+epsilon after T1s
+    dt      = config['integration']['dt']
+    delta   = config['simulation']['t1_threshold']
+    epsilon = config['simulation']['t1_offset']
 
     vm.integrate(dt, delta, epsilon)
 
@@ -20,11 +20,11 @@ def one_timestep(vm, config):
     
 def cell_growth(vm, config):
     """
-    Linear growth of cell volumes: dV/dt = 1 / tauV.
+    Linear growth of cell volumes: dV/dt = g.
     """
 
-    dt = config["simulation"]["dt"]        # integration time step
-    g  = config["calibration"]["g"]        # timescale of cell growth
+    dt = config["integration"]["dt"]
+    g  = config["growth"]["g"]
 
     # Get cell volumes
     volumes = vm.vertexForces["surface"].volume.copy()
@@ -41,11 +41,11 @@ def cell_growth(vm, config):
 def volume_relaxation(vm, config):
     """
     Exponential relaxation of volumes towards V0:
-        dV/dt = (V0 - V) / tauV
+        dV/dt = g(V0 - V)
     """
 
-    dt   = config["simulation"]["dt"]   # integration time step
-    tauV = config["physics"]["tauV"]    # relaxation timescale
+    dt = config["integration"]["dt"]
+    g  = config["growth"]["g"]
 
     # Experimental mean cell volume (from calibration / density)
     V0      = cell_volume(config)
@@ -55,7 +55,7 @@ def volume_relaxation(vm, config):
 
     for i in vm.getVertexIndicesByType("centre"):
         # exponential relaxation
-        volumes[i] += (V0 - volumes[i]) * dt / tauV
+        volumes[i] += (V0 - volumes[i]) * g * dt
 
     # Update cell volumes
     vm.vertexForces["surface"].volume = volumes
@@ -83,7 +83,7 @@ def cell_division(vm, config):
             # Split cell i, get new vertice index j
             j = vm.splitCellAtMiddle(i, avoidThreeEdgeCells=True,
                                         avoidThinCells=True,
-                                        edgeLim=config["simulation"]["edgeLim"])
+                                        edgeLim=config["simulation"]["edge_limit"])
 
             # Update volumes of daughter cells to have half of mother volume
             volumes[i] = 0.5 * volumes[i]
@@ -103,7 +103,7 @@ def cell_death(vm, config):
     """
 
     Ncells  = len(vm.getVertexIndicesByType("centre"))
-    Ntarget = config["simulation"]["Nvertices"]**2 / 3
+    Ntarget = config["simulation"]["n_vertices"]**2 / 3
     p_dead = Ncells / Ntarget - 1
 
     for i in vm.getVertexIndicesByType("centre"):
