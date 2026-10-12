@@ -61,7 +61,6 @@ def set_cell_volumes(vm, config, distribution="experimental"):
             lambda i: (i, np.random.uniform(low=Vlow, high=Vhigh)),
             vm.vertexForces["surface"].volume))
 
-
     else:
         V0 = cell_volume(config)
 
