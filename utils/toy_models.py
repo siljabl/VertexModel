@@ -13,6 +13,7 @@ def run_division_no_history(initial_volumes, Ntime,
 
     Ncount  = [Ncells]
     Vcount  = [np.mean(initial_volumes)]
+    Divrate = []
 
     for t in range(1, Ntime):
 
@@ -52,6 +53,8 @@ def run_division_no_history(initial_volumes, Ntime,
         volumes_after_div[Ncells:] = volumes_after_div[mother_indices]
 
         # Update cell counter
+        Divrate.append(Ndiv / (Ncells * dt))
+
         Ncells  = len(volumes_after_div)
         Ncount.append(Ncells)
         Vcount.append(np.mean(volumes_after_div))
@@ -61,7 +64,7 @@ def run_division_no_history(initial_volumes, Ntime,
         if Ncells >= Nmax:
             break
 
-    return volumes_prev, Ncount, Vcount
+    return volumes_prev, Ncount, Vcount, Divrate
 
 
 
