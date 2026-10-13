@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 # Add repo root to sys.path
-repo_root = Path(__file__).resolve().parents[2]
+repo_root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(repo_root))
 
 import pickle
@@ -24,13 +24,13 @@ from utils.vm_observables import centre_indices
 def main():
     # Command-line argument parsing
     parser = argparse.ArgumentParser(description="Run simulation constant cell volume and active brownian motion")
+    parser.add_argument('mode',                type=str,                               help='Simulation mode (constant_volume, growing_volume, death_and_division)')
     parser.add_argument('-c', '--config_path', type=str,  default='configs/base.json', help='Path to config file')
-    parser.add_argument('-m', '--mode',        type=str,  default='growing_volume',    help='Simulation mode (constant_volume, growing_volume, death_and_division)')
     parser.add_argument('-s', '--seed',        type=int,  default=None,                help='Simulation seed')
     parser.add_argument('--cbar0',             type=str,  default='absolute',          help='How define 0 level of cbar in vm video')
     args = parser.parse_args()
 
-    assert args.mode in ("constant_volume", "growing_volume", "death_and_division")
+    assert args.mode in ("constant_volume", "growing_volume", "death_and_division", "emergent_volume")
 
     # Load config file
     config = cfg.load(args.config_path)
@@ -100,20 +100,42 @@ def main():
         for i in range(period):
             integrate.one_timestep(vm, config)
 
-            if args.mode in ("growing_volume", "death_and_division"):
+
+            # Growing volume: cell growth at every time step, cell death during transient state
+            if args.mode == "growing_volume":
                 integrate.cell_growth(vm, config)
 
-            # letting cells die during transient state
-            if args.mode == "growing_volume":
+                # letting cells die during transient state
                 if frame < n_transient and i == int(period / 2):
                     integrate.cell_death(vm, config)
-            
-            # letting cells always die
-            else:
-                integrate.cell_death(vm, config)
+
+
+            # Death and division: cell growth at every time step, cell death at every period'th time step
+            elif args.mode == "death_and_division":
+                integrate.cell_growth(vm, config)
+
+                # letting cells die during transient state
+                if i == int(period / 2):
+                    integrate.cell_death(vm, config)
+
+
+            # Emergent volume: cell growth and cell death only during transient state
+            elif args.mode == "emergent_volume":
+                # letting cells grow during transient state
+                if frame < n_transient:
+                    integrate.cell_growth(vm, config)
+                    
+                    # letting cells die during transient state
+                    if i == int(period / 2):
+                        integrate.cell_death(vm, config)
+
 
         # division
         if args.mode in ("growing_volume", "death_and_division"):
+            integrate.cell_division(vm, config)
+
+        # division
+        elif args.mode == "emergent_volume" and frame < n_transient:
             integrate.cell_division(vm, config)
 
         # print cell count
