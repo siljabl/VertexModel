@@ -101,9 +101,9 @@ def cell_death(vm, config):
     Probability of dying for cell i:
         p_death = 
     """
-
+    Atot    = vm.systemSize[0] * vm.systemSize[1]
     Ncells  = len(vm.getVertexIndicesByType("centre"))
-    Ntarget = 1e6 / config["cells"]["target_density"]
+    Ntarget = 1e-6 * config["cells"]["target_density"] * Atot
     p_dead = Ncells / Ntarget - 1
 
     for i in vm.getVertexIndicesByType("centre"):
