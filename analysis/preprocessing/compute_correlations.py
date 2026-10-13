@@ -12,11 +12,14 @@ repo_root = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(repo_root))
 sys.path.append("utils/")
 
-from paths_config import EXP_RAW_DIR, EXP_PROC_DIR, SIM_RAW_DIR, FRAME_TO_H, EXP_DATASETS_IDS
+from paths_config import EXP_RAW_DIR, EXP_PROC_DIR
+from paths_config import SIM_RAW_DIR, SIM_PROC_DIR
+from paths_config import FRAME_TO_H, EXP_DATASETS_IDS
 
 import cells.bind
 import ExperimentData
 import vm_io as vm_io
+import config_io as cfg
 import vm_observables as get_vm
 import exp_observables as get_exp
 
@@ -114,15 +117,21 @@ def process_one_path(path, base_args):
 
     if is_simulation_path(path):
         # ---- Simulation branch ----
-        mode   = path.parent.parent.name  # e.g. 'mode'
-        params = path.parent.name         # e.g. 'params'
-        seed   = Path(str(path.stem) + ".p")
+        mode = path.parent.parent.name 
+        dir  = path.parent.name
+        seed = Path(str(path.stem) + ".p")
 
         # Directory with simulation .p files
-        sim_path = Path(SIM_RAW_DIR) / mode / params / seed
+        sim_path = Path(SIM_RAW_DIR) / mode / dir / seed
 
-        data, _      = vm_io.load_simulation(sim_path)
+        # Load config
+        config = cfg.load((Path("configs") / mode / dir / path.stem).with_suffix(".json"))
+
+        data, _      = vm_io.load_run(sim_path, init_time=config["integration"]["n_transient"])
         autocorr_obj = SimulationAutocorrelations(in_path=str(sim_path))
+
+        # Save densities
+        autocorr_obj.density = 1e6 / np.ma.mean(get_vm.cell_areas(data), axis=1)
 
         # dt from simulation
         args.dt = data[1].time - data[0].time
@@ -166,16 +175,27 @@ def main():
     input_path = Path(args.path)
 
     if input_path.is_dir():
+
+        # Output directory
+        out_dir = SIM_PROC_DIR / input_path.parent.stem / input_path.stem
+
         print("input_path is dir")
         run_paths = sorted(input_path.glob("*.json"))
         if len(run_paths) == 0:
             run_paths = sorted(input_path.glob("*.p"))
-        print(run_paths)
+        
     else:
         # Single file
+
+        # Output directory
+        out_dir = SIM_PROC_DIR / input_path.parent.parent.stem / input_path.parent.stem
+
         if not input_path.is_file():
             raise FileNotFoundError(f"Input path does not exist: {input_path}")
         run_paths = [input_path]
+
+    # Create output directory if it does not exist
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     # Decide serial vs parallel based on number of paths
     if len(run_paths) == 1:
