@@ -27,11 +27,10 @@ def main():
 
     # Command-line argument parsing
     parser = argparse.ArgumentParser(description="Run several runs")
-    parser.add_argument('script',         type=str,  help='Simulation script')
+    parser.add_argument('mode',           type=str,  help='Simulation mode')
     parser.add_argument('-N', '--Nruns',  type=int,  help="Number of runs to so",         default=10)
     parser.add_argument('-P', '--Npool',  type=int,  help="Number of parallel processes", default=16)
     parser.add_argument('-s', '--seed',   type=int,  help="Simulation seed",              default=None)
-    #parser.add_argument('-c', '--config', type=str,  help='Path to config file',          default=None)
     args = parser.parse_args()
 
 
@@ -46,7 +45,8 @@ def main():
     for run in range(args.Nruns):
         command = [
             'python', 
-            args.script,
+            'exe/run_single.py',
+            args.mode,
             '--seed', str(np.random.randint(1e3)),
         ]
         commands.append(command)
