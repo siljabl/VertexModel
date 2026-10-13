@@ -68,17 +68,22 @@ def get_value(config_dict, key):
 
 
 
-def create_run_fname(config, script):
+def create_run_fname(config, mode):
     """
     Create filepath for simulation output
     """
 
+    rho   = config["cells"]["target_density"]
     N     = config['simulation']['n_vertices']
     seed  = config['simulation']['seed']
 
-    fname = f"N{N}_seed{seed}"
+    if mode == "constant_volume":
+        fname = f"N{N}_seed{seed}"
 
-    if script == "constant_volume":
+    else:
+        fname = f"rho{rho}_seed{seed}"
+
+    if mode in ("constant_volume", "emergent_volume"):
         gamma = int(config['forces']['gamma'])
         v0    = int(config['forces']['v0'])
         taup  = int(config['forces']['taup'] * 100)
@@ -87,7 +92,7 @@ def create_run_fname(config, script):
         dirname = f"gamma{gamma}_v0{v0}_taup{taup}_eta{eta}"
 
     
-    else:
+    elif mode in ("death_and_division", "growing_volume"):
         gamma = int(config['forces']['gamma'])
         v0    = int(config['forces']['v0'])
         g     = int(config['growth']['g'])
