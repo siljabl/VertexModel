@@ -6,14 +6,13 @@ from pathlib import Path
 repo_root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(repo_root))
 
+import utils.config_io as cfg
 from cells.bind import VertexModel
-from utils.vm_calibration import cell_density_from_Ngrid, cell_density_from_Ncell
-from utils.vm_observables import number_of_cells
 from utils.Correlations import SimulationAutocorrelations
 
 
 
-def load_simulation(file, init_time=100):
+def load_run(file, init_time):
     """ Loads vm object and returns as list """
     
     list_vm = []
@@ -40,85 +39,50 @@ def load_simulation(file, init_time=100):
 
 
 
-def sort_simulation_by_density(vms, density, bin_size=200, Lgrid=600):
-    """ Load all experiments in given density range """
-
-    runs_at_density = []
-
-    min_density = density - bin_size / 2
-    max_density = density + bin_size / 2
-
-    # Loop through experiments and mask data
-    for list_vm in vms:
-
-        # Compute cell density during simulation
-        N_cells   = number_of_cells(list_vm)
-        densities = cell_density_from_Ncell(N_cells, Lgrid=Lgrid)
-
-        mask = (densities > min_density) * (densities < max_density)
-        run = []
-        for vm, m in zip(list_vm, mask):
-            if m:
-                run.append(vm)
-
-        runs_at_density.append(run)
-
-    return runs_at_density
-
-
-
-def load_simulation_at_density(dirpath, density, Lgrid=600, bin_size=200, init_time=100):
-    """ Load all experiments in given density range """
-
-    dirpath = Path(dirpath)
-    runs_at_density = []
-
-    min_density = density - bin_size / 2
-    max_density = density + bin_size / 2
-
-    for path in sorted(dirpath.glob(f"N*_seed*.p")):
-        list_vm, init_vm = load_simulation(path, init_time=init_time)
-
-        # Compute cell density during simulation
-        N_cells   = number_of_cells(list_vm)
-        densities = cell_density_from_Ncell(N_cells, Lgrid=Lgrid)
-
-        mask = (densities > min_density) * (densities < max_density)
-        run = []
-        for vm, m in zip(list_vm, mask):
-            if m:
-                run.append(vm)
-
-        runs_at_density.append(run)
-
-    return runs_at_density
-
-
-
-def load_simulation_ensemble(dirpath, Ngrid, init_time=100):
+def load_ensemble(dirpath, rho=None, n_vertices=None):
     """ Loads all vm objects in ensemble and returns as list """
+
+    assert rho or n_vertices
+
+    if rho:
+        pattern = f"rho{rho}"
+    else:
+        pattern = f"N{n_vertices}"
+
 
     dirpath = Path(dirpath)
     runs = []
 
-    for path in sorted(dirpath.glob(f"N{Ngrid}_seed*.p")):
-        list_vm, init_vm = load_simulation(path, init_time=init_time)
+    for path in sorted(dirpath.glob(f"{pattern}_seed*.p")):
+        cfg_path = (Path("configs") / path.parent.parent.stem / path.parent.stem / path.stem).with_suffix(".json")
+        config = cfg.load(cfg_path)
+
+        list_vm, init_vm = load_run(path, init_time=config["integration"]["n_transient"])
         runs.append(list_vm)
 
     return runs
 
 
 
-def load_correlation_ensemble(dirpath, Ngrid):
+def load_ensemble_correlations(dirpath, rho=None, n_vertices=None):
     """ Loads all correlation objects in ensemble and returns as list """
 
+    assert rho or n_vertices
+
+    if rho:
+        pattern = f"rho{rho}"
+    else:
+        pattern = f"N{n_vertices}"
 
     dirpath = Path(dirpath)
     runs = []
 
-    for path in sorted(dirpath.glob(f"N{Ngrid}_seed*.p")):
+    for path in sorted(dirpath.glob(f"{pattern}_seed*.p")):
         corr = SimulationAutocorrelations(in_path=path)
 
         runs.append(corr)
 
     return runs
+
+
+
