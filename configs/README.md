@@ -30,7 +30,7 @@
 - `eta`: Drag coefficient for vertex--vertex interactions.
 
 ## Cells
-
+- `target_density`: Target density used to compute death rate.
 - `distribution`: Probability distribution used to initialise cell volumes.
 - `s`: Shape parameter $\sigma$ of the log-normal distribution
   (`scipy.stats.lognorm`).
