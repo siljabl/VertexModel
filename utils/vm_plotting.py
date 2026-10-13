@@ -53,7 +53,7 @@ def _update_canvas(fig):
         raise WindowClosedException
 
 def plot_frame(vm, fig=None, ax=None, update=True, only_set=False,
-               vertex_indices=False, cbar_zero='hexagon', hmax=14):
+               vertex_indices=False, cbar_zero='hexagon', hmax=20):
     """
     Plot vertex model.
 
