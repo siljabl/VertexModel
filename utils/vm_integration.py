@@ -103,14 +103,14 @@ def cell_death(vm, config):
     """
 
     Ncells  = len(vm.getVertexIndicesByType("centre"))
-    Ntarget = config["simulation"]["n_vertices"]**2 / 3
+    Ntarget = 1e6 / config["cells"]["target_density"]
     p_dead = Ncells / Ntarget - 1
 
     for i in vm.getVertexIndicesByType("centre"):
         # Get area of cell i
         area = vm.getVertexToNeighboursArea(i)
 
-        # Death probability
+        # Death probabilityimulation
         # p_dead = death_probability(config, area)
 
         if np.random.rand() < p_dead:
