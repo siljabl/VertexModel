@@ -10,6 +10,7 @@ from tqdm import tqdm
 repo_root = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(repo_root))
 
+import utils.config_io as cfg
 from cells.init import movie_sh_fname
 from utils.vm_io import load_simulation
 from paths_config import SIM_RAW_DIR, SIM_FRAMES_DIR, VIDEOS_DIR
@@ -22,8 +23,8 @@ def main():
     parser.add_argument('config_path',       type=str,                        help="Defines path to file, typically: configs/constant_volume/parameters/N36_seed0.json")
     parser.add_argument('--cbar0',           type=str,   default='absolute',  help='How define 0 level of cbar in vm video')
     parser.add_argument('--fps',             type=int,   default="10",        help="Frame rate (frames per second) for the output video")
-    parser.add_argument('--hmax',            type=float, default=14)
-    parser.add_argument('--init_time',       type=int,   default=100)
+    parser.add_argument('--hmax',            type=float, default=20)
+    parser.add_argument('--init_time',       type=int,   default=None)
     parser.add_argument('-o', '--overwrite', action="store_true")
     args = parser.parse_args()
 
@@ -43,6 +44,11 @@ def main():
     videos_dir   = Path(VIDEOS_DIR)     / mode / dirname
     videos_dir.mkdir(parents=True, exist_ok=True)
 
+    # Start movie from production frames unless given other init_time
+    if not args.init_time:
+        config = cfg.load(args.config_path)
+        args.init_time = config["integration"]["n_production"]
+
 
     if args.overwrite:
         # Clear and recreate frames directory
@@ -54,7 +60,7 @@ def main():
             raise FileNotFoundError(f"Data file not found: {data_path}")
 
         # Load vm objects (list of frames) — adjust init_time if needed
-        list_vm, init_vm = load_simulation(data_path, init_time=args.init_time)
+        list_vm, init_vm = load_run(data_path, init_time=args.init_time)
         print(f"Loaded {len(list_vm)} frames from {data_path}")
 
         # Initialise plot with first frame
