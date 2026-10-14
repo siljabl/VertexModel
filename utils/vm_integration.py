@@ -81,13 +81,13 @@ def cell_division(vm, config):
         if np.random.rand() < p_div:
 
             # Split cell i, get new vertice index j
-            j = vm.splitCellAtMiddle(i, avoidThreeEdgeCells=True,
-                                        avoidThinCells=True,
-                                        edgeLim=config["simulation"]["edge_limit"])
+            j, k = vm.splitCellAtMiddle(i, avoidThreeEdgeCells=True,
+                                           avoidThinCells=True,
+                                           edgeLim=config["simulation"]["edge_limit"])
 
             # Update volumes of daughter cells to have half of mother volume
-            volumes[i] = 0.5 * volumes[i]
-            volumes[j] = volumes[i]
+            volumes[j] = 0.5 * volumes[i]
+            volumes[k] = 0.5 * volumes[i]
 
     # Update cell volumes
     vm.vertexForces["surface"].volume = volumes
@@ -108,7 +108,7 @@ def cell_death(vm, config):
 
     for i in vm.getVertexIndicesByType("centre"):
         # Get area of cell i
-        area = vm.getVertexToNeighboursArea(i)
+        # area = vm.getVertexToNeighboursArea(i)
 
         # Death probabilityimulation
         # p_dead = death_probability(config, area)
