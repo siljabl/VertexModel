@@ -8,7 +8,7 @@ from exp_observables import get_attribute, pad_datasets_to_common_shape
 from matrix_preprocessing import pad_and_stack_2d, pad_and_stack_axis, interp_corr2d_to_t_common
 
 
-def simulation_observable(vms, func):
+def simulation_observable(vms_at_density, func):
     """
     vms  : list of runs, each run is list_vm (frames)
     func : function(list_vm) -> array (T, N)
@@ -16,18 +16,21 @@ def simulation_observable(vms, func):
     Returns
     -------
     obs : np.ma.array
-        Shape (T, R, N): frame, run, cell.
+        Shape (R, T, N): run, frame, cell.
     """
 
     obs = []
 
-    for vm in vms:
+    assert func not in (cell_positions, cell_displacement_vectors), "observable must be a scalar"
+
+    for vm in vms_at_density:
         observable = func(vm)
         obs.append(observable)
 
+    obs = pad_and_stack_2d(obs)
     obs = np.ma.array(obs)
 
-    return np.swapaxes(obs, 0, 1)
+    return obs
 
 
 
@@ -39,10 +42,11 @@ def experiment_observable(exps_at_density, attr):
     Returns
     -------
     obs : np.ma.array
-        Shape (T, R, N): frame, run, cell.
+        Shape (R, T, N): run, frame, cell.
     """
 
     #assert hasattr(exps_at_density[0], attr), f"Datasets do not have attribute '{attr}'."
+    assert attr not in ("pos", "v_vec"), "observable must be a scalar"
 
     obs = []
     exps = pad_datasets_to_common_shape(exps_at_density)
@@ -53,8 +57,7 @@ def experiment_observable(exps_at_density, attr):
         obs.append(attr_arr)
 
     obs = np.ma.array(obs)
-    obs = np.ma.swapaxes(obs, 0, 1)
-
+    
     return obs
 
 
@@ -102,7 +105,7 @@ def spatial_correlation(corr_list, parameter, r_ref=None):
 
 
 
-def temporal_correlation(corr_list, parameter, mean_var='r', t_ref=None):
+def temporal_correlation(corr_list, parameter, mean_var='r', dt_ref=1/12):
     """
     Build an ensemble of temporal correlations C(t) across multiple Autocorrelations objects.
 
@@ -130,29 +133,33 @@ def temporal_correlation(corr_list, parameter, mean_var='r', t_ref=None):
 
     per_corr = []
 
-    for corr, f2h in zip(corr_list, FRAME_TO_H):
+    for corr in corr_list:
+
+        # Array of lag times
+        t  = corr.t_array[parameter]
+        dt = t[1] - t[0]
         
         if mean_var == 'r':
             C_t = corr.temporal[parameter]       # shape (N_rho, N_t)
         else:
             C_t = corr.temporal_cell[parameter]  # shape (N_rho, N_t)
 
-        if f2h > min(FRAME_TO_H) and len(C_t) > 0:
+        if dt > dt_ref and len(C_t) > 0:
             N_rho, N_t = np.shape(C_t)
 
             # target number of lags when resampled to common dt
-            N_t_common = int(N_t / f2h)
-            t_interp = np.arange(N_t_common) * min(FRAME_TO_H)
-            C_t = interp_corr2d_to_t_common(C_t, f2h, t_interp)
+            N_t_common = int(N_t / dt)
+            t_interp = np.arange(N_t_common) * dt_ref
+            C_t = interp_corr2d_to_t_common(C_t, dt, t_interp)
 
         per_corr.append(C_t)
 
     # Pad along time (last axis) and stack over objects
-    C_t_ensemble = pad_and_stack_2d(per_corr)  # shape (N_obj, N_rho, N_t_max)
+    C_t_ensemble = pad_and_stack_2d(per_corr)  # shape (N_ds, N_rho, N_t_max)
 
     # Define a common t_array (indices 0..N_t_max-1)
     N_t_max = C_t_ensemble.shape[-1]
-    t_ref = np.arange(N_t_max) * min(FRAME_TO_H)
+    t_ref = np.arange(N_t_max) * dt_ref
 
 
 
