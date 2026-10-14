@@ -1,5 +1,6 @@
 import os
 import json
+from datetime import datetime
 
 
 def load(config_path):
@@ -83,24 +84,25 @@ def create_run_fname(config, mode):
     else:
         fname = f"rho{rho}_seed{seed}"
 
-    if mode in ("constant_volume", "emergent_volume"):
-        gamma = int(config['forces']['gamma'])
-        v0    = int(config['forces']['v0'])
-        taup  = int(config['forces']['taup'] * 100)
-        eta   = int(config['forces']['eta'] * 100)
+    # if mode in ("constant_volume", "emergent_volume"):
+    #     gamma = int(config['forces']['gamma'])
+    #     v0    = int(config['forces']['v0'])
+    #     taup  = int(config['forces']['taup'] * 100)
+    #     eta   = int(config['forces']['eta'] * 100)
 
-        dirname = f"gamma{gamma}_v0{v0}_taup{taup}_eta{eta}"
+    #     dirname = f"gamma{gamma}_v0{v0}_taup{taup}_eta{eta}"
 
     
-    elif mode in ("death_and_division", "growing_volume"):
-        gamma = int(config['forces']['gamma'])
-        v0    = int(config['forces']['v0'])
-        g     = int(config['growth']['g'])
-        kdiv  = int(config['growth']['k_div'] * 1e6)
-        Vdiv  = int(config['growth']['V_div'])
+    # elif mode in ("death_and_division", "growing_volume"):
+    #     gamma = int(config['forces']['gamma'])
+    #     v0    = int(config['forces']['v0'])
+    #     g     = int(config['growth']['g'])
+    #     kdiv  = int(config['growth']['k_div'] * 1e6)
+    #     Vdiv  = int(config['growth']['V_div'])
 
 
-        dirname = f"g{g}_kdiv{kdiv}_Vdiv{Vdiv}"
+    #     dirname = f"g{g}_kdiv{kdiv}_Vdiv{Vdiv}"
+    dirname = datetime.now().strftime('%Y-%m-%d')
 
 
     return dirname, fname
