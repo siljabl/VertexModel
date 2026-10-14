@@ -1,5 +1,10 @@
 import numpy as np
 
+def lognorm_distribution(x, mu, sigma):
+    lognorm = (1 / (x*sigma*np.sqrt(2*np.pi))) * np.exp(-((np.log(x)-mu)**2 / (2*sigma**2)))
+    return lognorm
+    
+
 def dataset_mean(arr):
     """
     Mean over an entire dataset.
@@ -52,7 +57,7 @@ def timepoint_mean(arr):
 
     if len(dims) == 3:
         # mean over runs and cells, keep time axis
-        mean = np.ma.mean(arr, axis=(1,2), keepdims=True)
+        mean = np.ma.mean(arr, axis=(0,2), keepdims=True)
     elif len(dims) == 2:
         # mean over "cells" (axis 1), keep time axis
         mean = np.ma.mean(arr, axis=1, keepdims=True)
