@@ -6,7 +6,10 @@ from cells.bind import getPolygonsCell
 from utils.matrix_preprocessing import pad_and_stack_axis
 
 
-# NB: Update when adding cell division!
+######################
+### Counting cells ###
+######################
+
 def centre_indices(vm):
     """Return indices of cell centres)."""
     return vm.getVertexIndicesByType("centre")
@@ -32,34 +35,17 @@ def number_of_cells(list_vm):
 
 
 
-def cell_positions(list_vm):
-    """ Get cell heights """
+def cell_density(list_vm):
+    A = cell_areas(list_vm)
 
-    idx = unique_indices(list_vm)
-    Nc  = len(idx)
-    Nt  = len(list_vm)
-
-    # Maps an actual cell ID, e.g. 17 or 1042, to a column number 0, 1, ...
-    id_to_column = {cell_id: col for col, cell_id in enumerate(idx)}
-
-    positions = np.ma.array(np.zeros([Nt, Nc, 2]), mask=True)
-
-    for vm, t in zip(list_vm, np.arange(Nt)):
-        idx_in_frame = centre_indices(vm)
-        pos_in_frame = np.ma.array(itemgetter(*idx_in_frame)(vm.getPositions(wrapped=False)))
-
-        # Convert the non-consecutive cell IDs to output-column indices
-        columns = np.array([id_to_column[cell_id] for cell_id in idx_in_frame])
-
-        # Assign each height to the column for its cell ID
-        positions[t, columns] = pos_in_frame
-
-    # positions[:,:,0] = positions[:,:,0] % vm.systemSize[0]
-    # positions[:,:,1] = positions[:,:,1] % vm.systemSize[1]
-
-    return positions
+    return 10**6 / np.ma.mean(A, axis=1)   
 
 
+
+
+###################
+### Cell shapes ###
+###################
 
 def cell_heights(list_vm):
     """ Get cell heights """
@@ -121,96 +107,48 @@ def cell_areas(list_vm):
     return V / h
 
 
+
 def cell_perimeters(list_vm):
-    """ Get cell perimeters"""
-
-    perimeter = []
-    for vm in list_vm:
-        perimeter.append(np.array(list(map(
-                         lambda i: vm.getVertexToNeighboursPerimeter(i),
-                         vm.getVertexIndicesByType("centre"))))) 
-
-    return np.ma.array(perimeter)
-
-
-
-def cell_displacement_vectors(list_vm):
-    """Get cell displacement vectors per frame (vx, vy)."""
-
-    # Get simulation time step
-    dt = list_vm[1].time - list_vm[0].time
-
-    position_vectors     = cell_positions(list_vm)
-    displacement_vectors = np.ma.diff(position_vectors, axis=0)
-
-    return displacement_vectors / dt
-
-
-
-def cell_velocities(list_vm):
-    """ Get instantaneous cell velocities """
-
-    # indices of cell centres (from first frame)
-    cells = centre_indices(list_vm[0])
-
-    # unwrap cell velocities at cell centers
-    velocities = np.ma.array(list(map(
-        lambda vm: itemgetter(*cells)(vm.getCentreVelocities().copy()),
-        list_vm)))
-
-    return velocities
-
-
-
-def cell_vector_norm(vector):
-    """ Take norm of vector in cell observable """
-    return np.ma.sqrt(vector[:,:,0]**2 + vector[:,:,1]**2) 
-
-
-
-def cell_displacements(list_vm):
-    """Get scalar cell displacements per frame (distance per unit time)."""
-
-    displacement_vectors = cell_displacement_vectors(list_vm)
-    scalar_displacements = cell_vector_norm(displacement_vectors)
-    scalar_displacements.mask[scalar_displacements > 50] = True     # Quickfixs, should be improved!
-
-    return scalar_displacements
-
-
-
-def cell_speeds(list_vm):
-    """ Get instantenaous cell speed """
-
-    # unwrap cell velocities at cell centers
-    velocities = cell_velocities(list_vm)
-    speeds     = cell_vector_norm(velocities) 
-
-    return speeds
-
-
-
-def neighbour_matrix(list_vm):
-    """
-    Get neighbour matrix over time.
-
-    Returns
-    -------
-    neighbours_matrix : np.ndarray
-        Shape (T, Ncells_max+1, Ncells_max+1), with entries 1 if cells
-        are neighbours, 0 otherwise, for each frame.
+    """Get cell perimeters as a masked array of shape (Nt, Nc),
+    consistent with cell_heights and cell_volumes.
     """
 
-    cells = centre_indices(list_vm[0])
+    idx = unique_indices(list_vm)
+    Nc  = len(idx)
+    Nt  = len(list_vm)
 
-    neighbours_matrix = np.zeros([len(list_vm), max(cells) + 1, max(cells) + 1])
+    # Map actual cell ID (e.g. 17, 1042) to column index 0..Nc-1
+    id_to_column = {cell_id: col for col, cell_id in enumerate(idx)}
 
-    for frame in range(len(list_vm)):
-        for cell in cells:
-            neighbours = list_vm[frame].getNeighbouringCellIndices(cell)
-            neighbours_matrix[frame, cell, neighbours] = 1
+    perimeters = np.ma.array(np.zeros([Nt, Nc]), mask=True)
 
-    return neighbours_matrix
+    for vm, t in zip(list_vm, np.arange(Nt)):
+        # Cell IDs present in this frame
+        idx_in_frame = centre_indices(vm)
+
+        # Compute perimeters for these cells in this frame
+        perimeters_in_frame = np.ma.array([
+            vm.getVertexToNeighboursPerimeter(i)
+            for i in vm.getVertexIndicesByType("centre")
+        ])
+
+        # Convert the non-consecutive cell IDs to output-column indices
+        columns = np.array([id_to_column[cell_id] for cell_id in idx_in_frame])
+
+        # Assign each perimeter to the column for its cell ID
+        perimeters[t, columns] = perimeters_in_frame
+
+    return perimeters
+
+
+
+def cell_vertical_aspect_ratios(list_vm):
+    """ Get vertical aspect ratios"""
+
+    heights = cell_heights(list_vm)
+    areas   = cell_areas(list_vm)
+
+    return np.ma.array(heights / np.ma.sqrt(areas))
 
 
 
@@ -251,18 +189,148 @@ def cell_planar_aspect_ratios(list_vm):
             aminor.append(minor_length)
 
         # Collect aspect ratio of all cells in frame
-        aspect_ratios.append(np.array(amajor) / np.array(aminor))
+        aspect_ratios.append(np.ma.array(amajor) / np.ma.array(aminor))
 
     aspect_ratios = pad_and_stack_axis(aspect_ratios)
 
-    return np.array(aspect_ratios)
+    # Quick fix
+    # aspect_ratios.mask[abs(aspect_ratios)>10] = True
+
+    return np.ma.array(aspect_ratios)
 
 
 
-def cell_vertical_aspect_ratios(list_vm):
-    """ Get vertical aspect ratios"""
 
-    heights = cell_heights(list_vm)
-    areas   = cell_areas(list_vm)
+######################
+### Cell positions ###
+######################
 
-    return np.array(heights / np.ma.sqrt(areas))
+def cell_vector_norm(vector):
+    """ Take norm of vector in cell observable """
+    return np.ma.sqrt(vector[0]**2 + vector[1]**2) 
+
+
+
+def cell_positions(list_vm):
+    """ Get cell heights """
+
+    idx = unique_indices(list_vm)
+    Nc  = len(idx)
+    Nt  = len(list_vm)
+
+    # Maps an actual cell ID, e.g. 17 or 1042, to a column number 0, 1, ...
+    id_to_column = {cell_id: col for col, cell_id in enumerate(idx)}
+
+    positions = np.ma.array(np.zeros([Nt, Nc, 2]), mask=True)
+
+    for vm, t in zip(list_vm, np.arange(Nt)):
+        idx_in_frame = centre_indices(vm)
+        pos_in_frame = np.ma.array(itemgetter(*idx_in_frame)(vm.getPositions(wrapped=False)))
+
+        # Convert the non-consecutive cell IDs to output-column indices
+        columns = np.array([id_to_column[cell_id] for cell_id in idx_in_frame])
+
+        # Assign each height to the column for its cell ID
+        positions[t, columns] = pos_in_frame
+
+    # positions[:,:,0] = positions[:,:,0] % vm.systemSize[0]
+    # positions[:,:,1] = positions[:,:,1] % vm.systemSize[1]
+
+    return np.ma.array([positions[:,:,0], positions[:,:,1]])
+
+
+
+def cell_displacement_vectors(list_vm):
+    """Get cell displacement vectors per frame (vx, vy)."""
+
+    # Get simulation time step
+    dt = list_vm[1].time - list_vm[0].time
+
+    position_vectors     = cell_positions(list_vm)
+    displacement_vectors = np.ma.diff(position_vectors, axis=1)
+
+    return displacement_vectors / dt
+
+
+
+def cell_displacements(list_vm):
+    """Get scalar cell displacements per frame (distance per unit time)."""
+
+    displacement_vectors = cell_displacement_vectors(list_vm)
+    scalar_displacements = cell_vector_norm(displacement_vectors)
+    scalar_displacements.mask[scalar_displacements > 50] = True     # Quickfix, should be improved!
+
+    return scalar_displacements
+
+
+# Attempt to obtain velocity by same pattern as other functions.
+# Have not yet made it work.
+
+# def cell_velocities(list_vm):
+#     """Get instantaneous cell velocities as a masked array (Nt, Nc),
+#     consistent with cell_heights / cell_volumes / cell_areas.
+#     """
+
+#     idx = unique_indices(list_vm)
+#     Nc  = len(idx)
+#     Nt  = len(list_vm)
+
+#     # Map actual cell ID (e.g. 17, 1042) to column index 0..Nc-1
+#     id_to_column = {cell_id: col for col, cell_id in enumerate(idx)}
+
+#     velocities = np.ma.array(np.zeros([Nt, Nc]), mask=True)
+
+#     for vm, t in zip(list_vm, np.arange(Nt)):
+#         # Cell IDs present in this frame
+#         idx_in_frame = centre_indices(vm)
+
+#         # Extract velocities at these cell centres
+#         vel_in_frame = np.ma.array(itemgetter(*idx_in_frame)(vm.getCentreVelocities().copy()))
+
+#         # Convert non-consecutive cell IDs to output-column indices
+#         columns = np.array([id_to_column[cell_id] for cell_id in idx_in_frame])
+
+#         # Assign each velocity to the column for its cell ID
+#         velocities[t, columns] = vel_in_frame
+
+#     return velocities
+
+
+
+# def cell_speeds(list_vm):
+#     """ Get instantenaous cell speed """
+
+#     # unwrap cell velocities at cell centers
+#     velocities = cell_velocities(list_vm)
+#     speeds     = cell_vector_norm(velocities) 
+
+#     return speeds
+
+
+
+
+#############
+### Other ###
+#############
+
+def neighbour_matrix(list_vm):
+    """
+    Get neighbour matrix over time.
+
+    Returns
+    -------
+    neighbours_matrix : np.ndarray
+        Shape (T, Ncells_max+1, Ncells_max+1), with entries 1 if cells
+        are neighbours, 0 otherwise, for each frame.
+    """
+
+    cells = centre_indices(list_vm[0])
+
+    neighbours_matrix = np.zeros([len(list_vm), max(cells) + 1, max(cells) + 1])
+
+    for frame in range(len(list_vm)):
+        for cell in cells:
+            neighbours = list_vm[frame].getNeighbouringCellIndices(cell)
+            neighbours_matrix[frame, cell, neighbours] = 1
+
+    return neighbours_matrix
