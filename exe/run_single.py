@@ -105,9 +105,9 @@ def main():
             if args.mode == "growing_volume":
                 integrate.cell_growth(vm, config)
 
-                # letting cells die during transient state
-                if frame < n_transient and i == int(period / 2):
-                    integrate.cell_death(vm, config)
+                # division
+                if i == int(period / 2):
+                    integrate.cell_division(vm, config)
 
 
             # Death and division: cell growth at every time step, cell death at every period'th time step
@@ -115,8 +115,12 @@ def main():
                 integrate.cell_growth(vm, config)
 
                 # letting cells die during transient state
-                if i == int(period / 2):
+                if i == int(period / 4):
                     integrate.cell_death(vm, config)
+
+                # division
+                elif i == int(3*period / 4):
+                    integrate.cell_division(vm, config)
 
 
             # Emergent volume: cell growth and cell death only during transient state
@@ -130,9 +134,10 @@ def main():
                         integrate.cell_death(vm, config)
 
 
-        # division
-        if args.mode in ("growing_volume", "death_and_division"):
-            integrate.cell_division(vm, config)
+
+        # let cells die during transient state
+        if args.mode in ("growing_volume") and frame < n_transient:
+            integrate.cell_death(vm, config)
 
         # division
         elif args.mode == "emergent_volume" and frame < n_transient:
