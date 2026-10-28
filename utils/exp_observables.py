@@ -1,5 +1,6 @@
 import numpy as np
 from matrix_preprocessing import pad_2d
+from kalman_filter import kalman_smooth_all_cells_numba
 
 
 def get_attribute(exp, attr, f2h):
@@ -46,13 +47,15 @@ def get_attribute(exp, attr, f2h):
         dx = np.ma.masked_invalid(attrs["dx"])
         dy = np.ma.masked_invalid(attrs["dy"])
         v  = np.ma.masked_invalid(np.ma.sqrt(dx**2 + dy**2) / f2h)
-        
+       
         return v
 
     elif attr == "v_vec":
         dx = np.ma.masked_invalid(attrs["dx"])
         dy = np.ma.masked_invalid(attrs["dy"])
         v_vec  = np.ma.array([dx / f2h, dy / f2h])
+
+        kalman_smooth_all_cells_numba(v, measurement_var=5e-4)
         
         return v_vec
     
